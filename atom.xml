@@ -4,7 +4,7 @@
   <title><![CDATA[The Future Is Now]]></title>
   <link href="http://mistydemeo.github.io//github/atom.xml" rel="self"/>
   <link href="http://mistydemeo.github.io//github/"/>
-  <updated>2014-12-06T13:28:30-08:00</updated>
+  <updated>2014-12-06T13:29:39-08:00</updated>
   <id>http://mistydemeo.github.io//github/</id>
   <author>
     <name><![CDATA[Misty De Meo]]></name>
@@ -64,7 +64,7 @@
 
 <h2>The tl;dr version</h2>
 
-<p>On December 12, 2014, we will push a new GCC package that changes the install location of libraries. Any software you&rsquo;ve built using the old package (for instance, C++) will no longer work and will need to be reinstalled. If you build packages for distribution using Homebrew&rsquo;s GCC package, make sure you&rsquo;ve built new versions using our new package and have them ready to distribute at that date.</p>
+<p>On December 12, 2014, we will push a new GCC package that changes the install location of libraries. Any software you&rsquo;ve built using the old package (for instance, C++ or Fortran software) will no longer work and will need to be reinstalled. If you build packages for distribution using Homebrew&rsquo;s GCC package, make sure you&rsquo;ve built new versions using our new package and have them ready to distribute at that date.</p>
 ]]></content>
   </entry>
   
