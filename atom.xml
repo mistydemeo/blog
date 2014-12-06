@@ -4,7 +4,7 @@
   <title><![CDATA[My Octopress Blog]]></title>
   <link href="http://mistydemeo.github.io//github/atom.xml" rel="self"/>
   <link href="http://mistydemeo.github.io//github/"/>
-  <updated>2014-12-05T19:24:40-08:00</updated>
+  <updated>2014-12-05T19:25:50-08:00</updated>
   <id>http://mistydemeo.github.io//github/</id>
   <author>
     <name><![CDATA[Your Name]]></name>
@@ -12,5 +12,40 @@
   </author>
   <generator uri="http://octopress.org/">Octopress</generator>
 
+  
+  <entry>
+    <title type="html"><![CDATA[Homebrew GCC Changes Coming]]></title>
+    <link href="http://mistydemeo.github.io//github/blog/2014/12/05/homebrew-gcc-changes-coming/"/>
+    <updated>2014-12-05T18:57:06-08:00</updated>
+    <id>http://mistydemeo.github.io//github/blog/2014/12/05/homebrew-gcc-changes-coming</id>
+    <content type="html"><![CDATA[
+]]></content>
+  </entry>
+  
+  <entry>
+    <title type="html"><![CDATA[Thank You, Ada]]></title>
+    <link href="http://mistydemeo.github.io//github/blog/2014/09/10/thank-you/"/>
+    <updated>2014-09-10T08:46:54-07:00</updated>
+    <id>http://mistydemeo.github.io//github/blog/2014/09/10/thank-you</id>
+    <content type="html"><![CDATA[<p><a href="http://www.ibiblio.org/bess/">Bess Sadler</a>, <a href="http://andromedayelton.com/">Andromeda Yelton</a>, <a href="http://chrisbourg.wordpress.com/">Chris Bourg</a> and <a href="http://matienzo.org/">Mark Matienzo</a> have stepped forward to pledge to <a href="https://adainitiative.org/donate/?campaign=libraries">match up to $5120 of donations</a> to the <a href="http://adainitiative.org/">Ada Initiative</a>, a non-profit organization that supports the participation of women in open source and culture. I completely support this very generous act; the Ada Initiative does <a href="http://adainitiative.org/what-we-do/">incredibly important</a> work, and I&rsquo;m extremely proud of my friends and of the library community for supporting them.</p>
+
+<p>I&rsquo;ve <a href="http://modelviewculture.com/pieces/there-and-back-again">written before</a> about how I stopped pursuing a career in tech in my late teens. I saw few female (or trans) role models in the tech industry; at a time when my self-image and self-identity was its most fragile, I pivoted away from something I saw as too masculine, without room for me. The Ada Initiative&rsquo;s conferences and advocacy work have done a lot to help make the open tech world a more welcoming space.</p>
+
+<p>There are a lot of reasons why women don&rsquo;t enter, or don&rsquo;t stay, in the tech industry. The last few weeks, when <a href="http://www.theguardian.com/technology/2014/sep/01/how-to-attack-a-woman-who-works-in-video-games">harassment campaigns</a> have <a href="http://www.themarysue.com/gamergate-harms-women/">targeted women to drive them out of the video game industry</a>, have made me reflect on how important it is to work to make online communities and conferences safe spaces.</p>
+
+<p>The Ada Initiative&rsquo;s <a href="http://adainitiative.org/what-we-do/conference-policies/">conference policy advocacy work</a> and their <a href="http://geekfeminism.wikia.com/wiki/Conference_anti-harassment">example anti-harassment policy</a> have been instrumental in helping many organizations and projects adopt their own policies. Both the <a href="https://github.com/code4lib/antiharassment-policy">Code4lib anti-harassment policy</a> and the <a href="https://github.com/Homebrew/homebrew/blob/master/CODEOFCONDUCT.md">Homebrew code of conduct</a>, for example, were inspired by and partially based on the Ada Initiative&rsquo;s work. Seeing organizations adopt these policies has done a lot to make me feel comfortable, and given me confidence that both preventing and dealing with these forms of harassment is something that they see as important. My hope is that future generations of women will feel comfortable entering and interacting in these spaces in ways that others may not have in the past.</p>
+
+<p>In just a few years, the Ada Initiative has helped make sure that these policies are becoming the norm and not the exception for conferences and online communities. I&rsquo;m so grateful we have their advocacy; please consider <a href="https://supportada.org/?campaign=libraries">donating</a> to help them do even more great things.</p>
+]]></content>
+  </entry>
+  
+  <entry>
+    <title type="html"><![CDATA[Mind the Dust]]></title>
+    <link href="http://mistydemeo.github.io//github/blog/2014/09/10/mind-the-dust/"/>
+    <updated>2014-09-10T08:42:12-07:00</updated>
+    <id>http://mistydemeo.github.io//github/blog/2014/09/10/mind-the-dust</id>
+    <content type="html"><![CDATA[<p>Please excuse the sparseness! I&rsquo;m in the process of migrating from Wordpress to Octopress; I haven&rsquo;t had time to change the default team or migrate over my older posts.</p>
+]]></content>
+  </entry>
   
 </feed>
