@@ -9,8 +9,7 @@
   <meta name="author" content="Misty De Meo">
 
   
-  <meta name="description" content="
-">
+  <meta name="description" content="Big GCC changes are a-coming to Homebrew, which will make building your own software against Homebrew-provided GCCs much more reliable. There&rsquo;s &hellip;">
   
 
   <!-- http://t.co/dKP3o1e -->
@@ -83,7 +82,51 @@
   </header>
 
 
-<div class="entry-content">
+<div class="entry-content"><p>Big GCC changes are a-coming to <a href="http://brew.sh">Homebrew</a>, which will make building your own software against Homebrew-provided GCCs much more reliable. There&rsquo;s going to be a transition period, though, and any software built against GCC will need to be rebuilt against the new package to work. We&rsquo;ll be pushing the changes on <strong>December 12th, 2014</strong>, and this post is here to help you get ready for it!</p>
+
+<p>(This only affects software built using Homebrew&rsquo;s GCC. Any software built using Clang, which is the compiler that Apple ships, will be unaffected. If you don&rsquo;t know what this means: you&rsquo;re probably fine.)</p>
+
+<h2>The problem</h2>
+
+<p>Since Apple provides many of the same libraries as GCC, Homebrew installs GCC to a nonstandard location in order to avoid shadowing those libraries. Homebrew currently installs GCC using the <code>--enable-version-specific-runtime-libs</code> option to sandbox its libraries and headers, which installs libraries into versioned locations like so:</p>
+
+<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+</pre></td><td class='code'><pre><code class=''><span class='line'>/usr/local/lib/gcc/x86_64-apple-darwin13.4.0/4.9.2/libgfortran.3.dylib</span></code></pre></td></tr></table></div></figure>
+
+
+<p>Since the full version of GCC is embedded&mdash;including the minor version&mdash;along with the OS version, every minor release is installed to a new location; this breaks any software which has dynamically linked against these libraries.</p>
+
+<h2>What&rsquo;s changing</h2>
+
+<p>The new GCC package we are shipping will install GCC libraries to a path containing only the series version of GCC. For example, the libgfortran example earlier will be:</p>
+
+<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+</pre></td><td class='code'><pre><code class=''><span class='line'>/usr/local/lib/gcc/4.9/libgfortran.3.dylib</span></code></pre></td></tr></table></div></figure>
+
+
+<p>This has several advantages:</p>
+
+<ul>
+<li>New releases of GCC 4.9 will be installed to the same path, so software built using GCC 4.9.2 will work with software built using GCC 4.9.3.</li>
+<li>The same changes will be applied to the <code>gcc49</code> formula in the <a href="https://github.com/Homebrew/homebrew-versions/">homebrew/versions</a> repository, allowing <code>gcc49</code> to provide the 4.9 libraries when <code>gcc</code> is eventually upgraded to 5.0.</li>
+</ul>
+
+
+<h2>What you need to do</h2>
+
+<h3>If you&rsquo;re a user</h3>
+
+<p>If you have built any software using the Homebrew-installed GCC, you will need to reinstall that software once the package is updated on the 12th.</p>
+
+<h3>If you maintain Homebrew formulae that use GCC/GFortran, or provide binary packages built using the Homebrew-installed GCC</h3>
+
+<p>If you provide binary packages that were built using the Homebrew-installed GCC, you should rebuild them using the <a href="https://github.com/Homebrew/homebrew/pull/34303">new formula</a> and have them ready for your users on the 12th.</p>
+
+<p>If you maintain Homebrew formulae that build using GCC or GFortran, you should consider <a href="https://github.com/Homebrew/homebrew/blob/master/share/doc/homebrew/Formula-Cookbook.md#formulae-revisions">bumping their revisions</a> on the 12th to ensure that users rebuild them against the new GCC package.</p>
+
+<h2>The tl;dr version</h2>
+
+<p>On December 12, 2014, we will push a new GCC package that changes the install location of libraries. Any software you&rsquo;ve built using the old package (for instance, C++) will no longer work and will need to be reinstalled. If you build packages for distribution using Homebrew&rsquo;s GCC package, make sure you&rsquo;ve built new versions using our new package and have them ready to distribute at that date.</p>
 </div>
 
 
