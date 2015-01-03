@@ -4,7 +4,7 @@
   <title><![CDATA[The Future Is Now]]></title>
   <link href="http://mistydemeo.github.io//github/atom.xml" rel="self"/>
   <link href="http://mistydemeo.github.io//github/"/>
-  <updated>2014-12-06T13:29:39-08:00</updated>
+  <updated>2015-01-02T20:26:15-08:00</updated>
   <id>http://mistydemeo.github.io//github/</id>
   <author>
     <name><![CDATA[Misty De Meo]]></name>
@@ -12,6 +12,81 @@
   </author>
   <generator uri="http://octopress.org/">Octopress</generator>
 
+  
+  <entry>
+    <title type="html"><![CDATA[Widescreen Gaming in the 90s]]></title>
+    <link href="http://mistydemeo.github.io//github/blog/2015/01/02/widescreen-gaming-in-the-90s/"/>
+    <updated>2015-01-02T14:02:49-08:00</updated>
+    <id>http://mistydemeo.github.io//github/blog/2015/01/02/widescreen-gaming-in-the-90s</id>
+    <content type="html"><![CDATA[<p>Most people got their first taste of widescreen gaming with the Wii, Xbox 360, and PS3, but not a lot of people know that companies were experimenting with widescreen all the way back in the fifth console generation (PS1, Saturn, N64). A tiny number of games have full widescreen support, which looks great on modern widescreen TVs.</p>
+
+<h2>Anamorphic widescreen</h2>
+
+<p>(Skip to the next section if you just care about pretty pictures!)</p>
+
+<p>Since there isn&rsquo;t a widescreen resolution in the SDTV standards, all widescreen games used a technique called <a href="https://en.wikipedia.org/wiki/Anamorphic_widescreen">anamorphic widescreen</a><sup id="fnref:1"><a href="#fn:1" rel="footnote">1</a></sup>. In anamorphic widescreen, the game squeezes down a 16:9 scene into 4:3; the TV then stretches the 4:3 image back out to 16:9 for display. For example, take a look at this image from Christmas Nights:</p>
+
+<p><img src="http://mistydemeo.github.io//github/images/widescreen/Nights_3_wide_unscaled.png"></p>
+
+<p>You can see that the proportions on everything are too thin&mdash;it&rsquo;s very noticeable on Claris. Here&rsquo;s what it looks like stretched out:</p>
+
+<p><img src="http://mistydemeo.github.io//github/images/widescreen/Nights_2_wide.png"></p>
+
+<p>This shows you a lot more of the game world than you&rsquo;d get in the standard 4:3 mode, but you can see that all of the 2D elements in the scene are displayed with the wrong aspect ratio. This lack of aspect ratio correction for 2D elements is common to most widescreen games of that era. In Nights, for example, you can see that the interface elements and all 2D in-game elements (the tree, the stars in the upper left corner) are displayed at the wrong aspect ratio when playing in widescreen. This hurts some games more than others.<sup id="fnref:2"><a href="#fn:2" rel="footnote">2</a></sup></p>
+
+<h2>Examples</h2>
+
+<h3>Christmas Nights</h3>
+
+<p>Both Christmas Nights and Nights support native widescreen. This is probably one of the most famous widescreen games of the era.</p>
+
+<p><img src="http://mistydemeo.github.io//github/images/widescreen/Nights_1_narrow.png"></p>
+
+<p><img src="http://mistydemeo.github.io//github/images/widescreen/Nights_2_wide.png"></p>
+
+<p>Nights benefits enormously from a wider field of view, even though it uses a lot of sprites. Being able to see more of where you&rsquo;re going makes for a much better game.</p>
+
+<h3>Panzer Dragoon Zwei</h3>
+
+<p><img src="http://mistydemeo.github.io//github/images/widescreen/Panzer_1_narrow.png"></p>
+
+<p><img src="http://mistydemeo.github.io//github/images/widescreen/Panzer_2_wide.png"></p>
+
+<p>Like Nights, Panzer Zwei has a similar field of view in either mode, with more content displayed on the sides.</p>
+
+<h3>Baroque</h3>
+
+<p>This is an obscure game, but Baroque&rsquo;s spare, gritty low-poly nightmarish landscapes are some of the most beautiful and haunting I&rsquo;ve ever seen. It reminds me a lot of <a href="http://cicadamarionette.com/">Lilith</a>&rsquo;s dreamscapes, like <a href="http://lilithzone.itch.io/oneiric-gardens">Oneiric Gardens</a> and <a href="http://cicadamarionette.com/Games/CryptWorlds/Main.html">Crypt Worlds</a>.</p>
+
+<p><img src="http://mistydemeo.github.io//github/images/widescreen/Baroque_1_narrow.png"></p>
+
+<p><img src="http://mistydemeo.github.io//github/images/widescreen/Baroque_2_wide.png"></p>
+
+<p>Baroque makes heavy use of sprites; all of the game&rsquo;s NPCs and enemies are sprites in a 3D space. Unfortunately, that makes it look worse in widescreen than the other games I&rsquo;ve written about.</p>
+
+<h3>Virtua Fighter (32X)</h3>
+
+<p><img src="http://mistydemeo.github.io//github/images/widescreen/Virtua_1_narrow.png"></p>
+
+<p><img src="http://mistydemeo.github.io//github/images/widescreen/Virtua_2_wide.png"></p>
+
+<p>This game&rsquo;s almost entirely 3D, so it scales very well; the only major 2D element is the 2D background.</p>
+
+<h2>More</h2>
+
+<p>A more complete list of widescreen games of this generation is available on the <a href="http://www.sega-16.com/forum/showthread.php?25942-5th-Generation-Games-List-Playing-in-Widescreen">Sega-16 forums</a>.</p>
+<div class="footnotes">
+<hr/>
+<ol>
+<li id="fn:1">
+<p>This is the same technique used by widescreen DVDs and Wii games.<a href="#fnref:1" rev="footnote">&#8617;</a></p></li>
+<li id="fn:2">
+<p>I&rsquo;ve focused on Sega games for this post; I haven&rsquo;t checked to see whether PS1 or N64 games have the same aspect ratio issues with sprites.<a href="#fnref:2" rev="footnote">&#8617;</a></p></li>
+</ol>
+</div>
+
+]]></content>
+  </entry>
   
   <entry>
     <title type="html"><![CDATA[Homebrew GCC Changes Coming]]></title>
