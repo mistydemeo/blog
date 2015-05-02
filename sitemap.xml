@@ -21,14 +21,49 @@
     <priority>0.8</priority>
   </url>
   <url>
+    <loc>http://mistydemeo.github.io//github/blog/2013/10/19/no-cpp-precomp-the-compiler-flag-that-time-forgot/</loc>
+    <lastmod>2013-10-19T22:58:00-07:00</lastmod>
+    <priority>0.8</priority>
+  </url>
+  <url>
+    <loc>http://mistydemeo.github.io//github/blog/2013/04/09/software-archaeology-apples-cctools/</loc>
+    <lastmod>2013-04-09T20:08:00-07:00</lastmod>
+    <priority>0.8</priority>
+  </url>
+  <url>
+    <loc>http://mistydemeo.github.io//github/blog/2013/04/04/tigers-which-is-terrible/</loc>
+    <lastmod>2013-04-04T07:11:00-07:00</lastmod>
+    <priority>0.8</priority>
+  </url>
+  <url>
+    <loc>http://mistydemeo.github.io//github/blog/2013/04/02/adventures-with-ruby-1-8-2/</loc>
+    <lastmod>2013-04-02T21:59:00-07:00</lastmod>
+    <priority>0.8</priority>
+  </url>
+  <url>
+    <loc>http://mistydemeo.github.io//github/blog/2013/04/01/introducing-tigerbrew/</loc>
+    <lastmod>2013-04-01T19:21:00-07:00</lastmod>
+    <priority>0.8</priority>
+  </url>
+  <url>
+    <loc>http://mistydemeo.github.io//github/blog/2012/11/21/psa-homebrew-digipres-repository-now-available/</loc>
+    <lastmod>2012-11-21T22:13:00-08:00</lastmod>
+    <priority>0.8</priority>
+  </url>
+  <url>
+    <loc>http://mistydemeo.github.io//github/blog/2012/05/01/file-id-hackathon-debrief-fits-handles-video-now/</loc>
+    <lastmod>2012-05-01T22:44:42-07:00</lastmod>
+    <priority>0.8</priority>
+  </url>
+  <url>
     <loc>http://mistydemeo.github.io//github/blog/archives/</loc>
-    <lastmod>2015-01-02T20:26:15-08:00</lastmod>
+    <lastmod>2015-05-01T22:49:42-07:00</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.7</priority>
   </url>
   <url>
     <loc>http://mistydemeo.github.io//github/</loc>
-    <lastmod>2015-01-02T20:26:15-08:00</lastmod>
+    <lastmod>2015-05-01T22:49:42-07:00</lastmod>
     <changefreq>weekly</changefreq>
     <priority>1.0</priority>
   </url>

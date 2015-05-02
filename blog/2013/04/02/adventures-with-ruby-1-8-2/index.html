@@ -1,0 +1,228 @@
+
+<!DOCTYPE html>
+<!--[if IEMobile 7 ]><html class="no-js iem7"><![endif]-->
+<!--[if lt IE 9]><html class="no-js lte-ie8"><![endif]-->
+<!--[if (gt IE 8)|(gt IEMobile 7)|!(IEMobile)|!(IE)]><!--><html class="no-js" lang="en"><!--<![endif]-->
+<head>
+  <meta charset="utf-8">
+  <title>Adventures With Ruby 1.8.2 - The Future Is Now</title>
+  <meta name="author" content="Misty De Meo">
+
+  
+  <meta name="description" content="Homebrew has always used the version of Ruby which comes with OS X,1 a design decision I decided to keep with Tigerbrew. Tiger comes with Ruby 1.8.2 &hellip;">
+  
+
+  <!-- http://t.co/dKP3o1e -->
+  <meta name="HandheldFriendly" content="True">
+  <meta name="MobileOptimized" content="320">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+
+  
+  <link rel="canonical" href="http://mistydemeo.github.io//github/blog/2013/04/02/adventures-with-ruby-1-8-2">
+  <link href="/blog/favicon.png" rel="icon">
+  <link href="/blog/stylesheets/screen.css" media="screen, projection" rel="stylesheet" type="text/css">
+  <link href="/blog/atom.xml" rel="alternate" title="The Future Is Now" type="application/atom+xml">
+  <script src="/blog/javascripts/modernizr-2.0.js"></script>
+  <script src="//ajax.googleapis.com/ajax/libs/jquery/1.9.1/jquery.min.js"></script>
+  <script>!window.jQuery && document.write(unescape('%3Cscript src="./javascripts/libs/jquery.min.js"%3E%3C/script%3E'))</script>
+  <script src="/blog/javascripts/octopress.js" type="text/javascript"></script>
+  <!--Fonts from Google"s Web font directory at http://google.com/webfonts -->
+<link href="//fonts.googleapis.com/css?family=PT+Serif:regular,italic,bold,bolditalic" rel="stylesheet" type="text/css">
+<link href="//fonts.googleapis.com/css?family=PT+Sans:regular,italic,bold,bolditalic" rel="stylesheet" type="text/css">
+
+  
+
+</head>
+
+<body   >
+  <header role="banner"><hgroup>
+  <h1><a href="/blog/">The Future Is Now</a></h1>
+  
+</hgroup>
+
+</header>
+  <nav role="navigation"><ul class="subscription" data-subscription="rss">
+  <li><a href="/blog/atom.xml" rel="subscribe-rss" title="subscribe via RSS">RSS</a></li>
+  
+</ul>
+  
+<form action="https://www.google.com/search" method="get">
+  <fieldset role="search">
+    <input type="hidden" name="q" value="site:mistydemeo.github.io//github" />
+    <input class="search" type="text" name="q" results="0" placeholder="Search"/>
+  </fieldset>
+</form>
+  
+<ul class="main-navigation">
+  <li><a href="/blog/">Blog</a></li>
+  <li><a href="/blog/blog/archives">Archives</a></li>
+</ul>
+
+</nav>
+  <div id="main">
+    <div id="content">
+      <div>
+<article class="hentry" role="article">
+  
+  <header>
+    
+      <h1 class="entry-title">Adventures With Ruby 1.8.2</h1>
+    
+    
+      <p class="meta">
+        
+
+
+
+
+<time class='entry-date' datetime='2013-04-02T21:59:00-07:00'><span class='date'><span class='date-month'>Apr</span> <span class='date-day'>2</span><span class='date-suffix'>nd</span>, <span class='date-year'>2013</span></span> <span class='time'>9:59 pm</span></time>
+        
+      </p>
+    
+  </header>
+
+
+<div class="entry-content"><p>Homebrew has always used the version of Ruby which comes with OS X,<sup id="fnref:1"><a href="#fn:1" rel="footnote">1</a></sup> a design decision I decided to keep with Tigerbrew. Tiger comes with Ruby 1.8.2, built on Christmas Day, 2004, and with a version of Ruby that old I went in steeling myself for the inevitable ton of compatibility issues.</p>
+
+<p>On the whole I was pleasantly surprised. Most of what Homebrew uses is provided in exactly the same form, and while there are differences that range from puzzling<sup id="fnref:2"><a href="#fn:2" rel="footnote">2</a></sup> to major<sup id="fnref:3"><a href="#fn:3" rel="footnote">3</a></sup>, pretty much everything Just Works.</p>
+
+<p>Except, at first, for Pathname. Ruby’s Pathname class, which is an object-oriented wrapper around the File and Dir classes, is at the heart of Homebrew’s file management. The first time I tried to install something with the newborn Tigerbrew, I was quickly treated to a strange exception with an equally mysterious backtrace: <code>Errno::ENOTDIR: Not a directory</code>.</p>
+
+<p>Curious, I dug in. I soon discovered that the bug occurred while Homebrew was unlinking an existing version of a package before beginning to install an upgrade. (For those not in the know, Homebrew installs software into isolated versioned prefixes. The active version of a given package is symlinked into the standard <code>/usr/local</code> locations.) Most of the files were linked and unlinked just fine, but a few files caused the method Pathname#unlink to throw an exception every time. Eventually I noticed a pattern — every symlink that Pathname choked on represented a directory. Once I noticed that, it clicked.</p>
+
+<p>For those who don’t know, symlinks are actually treated on the filesystem level as special files containing their target as text. For most operations, symlinks transparently act as their targets. However, applications which hit the filesystem directly will see them as files — even when they point to directories. Since Pathname handles files and directories differently, handing its instance methods off to File or Dir as appropriate, the bug happened something like this:</p>
+
+<ul>
+<li>The #unlink method is called on a Pathname object representing a symlink to a directory.</li>
+<li>Pathname examines the object to see if it represents a file or directory, in order to determine whether to call File.unlink or Dir.unlink.</li>
+<li>In doing so, Pathname follows the symlink to its target and examines the properties <em>of the target</em>.</li>
+<li>Seeing that the target is a directory, Pathname calls Dir.unlink <em>on the original symlink</em>.</li>
+<li>Dir.unlink raises <code>Errno::ENOTDIR</code> because, of course, the symlink isn’t a directory.</li>
+</ul>
+
+
+<p>The overridden version of the method can be <a href="https://github.com/mistydemeo/tigerbrew/blob/992ec641652097bb619e9a8de153e436f7dbed16/Library/Homebrew/extend/pathname.rb#L476-L490">found here</a>. The rest of Tigerbrew’s current backports are in Tigerbrew’s file <a href="https://github.com/mistydemeo/tigerbrew/blob/master/Library/Homebrew/extend/tiger.rb">extend/tiger.rb</a>, for the curious.</p>
+<div class="footnotes">
+<hr/>
+<ol>
+<li id="fn:1">
+<p>For predictability, and so the user doesn’t have to install Ruby before installing Homebrew.<a href="#fnref:1" rev="footnote">&#8617;</a></p></li>
+<li id="fn:2">
+<p>String’s <code>[]</code> operator always returns the sliced character’s ASCII ordinal, not a string.<a href="#fnref:2" rev="footnote">&#8617;</a></p></li>
+<li id="fn:3">
+<p>File#flock doesn’t exist in any form.<a href="#fnref:3" rev="footnote">&#8617;</a></p></li>
+</ol>
+</div>
+
+</div>
+
+
+  <footer>
+    <p class="meta">
+      
+  
+
+<span class="byline author vcard">Posted by <span class="fn">Misty De Meo</span></span>
+
+      
+
+
+
+
+<time class='entry-date' datetime='2013-04-02T21:59:00-07:00'><span class='date'><span class='date-month'>Apr</span> <span class='date-day'>2</span><span class='date-suffix'>nd</span>, <span class='date-year'>2013</span></span> <span class='time'>9:59 pm</span></time>
+      
+
+
+    </p>
+    
+      <div class="sharing">
+  
+  <a href="//twitter.com/share" class="twitter-share-button" data-url="http://mistydemeo.github.io//github/blog/2013/04/02/adventures-with-ruby-1-8-2/" data-via="" data-counturl="http://mistydemeo.github.io//github/blog/2013/04/02/adventures-with-ruby-1-8-2/" >Tweet</a>
+  
+  
+  
+</div>
+
+    
+    <p class="meta">
+      
+        <a class="basic-alignment left" href="/blog/blog/2013/04/01/introducing-tigerbrew/" title="Previous Post: Introducing Tigerbrew">&laquo; Introducing Tigerbrew</a>
+      
+      
+        <a class="basic-alignment right" href="/blog/blog/2013/04/04/tigers-which-is-terrible/" title="Next Post: Tiger’s `which` is terrible; or, Necessity is the mother of invention">Tiger’s `which` is terrible; or, Necessity is the mother of invention &raquo;</a>
+      
+    </p>
+  </footer>
+</article>
+
+</div>
+
+<aside class="sidebar">
+  
+    <section>
+  <h1>Recent Posts</h1>
+  <ul id="recent_posts">
+    
+      <li class="post">
+        <a href="/blog/blog/2015/01/02/widescreen-gaming-in-the-90s/">Widescreen Gaming in the 90s</a>
+      </li>
+    
+      <li class="post">
+        <a href="/blog/blog/2014/12/05/homebrew-gcc-changes-coming/">Homebrew GCC Changes Coming</a>
+      </li>
+    
+      <li class="post">
+        <a href="/blog/blog/2014/09/10/thank-you/">Thank You, Ada</a>
+      </li>
+    
+      <li class="post">
+        <a href="/blog/blog/2014/09/10/mind-the-dust/">Mind the Dust</a>
+      </li>
+    
+      <li class="post">
+        <a href="/blog/blog/2013/10/19/no-cpp-precomp-the-compiler-flag-that-time-forgot/">-no-cpp-precomp: The Compiler Flag That Time Forgot</a>
+      </li>
+    
+  </ul>
+</section>
+
+
+
+
+
+  
+</aside>
+
+
+    </div>
+  </div>
+  <footer role="contentinfo"><p>
+  Copyright &copy; 2015 - Misty De Meo -
+  <span class="credit">Powered by <a href="http://octopress.org">Octopress</a></span>
+</p>
+
+</footer>
+  
+
+
+
+
+
+
+
+  <script type="text/javascript">
+    (function(){
+      var twitterWidgets = document.createElement('script');
+      twitterWidgets.type = 'text/javascript';
+      twitterWidgets.async = true;
+      twitterWidgets.src = '//platform.twitter.com/widgets.js';
+      document.getElementsByTagName('head')[0].appendChild(twitterWidgets);
+    })();
+  </script>
+
+
+
+
+
+</body>
+</html>
