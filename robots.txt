@@ -1,0 +1,4 @@
+User-agent: *
+Disallow: 
+
+Sitemap: http://mistydemeo.github.io//github/sitemap.xml 
