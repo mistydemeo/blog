@@ -9,7 +9,7 @@
   <meta name="author" content="Misty De Meo">
 
   
-  <meta name="description" content="I took part in the 24-hour file ID hackathon November 16th. It was a fantastic event, and between us the 15-ish participants got a lot of practical &hellip;">
+  <meta name="description" content="Outside of archivy, I’m also a collaborator on Homebrew, the awesome, lightweight package manager for OS X. I’ve been building a private repository &hellip;">
   
 
   <!-- http://t.co/dKP3o1e -->
@@ -63,6 +63,35 @@
     <div id="content">
       <div class="blog-index">
   
+  
+  
+    <article>
+      
+  <header>
+    
+      <h1 class="entry-title"><a href="/blog/blog/2012/11/21/psa-homebrew-digipres-repository-now-available/">PSA: Homebrew-digipres Repository Now Available!</a></h1>
+    
+    
+      <p class="meta">
+        
+
+
+
+
+<time class='entry-date' datetime='2012-11-21T22:13:00-08:00'><span class='date'><span class='date-month'>Nov</span> <span class='date-day'>21</span><span class='date-suffix'>st</span>, <span class='date-year'>2012</span></span> <span class='time'>10:13 pm</span></time>
+        
+      </p>
+    
+  </header>
+
+
+  <div class="entry-content"><p>Outside of archivy, I’m also a collaborator on <a href="http://brew.sh">Homebrew</a>, the awesome, lightweight package manager for OS X. I’ve been building a private repository of niche packages which aren’t available in the core repository for some reason or another, and ended up collecting enough digital preservation tools to create a new digital preservation-focused repository. You can find the new homebrew-digipres here: <a href="https://github.com/mistydemeo/homebrew-digipres">https://github.com/mistydemeo/homebrew-digipres</a> I’d welcome any contributions if you want to improve an existing formula, submit updates, or add a new package! Fork away.</p>
+</div>
+  
+  
+
+
+    </article>
   
   
     <article>
@@ -239,6 +268,69 @@
 
     </article>
   
+  
+    <article>
+      
+  <header>
+    
+      <h1 class="entry-title"><a href="/blog/blog/2011/05/30/revisiting-archival-description/">Revisiting Archival Description – LOD-LAM Session Idea</a></h1>
+    
+    
+      <p class="meta">
+        
+
+
+
+
+<time class='entry-date' datetime='2011-05-30T15:29:00-07:00'><span class='date'><span class='date-month'>May</span> <span class='date-day'>30</span><span class='date-suffix'>th</span>, <span class='date-year'>2011</span></span> <span class='time'>3:29 pm</span></time>
+        
+      </p>
+    
+  </header>
+
+
+  <div class="entry-content"><p>Apologies for the brevity of this blog post – I’m keeping this brief to make sure I get it posted before LOD-LAM.</p>
+
+<p>So, archival description.</p>
+
+<p>Archival records are hard to find. They’re often in large bodies of records, difficult to browse through and generally less cut-and-dry than publications which are intended for formal publication and/or public consumption. Archival finding aids are the researcher’s traditional first point of contact, providing background biographical information on the organization and/or personal creator(s), as well as a description of how the records are arranged and description of the various levels of organizational hierarchy. They’re useful!</p>
+
+<p>But they’re also a bit old-fashioned, at least as typically implemented. The finding aid structure imposes a few issues for linked open data applications.</p>
+
+<p>I see two[^1] major problems with current archival description:</p>
+
+<h3>They’re hierarchical</h3>
+
+<p>Most countries’ archival description standards are based on a strict hierarchy from higher levels of description (fonds, etc.) to more precise levels of description (series, sub-series, file, item) with fairly rigidly prescribed relationships between items. The finding aid also assumes a “paper” whole-body approach, rather than a linking approach. This is kind of non-webby, and imposes a stricter order on documents than their creators may have had, in many cases.</p>
+
+<p>(The Australians, of course, are a few steps ahead of the rest of us already.)</p>
+
+<p>Perhaps even more though, a major problem is that:</p>
+
+<h3>They’re imprecise.</h3>
+
+<p>This is the real issue, or at least the most immediate issue. Archival descriptions are designed for human eyes in a paper world, and so they’re often encoded with a level of ambiguity that’s difficult for machines to extract. (<a href="http://archiveshub.ac.uk/blog/?p=2401">LOCAH</a> has been doing a great job of identifying points of concern and trying to route around them.)</p>
+
+<p>Archival descriptions have some inherent ambiguity because interpretation of archival holdings is not always cut and dry, but that doesn’t mean that we have to be ambiguous in how we create those descriptions. We can be precise about the ways in which our collections are ambiguous.</p>
+
+<p>I’d love to get a conversation going about revising descriptive standards to enhance precision in finding aids in order to enhance the ability to use them as computer-readable metadata. I can see a number of areas for improvement:</p>
+
+<ul>
+<li>More strongly-typed data fields, rather than “fuzzy” fields that can hold a variety of types of subjectively-defined data</li>
+<li>More focus on “globally-scoped” names rather than “locally scoped” (as pointed out by Pete@LOCAH <a href="http://blogs.ukoln.ac.uk/locah/2010/11/16/identifying-the-things-uri-patterns-for-the-hub-linked-data/">here</a>)</li>
+<li>A stricter, clearer inheritance model rather than ISAD(G)’s rule of non-repetition (Thanks to Pete <a href="http://web.archive.org/web/20110520025412/http://blogs.ukoln.ac.uk/locah/2010/09/28/model-a-first-cut/">again</a>)</li>
+<li>Certainly more, which we can talk about at LOD-LAM!</li>
+</ul>
+
+
+<p>The extent to which all this can be implemented will depend on the organization, of course – retrofitting older archival descriptions for all of this would be time-consuming, if practical at all. But I think there are a lot of benefits to be gained by changing practices going forward, and I see this as an enhancement to current descriptive standards/practices that can benefit more than just linked open data applications.</p>
+</div>
+  
+  
+
+
+    </article>
+  
   <div class="pagination">
     
     <a href="/blog/blog/archives">Blog Archives</a>
@@ -254,6 +346,10 @@
   <ul id="recent_posts">
     
       <li class="post">
+        <a href="/blog/blog/2015/05/02/reevaluate/">Reevaluate</a>
+      </li>
+    
+      <li class="post">
         <a href="/blog/blog/2015/01/02/widescreen-gaming-in-the-90s/">Widescreen Gaming in the 90s</a>
       </li>
     
@@ -267,10 +363,6 @@
     
       <li class="post">
         <a href="/blog/blog/2014/09/10/mind-the-dust/">Mind the Dust</a>
-      </li>
-    
-      <li class="post">
-        <a href="/blog/blog/2013/10/19/no-cpp-precomp-the-compiler-flag-that-time-forgot/">-no-cpp-precomp: The Compiler Flag That Time Forgot</a>
       </li>
     
   </ul>

@@ -1,6 +1,11 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <urlset xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.sitemaps.org/schemas/sitemap/0.9 http://www.sitemaps.org/schemas/sitemap/0.9/sitemap.xsd" xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
   <url>
+    <loc>http://mistydemeo.github.io//github/blog/2015/05/02/reevaluate/</loc>
+    <lastmod>2015-05-02T10:41:08-07:00</lastmod>
+    <priority>0.8</priority>
+  </url>
+  <url>
     <loc>http://mistydemeo.github.io//github/blog/2015/01/02/widescreen-gaming-in-the-90s/</loc>
     <lastmod>2015-01-02T14:02:49-08:00</lastmod>
     <priority>0.8</priority>
@@ -56,14 +61,19 @@
     <priority>0.8</priority>
   </url>
   <url>
+    <loc>http://mistydemeo.github.io//github/blog/2011/05/30/revisiting-archival-description/</loc>
+    <lastmod>2011-05-30T15:29:00-07:00</lastmod>
+    <priority>0.8</priority>
+  </url>
+  <url>
     <loc>http://mistydemeo.github.io//github/blog/archives/</loc>
-    <lastmod>2015-05-01T22:49:42-07:00</lastmod>
+    <lastmod>2015-05-02T10:42:17-07:00</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.7</priority>
   </url>
   <url>
     <loc>http://mistydemeo.github.io//github/</loc>
-    <lastmod>2015-05-01T22:49:42-07:00</lastmod>
+    <lastmod>2015-05-02T10:42:17-07:00</lastmod>
     <changefreq>weekly</changefreq>
     <priority>1.0</priority>
   </url>
