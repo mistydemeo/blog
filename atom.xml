@@ -4,7 +4,7 @@
   <title><![CDATA[The Future Is Now]]></title>
   <link href="http://mistys-internet.website/blog/atom.xml" rel="self"/>
   <link href="http://mistys-internet.website/blog/"/>
-  <updated>2015-05-02T11:12:05-07:00</updated>
+  <updated>2015-05-04T09:59:36-07:00</updated>
   <id>http://mistys-internet.website/blog/</id>
   <author>
     <name><![CDATA[Misty De Meo]]></name>
@@ -314,7 +314,7 @@
 
 <blockquote><p>gcc-4.8: error: unrecognized command line option &lsquo;-no-cpp-precomp&rsquo;</p></blockquote>
 
-<p>It built fine with the gcc-4.0 that came with the OS. GCC rarely removes support for flags like this, so I assumed it must be an Apple-only flag. Unfortunately, it wasn’t listed in the manpage at all, and the interenet was no help either – the search results were full of users confused about the same build failures, or trying to figure out what it does. All I could find was <a href="http://trac.wxwidgets.org/ticket/14029">confirmation</a> that it’s an obsolete Apple-only flag.</p>
+<p>It built fine with the gcc-4.0 that came with the OS. GCC rarely removes support for flags like this, so I assumed it must be an Apple-only flag. Unfortunately, it wasn’t listed in the manpage at all, and the internet was no help either – the search results were full of users confused about the same build failures, or trying to figure out what it does. All I could find was <a href="http://trac.wxwidgets.org/ticket/14029">confirmation</a> that it’s an obsolete Apple-only flag.</p>
 
 <p>Not finding anything, I decided to find out straight from the horse’s mouth and try source-diving. Luckily Apple publishes the source code for all obsolete versions of their tools at their <a href="http://opensource.apple.com/">Apple Open Source</a> site.</p>
 
