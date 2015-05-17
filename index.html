@@ -9,7 +9,7 @@
   <meta name="author" content="Misty De Meo">
 
   
-  <meta name="description" content="My least favourite backtrace is a backtrace that doesn&rsquo;t include my own code. Tigerbrew on OS X 10.4 uses Ruby 1.8.2, which was shipped on &hellip;">
+  <meta name="description" content="One downside of working with ancient OSs is coming across bugs that will never be fixed. In the early days of Tigerbrew, I had just started &hellip;">
   
 
   <!-- http://t.co/dKP3o1e -->
@@ -63,6 +63,111 @@
     <div id="content">
       <div class="blog-index">
   
+  
+  
+    <article>
+      
+  <header>
+    
+      <h1 class="entry-title"><a href="/blog/blog/2015/05/16/attack-the-vector/">Attack the Vector</a></h1>
+    
+    
+      <p class="meta">
+        
+
+
+
+
+<time class='entry-date' datetime='2015-05-16T21:12:00-07:00'><span class='date'><span class='date-month'>May</span> <span class='date-day'>16</span><span class='date-suffix'>th</span>, <span class='date-year'>2015</span></span> <span class='time'>9:12 pm</span></time>
+        
+      </p>
+    
+  </header>
+
+
+  <div class="entry-content"><p>One downside of working with ancient OSs is coming across bugs that will never be fixed.</p>
+
+<p>In the early days of Tigerbrew, I had just started experimenting with GCC 4.2 as a replacement for Xcode 2.5&rsquo;s GCC 4.0. Everything was going great until I built something that uses Cocoa, which blew up with this message:</p>
+
+<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+</pre></td><td class='code'><pre><code class=''><span class='line'>In file included from /System/Library/Frameworks/CoreServices.framework/Frameworks/CarbonCore.framework/Headers/DriverServices.h:32,
+</span><span class='line'>                 from /System/Library/Frameworks/CoreServices.framework/Frameworks/CarbonCore.framework/Headers/CarbonCore.h:125,
+</span><span class='line'>                 from /System/Library/Frameworks/CoreServices.framework/Headers/CoreServices.h:21,
+</span><span class='line'>                 from test.c:2:
+</span><span class='line'>/System/Library/Frameworks/CoreServices.framework/Frameworks/CarbonCore.framework/Headers/MachineExceptions.h:115: error: expected specifier-qualifier-list before ‘vector’</span></code></pre></td></tr></table></div></figure>
+
+
+<p>A syntax error coming not from within the package I was building, but from within&hellip; Carbon?</p>
+
+<p>The error actually comes from the Vector128 union within MachineExceptions.h, located in CoreServices&rsquo;s CarbonCore framework. The very first section of this union had the offending code. Let&rsquo;s play spot the bug:</p>
+
+<p>Here&rsquo;s what it looks like as of OS X 10.4.11:</p>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+</pre></td><td class='code'><pre><code class='c'><span class='line'><span class="k">typedef</span> <span class="k">struct</span> <span class="n">FPUInformationPowerPC</span>    <span class="n">FPUInformationPowerPC</span><span class="p">;</span>
+</span><span class='line'><span class="k">union</span> <span class="n">Vector128</span> <span class="p">{</span>
+</span><span class='line'><span class="cp">#ifdef __VEC__</span>
+</span><span class='line'> <span class="n">vector</span> <span class="kt">unsigned</span> <span class="kt">int</span>         <span class="n">v</span><span class="p">;</span>
+</span><span class='line'><span class="cp">#endif</span>
+</span><span class='line'>  <span class="kt">unsigned</span> <span class="kt">long</span>       <span class="n">l</span><span class="p">[</span><span class="mi">4</span><span class="p">];</span>
+</span><span class='line'>  <span class="kt">unsigned</span> <span class="kt">short</span>      <span class="n">s</span><span class="p">[</span><span class="mi">8</span><span class="p">];</span>
+</span><span class='line'>  <span class="kt">unsigned</span> <span class="kt">char</span>       <span class="n">c</span><span class="p">[</span><span class="mi">16</span><span class="p">];</span>
+</span><span class='line'><span class="p">};</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>And here it is in OS X 10.7.5<sup id="fnref:1"><a href="#fn:1" rel="footnote">1</a></sup>:</p>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+</pre></td><td class='code'><pre><code class='c'><span class='line'><span class="k">typedef</span> <span class="k">struct</span> <span class="n">FPUInformationPowerPC</span>    <span class="n">FPUInformationPowerPC</span><span class="p">;</span>
+</span><span class='line'><span class="k">union</span> <span class="n">Vector128</span> <span class="p">{</span>
+</span><span class='line'><span class="cp">#ifdef __APPLE_ALTIVEC__</span>
+</span><span class='line'>   <span class="n">vector</span> <span class="kt">unsigned</span> <span class="kt">int</span>         <span class="n">v</span><span class="p">;</span>
+</span><span class='line'><span class="cp">#endif</span>
+</span><span class='line'>  <span class="kt">unsigned</span> <span class="kt">long</span>       <span class="n">l</span><span class="p">[</span><span class="mi">4</span><span class="p">];</span>
+</span><span class='line'>  <span class="kt">unsigned</span> <span class="kt">short</span>      <span class="n">s</span><span class="p">[</span><span class="mi">8</span><span class="p">];</span>
+</span><span class='line'>  <span class="kt">unsigned</span> <span class="kt">char</span>       <span class="n">c</span><span class="p">[</span><span class="mi">16</span><span class="p">];</span>
+</span><span class='line'><span class="p">};</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>The bug comes from the use of the <code>vector</code> keyword. As pointed out in this <a href="https://trac.macports.org/ticket/34213#comment:7">MacPorts ticket</a>, the issue is with the <code>#ifdef</code> that checks for <code>__VEC__</code>. <code>__VEC__</code> is defined if AltiVec is on, <em>without necessarily</em> meaning that AltiVec syntactic extensions are enabled. The <code>vector</code> keyword is only available if either <code>altivec.h</code> is included, or the <code>-mpim-altivec</code> or <code>-faltivec</code> flags are passed. Since Tigerbrew always optimizes for the host CPU, G4 and G5 users were getting AltiVec enabled without forcing syntactic extensions. I fixed this in Tigerbrew this by always passing <code>-faltivec</code> on PowerPC systems when building any package, regardless of whether AltiVec is being used.</p>
+
+<p>As to why Apple never caught this, GCC 4.0&rsquo;s behaviour seems to be different; it seems to enable AltiVec syntactic extensions whenever <code>-maltivec</code> is on. Apple did eventually fix the bug, as seen in the Lion header above. According to the MacPorts ticket linked previously, it was fixed in the CarbonCore header in 10.5 and in the 10.4u SDK packaged in Xcode 3 for Leopard. Since the 10.4u SDK fix was never backported to Tiger itself, Tiger users have to make do with the workaround.</p>
+<div class="footnotes">
+<hr/>
+<ol>
+<li id="fn:1">
+<p>10.7 may be Intel-only, but the relevant code&rsquo;s still there. In fact, the same PowerPC unions and structs are still there as of 10.9.4.<a href="#fnref:1" rev="footnote">&#8617;</a></p></li>
+</ol>
+</div>
+
+</div>
+  
+  
+
+
+    </article>
   
   
     <article>
@@ -809,61 +914,6 @@
 
     </article>
   
-  
-    <article>
-      
-  <header>
-    
-      <h1 class="entry-title"><a href="/blog/blog/2013/04/01/introducing-tigerbrew/">Introducing Tigerbrew</a></h1>
-    
-    
-      <p class="meta">
-        
-
-
-
-
-<time class='entry-date' datetime='2013-04-01T19:21:00-07:00'><span class='date'><span class='date-month'>Apr</span> <span class='date-day'>1</span><span class='date-suffix'>st</span>, <span class='date-year'>2013</span></span> <span class='time'>7:21 pm</span></time>
-        
-      </p>
-    
-  </header>
-
-
-  <div class="entry-content"><p>Some of you may know that my other gig is <a href="http://brew.sh/">Homebrew</a>, the package manager for Mac OS X. Over the last few months, I’ve been spending some time on a fork of Homebrew that’s starting to become usable enough that I think it’s ready to be announced.</p>
-
-<p>When I was attending the AMIA<sup id="fnref:1"><a href="#fn:1" rel="footnote">1</a></sup> conference in December, my partner and I were travelling together; while I was at the conference during the day, she worked from various places in Seattle on her laptop. Since it’s practically impossible to attend a modern conference without a laptop, and she uses a desktop at home, I dug out my 2005-era PowerBook G4 to take notes. It may be eight years old, but as soon as I opened it up I remembered why I loved that laptop so much. It’s still in great shape, and it feels like a crime to leave it sitting unused so much of the time.</p>
-
-<p>It’s slow by modern standards, of course, but the thing really keeping it from being usable all the time is software. Apple’s left PowerPC behind as of Mac OS X Leopard<sup id="fnref:2"><a href="#fn:2" rel="footnote">2</a></sup>, and so have nearly all developers at this point. There are still a few developers carrying the torch (shoutouts to <a href="http://www.floodgap.com/software/tenfourfox">TenFourFox</a>), but as a commandline junkie what I really need is an up-to-date shell[^2] and CLI software<sup id="fnref:3"><a href="#fn:3" rel="footnote">3</a></sup>. And as big Homebrew fan, as well as a developer, MacPorts just wasn’t going to cut it. <a href="https://github.com/mistydemeo/tigerbrew/">Tigerbrew</a> was born.</p>
-
-<p>The first version of Tigerbrew was pulled together over an evening at the hotel after the first day of the conference, and I’ve been plugging away at it regularly since. At this point I’m proud to say that a significant number of packages build flawlessly,<sup id="fnref:4"><a href="#fn:4" rel="footnote">4</a></sup> and thanks to <a href="https://github.com/mistydemeo/tigerbrew/wiki/New-formulae-in-Tigerbrew">some backports</a> from newer versions of OS X<sup id="fnref:5"><a href="#fn:5" rel="footnote">5</a></sup> Tigerbrew can supply a much more modern set of essential development tools than Apple provides.</p>
-
-<p>Tigerbrew’s still very much an alpha, and there’s some more work needed until it’s mature, but at this point I consider it ready enough to announce to the world.<sup id="fnref:6"><a href="#fn:6" rel="footnote">6</a></sup> If you have a PowerPC Mac yearning to be used again, why not <a href="https://github.com/mistydemeo/tigerbrew/">give it a go</a>?</p>
-<div class="footnotes">
-<hr/>
-<ol>
-<li id="fn:1">
-<p>Association of Moving Image Archivists<a href="#fnref:1" rev="footnote">&#8617;</a></p></li>
-<li id="fn:2">
-<p>And many hardcore PowerPC users stick with their old Macs for OS 9 compatibility, which was last supported in Tiger.<a href="#fnref:2" rev="footnote">&#8617;</a></p></li>
-<li id="fn:3">
-<p>bash 2.5 doesn’t cut it.<a href="#fnref:3" rev="footnote">&#8617;</a></p></li>
-<li id="fn:4">
-<p>Even complex software with a lot of moving parts, like FFmpeg.<a href="#fnref:4" rev="footnote">&#8617;</a></p></li>
-<li id="fn:5">
-<p>I’m very indebted to the MacPorts developers, whose portfiles served as a reference for the buildsystems for several of these.<a href="#fnref:5" rev="footnote">&#8617;</a></p></li>
-<li id="fn:6">
-<p>Development’s been happening in the public for months, of course, and there are already a few other users out there.<a href="#fnref:6" rev="footnote">&#8617;</a></p></li>
-</ol>
-</div>
-
-</div>
-  
-  
-
-
-    </article>
-  
   <div class="pagination">
     
       <a class="prev" href="/blog/posts/2">&larr; Older</a>
@@ -879,6 +929,10 @@
   <ul id="recent_posts">
     
       <li class="post">
+        <a href="/blog/blog/2015/05/16/attack-the-vector/">Attack the Vector</a>
+      </li>
+    
+      <li class="post">
         <a href="/blog/blog/2015/05/02/reevaluate/">Reevaluate</a>
       </li>
     
@@ -892,10 +946,6 @@
     
       <li class="post">
         <a href="/blog/blog/2014/09/10/thank-you/">Thank You, Ada</a>
-      </li>
-    
-      <li class="post">
-        <a href="/blog/blog/2014/09/10/mind-the-dust/">Mind the Dust</a>
       </li>
     
   </ul>

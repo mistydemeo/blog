@@ -4,7 +4,7 @@
   <title><![CDATA[The Future Is Now]]></title>
   <link href="http://mistys-internet.website/blog/atom.xml" rel="self"/>
   <link href="http://mistys-internet.website/blog/"/>
-  <updated>2015-05-04T09:59:36-07:00</updated>
+  <updated>2015-05-16T21:16:05-07:00</updated>
   <id>http://mistys-internet.website/blog/</id>
   <author>
     <name><![CDATA[Misty De Meo]]></name>
@@ -12,6 +12,91 @@
   </author>
   <generator uri="http://octopress.org/">Octopress</generator>
 
+  
+  <entry>
+    <title type="html"><![CDATA[Attack the Vector]]></title>
+    <link href="http://mistys-internet.website/blog/blog/2015/05/16/attack-the-vector/"/>
+    <updated>2015-05-16T21:12:00-07:00</updated>
+    <id>http://mistys-internet.website/blog/blog/2015/05/16/attack-the-vector</id>
+    <content type="html"><![CDATA[<p>One downside of working with ancient OSs is coming across bugs that will never be fixed.</p>
+
+<p>In the early days of Tigerbrew, I had just started experimenting with GCC 4.2 as a replacement for Xcode 2.5&rsquo;s GCC 4.0. Everything was going great until I built something that uses Cocoa, which blew up with this message:</p>
+
+<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+</pre></td><td class='code'><pre><code class=''><span class='line'>In file included from /System/Library/Frameworks/CoreServices.framework/Frameworks/CarbonCore.framework/Headers/DriverServices.h:32,
+</span><span class='line'>                 from /System/Library/Frameworks/CoreServices.framework/Frameworks/CarbonCore.framework/Headers/CarbonCore.h:125,
+</span><span class='line'>                 from /System/Library/Frameworks/CoreServices.framework/Headers/CoreServices.h:21,
+</span><span class='line'>                 from test.c:2:
+</span><span class='line'>/System/Library/Frameworks/CoreServices.framework/Frameworks/CarbonCore.framework/Headers/MachineExceptions.h:115: error: expected specifier-qualifier-list before ‘vector’</span></code></pre></td></tr></table></div></figure>
+
+
+<p>A syntax error coming not from within the package I was building, but from within&hellip; Carbon?</p>
+
+<p>The error actually comes from the Vector128 union within MachineExceptions.h, located in CoreServices&rsquo;s CarbonCore framework. The very first section of this union had the offending code. Let&rsquo;s play spot the bug:</p>
+
+<p>Here&rsquo;s what it looks like as of OS X 10.4.11:</p>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+</pre></td><td class='code'><pre><code class='c'><span class='line'><span class="k">typedef</span> <span class="k">struct</span> <span class="n">FPUInformationPowerPC</span>    <span class="n">FPUInformationPowerPC</span><span class="p">;</span>
+</span><span class='line'><span class="k">union</span> <span class="n">Vector128</span> <span class="p">{</span>
+</span><span class='line'><span class="cp">#ifdef __VEC__</span>
+</span><span class='line'> <span class="n">vector</span> <span class="kt">unsigned</span> <span class="kt">int</span>         <span class="n">v</span><span class="p">;</span>
+</span><span class='line'><span class="cp">#endif</span>
+</span><span class='line'>  <span class="kt">unsigned</span> <span class="kt">long</span>       <span class="n">l</span><span class="p">[</span><span class="mi">4</span><span class="p">];</span>
+</span><span class='line'>  <span class="kt">unsigned</span> <span class="kt">short</span>      <span class="n">s</span><span class="p">[</span><span class="mi">8</span><span class="p">];</span>
+</span><span class='line'>  <span class="kt">unsigned</span> <span class="kt">char</span>       <span class="n">c</span><span class="p">[</span><span class="mi">16</span><span class="p">];</span>
+</span><span class='line'><span class="p">};</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>And here it is in OS X 10.7.5<sup id="fnref:1"><a href="#fn:1" rel="footnote">1</a></sup>:</p>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+</pre></td><td class='code'><pre><code class='c'><span class='line'><span class="k">typedef</span> <span class="k">struct</span> <span class="n">FPUInformationPowerPC</span>    <span class="n">FPUInformationPowerPC</span><span class="p">;</span>
+</span><span class='line'><span class="k">union</span> <span class="n">Vector128</span> <span class="p">{</span>
+</span><span class='line'><span class="cp">#ifdef __APPLE_ALTIVEC__</span>
+</span><span class='line'>   <span class="n">vector</span> <span class="kt">unsigned</span> <span class="kt">int</span>         <span class="n">v</span><span class="p">;</span>
+</span><span class='line'><span class="cp">#endif</span>
+</span><span class='line'>  <span class="kt">unsigned</span> <span class="kt">long</span>       <span class="n">l</span><span class="p">[</span><span class="mi">4</span><span class="p">];</span>
+</span><span class='line'>  <span class="kt">unsigned</span> <span class="kt">short</span>      <span class="n">s</span><span class="p">[</span><span class="mi">8</span><span class="p">];</span>
+</span><span class='line'>  <span class="kt">unsigned</span> <span class="kt">char</span>       <span class="n">c</span><span class="p">[</span><span class="mi">16</span><span class="p">];</span>
+</span><span class='line'><span class="p">};</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>The bug comes from the use of the <code>vector</code> keyword. As pointed out in this <a href="https://trac.macports.org/ticket/34213#comment:7">MacPorts ticket</a>, the issue is with the <code>#ifdef</code> that checks for <code>__VEC__</code>. <code>__VEC__</code> is defined if AltiVec is on, <em>without necessarily</em> meaning that AltiVec syntactic extensions are enabled. The <code>vector</code> keyword is only available if either <code>altivec.h</code> is included, or the <code>-mpim-altivec</code> or <code>-faltivec</code> flags are passed. Since Tigerbrew always optimizes for the host CPU, G4 and G5 users were getting AltiVec enabled without forcing syntactic extensions. I fixed this in Tigerbrew this by always passing <code>-faltivec</code> on PowerPC systems when building any package, regardless of whether AltiVec is being used.</p>
+
+<p>As to why Apple never caught this, GCC 4.0&rsquo;s behaviour seems to be different; it seems to enable AltiVec syntactic extensions whenever <code>-maltivec</code> is on. Apple did eventually fix the bug, as seen in the Lion header above. According to the MacPorts ticket linked previously, it was fixed in the CarbonCore header in 10.5 and in the 10.4u SDK packaged in Xcode 3 for Leopard. Since the 10.4u SDK fix was never backported to Tiger itself, Tiger users have to make do with the workaround.</p>
+<div class="footnotes">
+<hr/>
+<ol>
+<li id="fn:1">
+<p>10.7 may be Intel-only, but the relevant code&rsquo;s still there. In fact, the same PowerPC unions and structs are still there as of 10.9.4.<a href="#fnref:1" rev="footnote">&#8617;</a></p></li>
+</ol>
+</div>
+
+]]></content>
+  </entry>
   
   <entry>
     <title type="html"><![CDATA[Reevaluate]]></title>
