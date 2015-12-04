@@ -9,7 +9,7 @@
   <meta name="author" content="Misty De Meo">
 
   
-  <meta name="description" content="Homebrew has always used the version of Ruby which comes with OS X,1 a design decision I decided to keep with Tigerbrew. Tiger comes with Ruby 1.8.2 &hellip;">
+  <meta name="description" content="One of the most useful things about running software in unusual configurations is that sometimes it exposes unexpected flaws you never knew you had. &hellip;">
   
 
   <!-- http://t.co/dKP3o1e -->
@@ -63,6 +63,80 @@
     <div id="content">
       <div class="blog-index">
   
+  
+  
+    <article>
+      
+  <header>
+    
+      <h1 class="entry-title"><a href="/blog/blog/2013/04/04/tigers-which-is-terrible/">Tiger’s `which` Is Terrible; or, Necessity Is the Mother of Invention</a></h1>
+    
+    
+      <p class="meta">
+        
+
+
+
+
+<time class='entry-date' datetime='2013-04-04T07:11:00-07:00'><span class='date'><span class='date-month'>Apr</span> <span class='date-day'>4</span><span class='date-suffix'>th</span>, <span class='date-year'>2013</span></span> <span class='time'>7:11 am</span></time>
+        
+      </p>
+    
+  </header>
+
+
+  <div class="entry-content"><p>One of the most useful things about running software in unusual configurations is that sometimes it exposes unexpected flaws you never knew you had.</p>
+
+<p>The <code>which</code> utility is one of those commandline niceties you never really think about until it’s not there anymore. While sometimes implemented as a shell builtin<sup id="fnref:1"><a href="#fn:1" rel="footnote">1</a></sup>, it’s also frequently shipped as a standalone utility. Apple’s modern version, which is part of the shell_utils package and crystallized around Snow Leopard, works like this:</p>
+
+<ul>
+<li>If the specified tool is found on the path, prints the path to the first version found (e.g., the one the shell would execute), and exits 0.</li>
+<li>If the specified tool isn’t found, prints a newline and exits 1.</li>
+</ul>
+
+
+<p>This version of the tool is really useful in shell scripts to determine a) if a program is present, and b) where it’s located, and until fairly recently Homebrew used it extensively. Unfortunately, early on in my work on Tigerbrew, I discovered that Tiger’s version was… deficient. It works like this:</p>
+
+<ul>
+<li>If the specified tool is found on the path, prints the path to the first version found, and exits 0.</li>
+<li>If the specified tool isn’t found, prints a verbose message to stdout, and exits 0.</li>
+</ul>
+
+
+<p>The lack of a meaningful exit status and the error message on stdout are both pretty poor behaviour for a CLI app, and broke Homebrew’s assumptions about how it should work.</p>
+
+<p>To work around this, I replaced Homebrew’s wrapper function with a two-line native Ruby method for Tigerbrew, like so:</p>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+</pre></td><td class='code'><pre><code class='ruby'><span class='line'><span class="k">def</span> <span class="nf">which</span> <span class="n">cmd</span>
+</span><span class='line'>  <span class="n">dir</span> <span class="o">=</span> <span class="no">ENV</span><span class="o">[</span><span class="s1">&#39;PATH&#39;</span><span class="o">].</span><span class="n">split</span><span class="p">(</span><span class="s1">&#39;:&#39;</span><span class="p">)</span><span class="o">.</span><span class="n">find</span> <span class="p">{</span><span class="o">|</span><span class="nb">p</span><span class="o">|</span> <span class="no">File</span><span class="o">.</span><span class="n">executable?</span> <span class="no">File</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="nb">p</span><span class="p">,</span> <span class="n">cmd</span><span class="p">)}</span>
+</span><span class='line'>  <span class="no">Pathname</span><span class="o">.</span><span class="n">new</span><span class="p">(</span><span class="no">File</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">dir</span><span class="p">,</span> <span class="n">cmd</span><span class="p">))</span> <span class="k">unless</span> <span class="n">dir</span><span class="o">.</span><span class="n">nil?</span>
+</span><span class='line'><span class="k">end</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>As it turns out, not only does it work better on Tiger, but this method is actually faster<sup id="fnref:2"><a href="#fn:2" rel="footnote">2</a></sup> than shelling out like Homebrew did; process spawning is relatively expensive. As a result, I ended up using the new helper in Homebrew even though it wasn’t strictly necessary.</p>
+
+<p>(And as for the commandline utility, Tigerbrew has a formula for the <a href="https://github.com/mistydemeo/tigerbrew/blob/master/Library/Formula/shell_cmds.rb">shell_cmds</a> collection of utilities.)</p>
+<div class="footnotes">
+<hr/>
+<ol>
+<li id="fn:1">
+<p>zsh does; bash doesn’t.<a href="#fnref:1" rev="footnote">&#8617;</a></p></li>
+<li id="fn:2">
+<p>On the millisecond scale, at least.<a href="#fnref:2" rev="footnote">&#8617;</a></p></li>
+</ol>
+</div>
+
+</div>
+  
+  
+
+
+    </article>
   
   
     <article>
@@ -461,6 +535,10 @@
   <ul id="recent_posts">
     
       <li class="post">
+        <a href="/blog/blog/2015/12/03/flat-whites-in-vancouver/">Flat Whites in Vancouver</a>
+      </li>
+    
+      <li class="post">
         <a href="/blog/blog/2015/06/21/release-asuka-120-percent-limit-over-english-translation/">Release: Asuka 120% Limit Over English Translation</a>
       </li>
     
@@ -474,10 +552,6 @@
     
       <li class="post">
         <a href="/blog/blog/2015/01/02/widescreen-gaming-in-the-90s/">Widescreen Gaming in the 90s</a>
-      </li>
-    
-      <li class="post">
-        <a href="/blog/blog/2014/12/05/homebrew-gcc-changes-coming/">Homebrew GCC Changes Coming</a>
       </li>
     
   </ul>
