@@ -96,7 +96,7 @@ These frames are set to a size of 2048 bytes&mdash;chosen because this is the ex
 This is also why the header takes up 2048 bytes, when the actual data stored within it uses fewer than 16 bytes.</p>
 
 <p>Each frame of content contains 1024 samples.
-Because each sample takes up one byte in the original format, this means only of a frame is used for content.
+Because each sample takes up one byte in the original format, this means only half of a frame is used for content.
 The actual content is interleaved with 0 bytes.
 Despite seeming a pointless, inefficient use of space, this does serve a purpose by <a href="https://gist.github.com/pbarfuss/cde669526ffc21dbd759">allowing for oversampling</a>. The PCM chip&rsquo;s <a href="http://www.retrodev.com/RF5C68A.pdf">datasheet</a> lists a maximum frequency of 19800Hz, but this trick allows for pseudo-32564Hz playback.</p>
 
