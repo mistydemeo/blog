@@ -99,7 +99,7 @@ Despite seeming a pointless, inefficient use of space, this does serve a purpose
 
 <p>The format used in Lunar: Eternal Blue supports stereo playback, though only two songs are actually encoded in stereo<sup id="fnref:2"><a href="#fn:2" rel="footnote">2</a></sup>.
 Songs encoded in stereo interleave their content not every sample, as in most PCM formats, but every frame; one 2048-byte frame will contain 1024 left samples, the next frame will contain the matching 1024 right samples, and so forth.
-This was likely chosen because the PCM chip expects samples for only one output sample at a time, and doesn&rsquo;t itself implement stereo support.</p>
+This was likely chosen because the PCM chip expects samples for only one output channel at a time, and doesn&rsquo;t itself implement stereo support.</p>
 
 <p>The loop format used is highly idiosyncratic.
 Loop starts are measured in bytes from the beginning of the header; that is, a position to seek to from the start of actual content.
