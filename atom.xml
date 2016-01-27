@@ -4,7 +4,7 @@
   <title><![CDATA[The Future Is Now]]></title>
   <link href="http://mistys-internet.website/blog/atom.xml" rel="self"/>
   <link href="http://mistys-internet.website/blog/"/>
-  <updated>2015-12-03T22:07:47-08:00</updated>
+  <updated>2016-01-26T21:28:49-08:00</updated>
   <id>http://mistys-internet.website/blog/</id>
   <author>
     <name><![CDATA[Misty De Meo]]></name>
@@ -12,6 +12,55 @@
   </author>
   <generator uri="http://octopress.org/">Octopress</generator>
 
+  
+  <entry>
+    <title type="html"><![CDATA[Elegance]]></title>
+    <link href="http://mistys-internet.website/blog/blog/2016/01/26/elegance/"/>
+    <updated>2016-01-26T20:37:58-08:00</updated>
+    <id>http://mistys-internet.website/blog/blog/2016/01/26/elegance</id>
+    <content type="html"><![CDATA[<p>A few months ago, I wrote <a href="https://github.com/mistydemeo/lucia">decoders</a> for the PCM formats used by the Sega CD and Sega Saturn versions of the game Lunar: Eternal Blue<sup id="fnref:1"><a href="#fn:1" rel="footnote">1</a></sup>.
+I wanted to write up a few notes on the format of the Sega CD version&rsquo;s uncompressed PCM format, and some interesting lessons I learned from it.</p>
+
+<p>All files in this format run at a sample rate of 16282Hz. This unusual number is based on the base clock of the PCM chip. Similarly, the reason that samples are 8-bit signed instead of 16-bit is because this is the Sega CD PCM chip&rsquo;s <a href="http://www.retrodev.com/RF5C68A.pdf">native format</a>.</p>
+
+<p>Each file is divided into a set of fixed-size frames; the header constitutes the first frame, and every group of samples constitutes the subsequent frames.
+These frames are set to a size of 2048 bytes&mdash;chosen because this is the exact size of a Mode 1 CD-ROM sector, and hence the most convenient chunk of data which can be read from a disc when streaming.
+This is also why the header takes up 2048 bytes, when the actual data stored within it uses fewer than 16 bytes.</p>
+
+<p>Each frame of content contains 1024 samples.
+Because each sample takes up one byte in the original format, this means only of a frame is used for content.
+The actual content is interleaved with 0 bytes.
+Despite seeming a pointless, inefficient use of space, this does serve a purpose by <a href="https://gist.github.com/pbarfuss/cde669526ffc21dbd759">allowing for oversampling</a>. The PCM chip&rsquo;s <a href="http://www.retrodev.com/RF5C68A.pdf">datasheet</a> lists a maximum frequency of 19800Hz, but this trick allows for pseudo-32564Hz playback.</p>
+
+<p>The format used in Lunar: Eternal Blue supports stereo playback, though only two songs are actually encoded in stereo<sup id="fnref:2"><a href="#fn:2" rel="footnote">2</a></sup>.
+Songs encoded in stereo interleave their content not every sample, as in most PCM formats, but every frame; one 2048-byte frame will contain 1024 left samples, the next frame will contain the matching 1024 right samples, and so forth.
+This was likely chosen because the PCM chip expects samples for only one output sample at a time, and doesn&rsquo;t itself implement stereo support.</p>
+
+<p>The loop format used is highly idiosyncratic.
+Loop starts are measured in bytes from the beginning of the header; that is, a position to seek to from the start of actual content.
+The loop end time, however, uses a different unit; loop end is measured in terms of the <em>sample</em> at which the loop ends, not the byte.
+Because one sample is stored for every two bytes, and because left/right samples in a stereo pair are counted numerically as the same sample, this means that this count differs from the byte position at the end of the song by a factor of either 2 or 4.
+This is a quirk of how the PCM playback routine works; it&rsquo;s more efficient to keep track of the number of samples played instead of the bytes played, and therefore storing the data in that format means that no extra math has to be performed to determine if the end of a loop has been reached.
+Similarly, the treatment of left/right samples as being the same sample is likely an artifact of what was the simplest way for the PCM playback code to handle this condition.</p>
+
+<p>Looking at these PCM files gave me a new appreciation for design, and helped me appreciate more how important it is to understand the reason behind design decisions.
+In a lot of ways this format feels like it should be &ldquo;bad&rdquo; design: it&rsquo;s strange, it&rsquo;s idiosyncratic, it&rsquo;s internally inconsistent.
+But every single detail is carefully chosen; everything serves a purpose.
+Each of these idiosyncrasies was carefully chosen to solve a particular problem, or to ensure peak performance in a particular bottleneck.
+Given the restrictions of a 16-bit game console, all of these choices were necessary to be able to support constantly streaming audio like this in the first place.
+Aligning every single detail of a format or API with the job which needs to be done is its own kind of elegance&mdash;a kind of elegance I understand a little better now.</p>
+<div class="footnotes">
+<hr/>
+<ol>
+<li id="fn:1">
+<p>I referenced a couple of open-source decoders for the Sega CD version&rsquo;s format when writing my own (<a href="https://bitbucket.org/kode54/foo_lunar2">foo_lunar2</a> by kode54, and <a href="http://hcs64.com/vgmstream.html">vgmstream</a>), along with some notes given to me by <a href="https://kode54.net">kode54</a>.<a href="#fnref:1" rev="footnote">&#8617;</a></p></li>
+<li id="fn:2">
+<p>The Pentagulia theme, and the sunken tower.<a href="#fnref:2" rev="footnote">&#8617;</a></p></li>
+</ol>
+</div>
+
+]]></content>
+  </entry>
   
   <entry>
     <title type="html"><![CDATA[Flat Whites in Vancouver]]></title>
