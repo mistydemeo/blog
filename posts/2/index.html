@@ -9,7 +9,7 @@
   <meta name="author" content="Misty De Meo">
 
   
-  <meta name="description" content="One of the things I’ve been working on in Tigerbrew is backporting modern Apple build tools. The latest official versions, bundled with Xcode 2.5, &hellip;">
+  <meta name="description" content="I’m often surprised how long software can keep trying to use compatibility features ages after their best-by date. Now that GCC 4.8 builds on Tiger1 &hellip;">
   
 
   <!-- http://t.co/dKP3o1e -->
@@ -69,7 +69,7 @@
       
   <header>
     
-      <h1 class="entry-title"><a href="/blog/blog/2013/04/09/software-archaeology-apples-cctools/">Software Archaeology: Apple’s Cctools</a></h1>
+      <h1 class="entry-title"><a href="/blog/blog/2013/10/20/no-cpp-precomp-the-compiler-flag-that-time-forgot/">-no-cpp-precomp: The Compiler Flag That Time Forgot</a></h1>
     
     
       <p class="meta">
@@ -78,7 +78,92 @@
 
 
 
-<time class='entry-date' datetime='2013-04-09T20:08:00-07:00'><span class='date'><span class='date-month'>Apr</span> <span class='date-day'>9</span><span class='date-suffix'>th</span>, <span class='date-year'>2013</span></span> <span class='time'>8:08 pm</span></time>
+<time class='entry-date' datetime='2013-10-20T16:58:00+11:00'><span class='date'><span class='date-month'>Oct</span> <span class='date-day'>20</span><span class='date-suffix'>th</span>, <span class='date-year'>2013</span></span> <span class='time'>4:58 pm</span></time>
+        
+      </p>
+    
+  </header>
+
+
+  <div class="entry-content"><p>I’m often surprised how long software can keep trying to use compatibility features ages after their best-by date.</p>
+
+<p>Now that GCC 4.8 builds on Tiger<sup id="fnref:1"><a href="#fn:1" rel="footnote">1</a></sup>, I’ve been testing as much software with it as I can. When building ncurses using GCC 4.8.1, though, I came across a strange error message:</p>
+
+<blockquote><p>gcc-4.8: error: unrecognized command line option &lsquo;-no-cpp-precomp&rsquo;</p></blockquote>
+
+<p>It built fine with the gcc-4.0 that came with the OS. GCC rarely removes support for flags like this, so I assumed it must be an Apple-only flag. Unfortunately, it wasn’t listed in the manpage at all, and the internet was no help either – the search results were full of users confused about the same build failures, or trying to figure out what it does. All I could find was <a href="http://trac.wxwidgets.org/ticket/14029">confirmation</a> that it’s an obsolete Apple-only flag.</p>
+
+<p>Not finding anything, I decided to find out straight from the horse’s mouth and try source-diving. Luckily Apple publishes the source code for all obsolete versions of their tools at their <a href="http://opensource.apple.com/">Apple Open Source</a> site.</p>
+
+<p>Recent versions of Apple GCC don’t include the flag anywhere in their source. The only place it’s still referenced is in a few configure scripts and changelogs, such as these:</p>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+</pre></td><td class='code'><pre><code class='sh'><span class='line'><span class="c"># The spiffy cpp-precomp chokes on some legitimate constructs in GCC</span>
+</span><span class='line'><span class="c"># sources; use -no-cpp-precomp to get to GNU cpp.</span>
+</span><span class='line'><span class="c"># Apple&#39;s GCC has bugs in designated initializer handling, so disable</span>
+</span><span class='line'><span class="c"># that too.</span>
+</span><span class='line'><span class="nv">stage1_cflags</span><span class="o">=</span><span class="s2">&quot;-g -no-cpp-precomp -DHAVE_DESIGNATED_INITIALIZERS=0&quot;</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>In several releases prior to that, for instance <a href="http://opensource.apple.com/source/gcc/gcc-5493/gcc/gcc.c">gcc-5493</a>, the flag is explicitly mentioned as being retained for compatibility and is a no-op:</p>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+</pre></td><td class='code'><pre><code class='sh'><span class='line'>/* APPLE LOCAL cpp-precomp compatibility */
+</span><span class='line'>%<span class="o">{</span>precomp:%ecpp-precomp not supported<span class="o">}</span>%<span class="o">{</span>no-cpp-precomp:<span class="o">}</span>%<span class="o">{</span>Wno-precomp:<span class="o">}</span><span class="se">\</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>The last time it was actually documented was in <a href="http://opensource.apple.com/source/gcc/gcc-1765/gcc/doc/install.texi">gcc-1765</a>&rsquo;s install.texi, shipped as a part of the WWDC 2004 Developer Preview of Xcode, which also provides a hint as to what the flag actually did:</p>
+
+<blockquote><p>It’s a good idea to use the GNU preprocessor instead of Apple’s @file{cpp-precomp} during the first stage of bootstrapping; this is automatic when doing @samp{make bootstrap}, but to do it from the toplevel objdir you will need to say @samp{make CC=’cc -no-cpp-precomp’ bootstrap}.</p></blockquote>
+
+<p>So this partially answers our question: Apple shipped an alternate preprocessor, and -no-cpp-precomp triggers the use of the GCC cpp instead. I can only assume this was a leftover that had yet to be excised, because the flag itself was still a no-op at that time. To actually find a version where the flag does something, we have to go all the way back to the December 2002 developer tools, whose <a href="http://opensource.apple.com/source/gcc/gcc-937.2/gcc/gcc.c">gcc-937.2</a> actually has code that uses the flag. This particular build of GCC is Apple’s version of gcc-2.95, and it appears to be the very last where it had any effect. Interestingly, the #ifdef that guards this particular block of code is “#ifdef NEXT_CPP_PRECOMP” – suggesting that this dates back to NeXT, rather than Apple.</p>
+
+<p>To actually find out what this means, O’Reilly’s <a href="http://shop.oreilly.com/product/9780596003562.do">Mac OS X for Unix Geeks</a>, from September 2002, has a nice explanation in chapter 5:</p>
+
+<blockquote><p>Precompiled header files are binary files that have been generated from ordinary C header files and that have been preprocessed and parsed using cpp-precomp. When such a precompiled header is created, both macros and declarations present in the corresponding ordinary header file are sorted, resulting in a faster compile time, a reduced symbol table size, and consequently, faster lookup. Precompiled header files are given a .p extension and are produced from ordinary header files that end with a .h extension.</p></blockquote>
+
+<p>Chapter 4 also provides a nice explanation of why -no-cpp-precomp was desirable:</p>
+
+<blockquote><p>cpp-precomp is faster than cpp. However, some code may not compile with cpp-precomp. In that case, you should invoke cpp by instructing cc not to use cpp-precomp.</p></blockquote>
+
+<p>So there we have it – -no-cpp-precomp became somewhat widely used in Unix software as a compatibility measure to prevent Apple’s cpp-precomp feature from breaking their headers, and has stuck around more than a decade since the last time it’s actually done anything.</p>
+<div class="footnotes">
+<hr/>
+<ol>
+<li id="fn:1">
+<p>More on that in a future blog post.<a href="#fnref:1" rev="footnote">&#8617;</a></p></li>
+</ol>
+</div>
+
+</div>
+  
+  
+
+
+    </article>
+  
+  
+    <article>
+      
+  <header>
+    
+      <h1 class="entry-title"><a href="/blog/blog/2013/04/10/software-archaeology-apples-cctools/">Software Archaeology: Apple’s Cctools</a></h1>
+    
+    
+      <p class="meta">
+        
+
+
+
+
+<time class='entry-date' datetime='2013-04-10T13:08:00+10:00'><span class='date'><span class='date-month'>Apr</span> <span class='date-day'>10</span><span class='date-suffix'>th</span>, <span class='date-year'>2013</span></span> <span class='time'>1:08 pm</span></time>
         
       </p>
     
@@ -205,7 +290,7 @@
       
   <header>
     
-      <h1 class="entry-title"><a href="/blog/blog/2013/04/04/tigers-which-is-terrible/">Tiger’s `which` Is Terrible; or, Necessity Is the Mother of Invention</a></h1>
+      <h1 class="entry-title"><a href="/blog/blog/2013/04/05/tigers-which-is-terrible/">Tiger’s `which` Is Terrible; or, Necessity Is the Mother of Invention</a></h1>
     
     
       <p class="meta">
@@ -214,7 +299,7 @@
 
 
 
-<time class='entry-date' datetime='2013-04-04T07:11:00-07:00'><span class='date'><span class='date-month'>Apr</span> <span class='date-day'>4</span><span class='date-suffix'>th</span>, <span class='date-year'>2013</span></span> <span class='time'>7:11 am</span></time>
+<time class='entry-date' datetime='2013-04-05T01:11:00+11:00'><span class='date'><span class='date-month'>Apr</span> <span class='date-day'>5</span><span class='date-suffix'>th</span>, <span class='date-year'>2013</span></span> <span class='time'>1:11 am</span></time>
         
       </p>
     
@@ -279,7 +364,7 @@
       
   <header>
     
-      <h1 class="entry-title"><a href="/blog/blog/2013/04/02/adventures-with-ruby-1-8-2/">Adventures With Ruby 1.8.2</a></h1>
+      <h1 class="entry-title"><a href="/blog/blog/2013/04/03/adventures-with-ruby-1-8-2/">Adventures With Ruby 1.8.2</a></h1>
     
     
       <p class="meta">
@@ -288,7 +373,7 @@
 
 
 
-<time class='entry-date' datetime='2013-04-02T21:59:00-07:00'><span class='date'><span class='date-month'>Apr</span> <span class='date-day'>2</span><span class='date-suffix'>nd</span>, <span class='date-year'>2013</span></span> <span class='time'>9:59 pm</span></time>
+<time class='entry-date' datetime='2013-04-03T15:59:00+11:00'><span class='date'><span class='date-month'>Apr</span> <span class='date-day'>3</span><span class='date-suffix'>rd</span>, <span class='date-year'>2013</span></span> <span class='time'>3:59 pm</span></time>
         
       </p>
     
@@ -339,7 +424,7 @@
       
   <header>
     
-      <h1 class="entry-title"><a href="/blog/blog/2013/04/01/introducing-tigerbrew/">Introducing Tigerbrew</a></h1>
+      <h1 class="entry-title"><a href="/blog/blog/2013/04/02/introducing-tigerbrew/">Introducing Tigerbrew</a></h1>
     
     
       <p class="meta">
@@ -348,7 +433,7 @@
 
 
 
-<time class='entry-date' datetime='2013-04-01T19:21:00-07:00'><span class='date'><span class='date-month'>Apr</span> <span class='date-day'>1</span><span class='date-suffix'>st</span>, <span class='date-year'>2013</span></span> <span class='time'>7:21 pm</span></time>
+<time class='entry-date' datetime='2013-04-02T13:21:00+11:00'><span class='date'><span class='date-month'>Apr</span> <span class='date-day'>2</span><span class='date-suffix'>nd</span>, <span class='date-year'>2013</span></span> <span class='time'>1:21 pm</span></time>
         
       </p>
     
@@ -394,7 +479,7 @@
       
   <header>
     
-      <h1 class="entry-title"><a href="/blog/blog/2012/11/21/psa-homebrew-digipres-repository-now-available/">PSA: Homebrew-digipres Repository Now Available!</a></h1>
+      <h1 class="entry-title"><a href="/blog/blog/2012/11/22/psa-homebrew-digipres-repository-now-available/">PSA: Homebrew-digipres Repository Now Available!</a></h1>
     
     
       <p class="meta">
@@ -403,7 +488,7 @@
 
 
 
-<time class='entry-date' datetime='2012-11-21T22:13:00-08:00'><span class='date'><span class='date-month'>Nov</span> <span class='date-day'>21</span><span class='date-suffix'>st</span>, <span class='date-year'>2012</span></span> <span class='time'>10:13 pm</span></time>
+<time class='entry-date' datetime='2012-11-22T17:13:00+11:00'><span class='date'><span class='date-month'>Nov</span> <span class='date-day'>22</span><span class='date-suffix'>nd</span>, <span class='date-year'>2012</span></span> <span class='time'>5:13 pm</span></time>
         
       </p>
     
@@ -423,7 +508,7 @@
       
   <header>
     
-      <h1 class="entry-title"><a href="/blog/blog/2012/05/01/file-id-hackathon-debrief-fits-handles-video-now/">File ID Hackathon Debrief: FITS Handles Video Now!</a></h1>
+      <h1 class="entry-title"><a href="/blog/blog/2012/05/02/file-id-hackathon-debrief-fits-handles-video-now/">File ID Hackathon Debrief: FITS Handles Video Now!</a></h1>
     
     
       <p class="meta">
@@ -432,7 +517,7 @@
 
 
 
-<time class='entry-date' datetime='2012-05-01T22:44:42-07:00'><span class='date'><span class='date-month'>May</span> <span class='date-day'>1</span><span class='date-suffix'>st</span>, <span class='date-year'>2012</span></span> <span class='time'>10:44 pm</span></time>
+<time class='entry-date' datetime='2012-05-02T15:44:42+10:00'><span class='date'><span class='date-month'>May</span> <span class='date-day'>2</span><span class='date-suffix'>nd</span>, <span class='date-year'>2012</span></span> <span class='time'>3:44 pm</span></time>
         
       </p>
     
@@ -598,7 +683,7 @@
       
   <header>
     
-      <h1 class="entry-title"><a href="/blog/blog/2011/05/30/revisiting-archival-description/">Revisiting Archival Description – LOD-LAM Session Idea</a></h1>
+      <h1 class="entry-title"><a href="/blog/blog/2011/05/31/revisiting-archival-description/">Revisiting Archival Description – LOD-LAM Session Idea</a></h1>
     
     
       <p class="meta">
@@ -607,7 +692,7 @@
 
 
 
-<time class='entry-date' datetime='2011-05-30T15:29:00-07:00'><span class='date'><span class='date-month'>May</span> <span class='date-day'>30</span><span class='date-suffix'>th</span>, <span class='date-year'>2011</span></span> <span class='time'>3:29 pm</span></time>
+<time class='entry-date' datetime='2011-05-31T08:29:00+10:00'><span class='date'><span class='date-month'>May</span> <span class='date-day'>31</span><span class='date-suffix'>st</span>, <span class='date-year'>2011</span></span> <span class='time'>8:29 am</span></time>
         
       </p>
     
@@ -671,23 +756,23 @@
   <ul id="recent_posts">
     
       <li class="post">
-        <a href="/blog/blog/2016/01/26/elegance/">Elegance</a>
+        <a href="/blog/blog/2017/02/19/review-undertale-vinyl-soundtrack/">Review: Undertale Vinyl Soundtrack</a>
       </li>
     
       <li class="post">
-        <a href="/blog/blog/2015/12/03/flat-whites-in-vancouver/">Flat Whites in Vancouver</a>
+        <a href="/blog/blog/2016/01/27/elegance/">Elegance</a>
       </li>
     
       <li class="post">
-        <a href="/blog/blog/2015/06/21/release-asuka-120-percent-limit-over-english-translation/">Release: Asuka 120% Limit Over English Translation</a>
+        <a href="/blog/blog/2015/12/04/flat-whites-in-vancouver/">Flat Whites in Vancouver</a>
       </li>
     
       <li class="post">
-        <a href="/blog/blog/2015/05/16/attack-the-vector/">Attack the Vector</a>
+        <a href="/blog/blog/2015/06/22/release-asuka-120-percent-limit-over-english-translation/">Release: Asuka 120% Limit Over English Translation</a>
       </li>
     
       <li class="post">
-        <a href="/blog/blog/2015/05/02/reevaluate/">Reevaluate</a>
+        <a href="/blog/blog/2015/05/17/attack-the-vector/">Attack the Vector</a>
       </li>
     
   </ul>
@@ -703,7 +788,7 @@
     </div>
   </div>
   <footer role="contentinfo"><p>
-  Copyright &copy; 2016 - Misty De Meo -
+  Copyright &copy; 2017 - Misty De Meo -
   <span class="credit">Powered by <a href="http://octopress.org">Octopress</a></span>
 </p>
 

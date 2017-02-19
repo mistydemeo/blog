@@ -4,7 +4,7 @@
   <title><![CDATA[The Future Is Now]]></title>
   <link href="http://mistys-internet.website/blog/atom.xml" rel="self"/>
   <link href="http://mistys-internet.website/blog/"/>
-  <updated>2016-01-26T21:37:37-08:00</updated>
+  <updated>2017-02-19T13:13:44+11:00</updated>
   <id>http://mistys-internet.website/blog/</id>
   <author>
     <name><![CDATA[Misty De Meo]]></name>
@@ -14,10 +14,42 @@
 
   
   <entry>
+    <title type="html"><![CDATA[Review: Undertale Vinyl Soundtrack]]></title>
+    <link href="http://mistys-internet.website/blog/blog/2017/02/19/review-undertale-vinyl-soundtrack/"/>
+    <updated>2017-02-19T13:05:40+11:00</updated>
+    <id>http://mistys-internet.website/blog/blog/2017/02/19/review-undertale-vinyl-soundtrack</id>
+    <content type="html"><![CDATA[<p>I got my copy of the Undertale vinyl soundtrack in the mail the other day. While I&rsquo;ve seen a lot of excitement for it, I haven&rsquo;t seen many people talk about what it&rsquo;s like, so I decided to write up my impressions.</p>
+
+<p><img src="http://mistys-internet.website/blog/images/undertale/front.jpg" title="Front cover" >
+First, to start with the good <a href="news:">news:</a> the art design is beautiful, and gorgeously printed. The red-on-black front cover is stylish, and the mostly-new pixel artwork is very well-done. The gatefold opens to a house party scene with a ton of the game&rsquo;s NPCs, which is adorable and fits the mood of the game really well too. Most of the printing is matte, with a few details in glossy ink that really stands out&mdash;the Undertale logo on the cover, and the coloured lights in the party scene.</p>
+
+<p><img class="right" src="http://mistys-internet.website/blog/images/undertale/poke.jpg" width="150" title="Sleeve pokes out awkwardly" >
+Unfortunately the quality of the sleeve itself is subpar. The cardboard feels thin and flimsy compared to other double-albums I own; it lacks weight. The gatefold hinge is also poorly-folded, and doesn&rsquo;t stay closed on its own when the records are in; it flops open awkwardly. The records also don&rsquo;t slide comfortably into the sleeve when the gatefold is closed, which makes putting records back after a play more awkward than it has to be. (See right: the record is inserted as far as it gets when the gatefold is closed. The black thing poking out is the inner record sleeve.) If you open the sleeve to insert the records all the way, then they can&rsquo;t be removed while the gatefold is closed, which is even more awkward. The overall feeling is surprisingly cheap for a $35 album.</p>
+
+<p>The records themselves are also mixed quality. The transparent red and blue coloured vinyl is classy, and the simple label design is attractive as well. It&rsquo;s a minor detail, but the inner record sleeves are very attractive and easy to get the discs in and out of.</p>
+
+<p><img class="left" src="http://mistys-internet.website/blog/images/undertale/scratch.jpg" width="150" title="Close up of scratched record" >
+Unfortunately, my copy shipped with large scratches on sides A and B. (See the photo on the left&mdash;the scratches are very visible at full size.) Both discs were also covered in dust fresh out of the package. Everything I&rsquo;ve seen suggests this isn&rsquo;t an isolated issue&mdash;I know other people whose iam8bit records shipped with scratches before the first play, and from scanning their twitter feed, it looks like this is a common complaint with other customers. Needless to say, this is a huge issue, and I&rsquo;m shocked it&rsquo;s as common a problem as it is with them.</p>
+
+<p>Given those defects, I was surprised when the discs sounded great. The mastering quality is very good, and leaves very little to complain about if you&rsquo;re lucky enough to get undamaged discs. I did notice a mastering error that clips off the first note of Snowy on side one, but that was the only discernible error.</p>
+
+<p>Given just how huge the Undertale soundtrack is, the entire thing was not going to fit on two discs. The vinyl release curates a selection of tracks to fit the available running time. They generally made a good set of calls, hitting all the major notes and popular moments, though by necessity your favourite deep cut is probably missing. Given the time constraints, I don&rsquo;t see much to complain about in the selection. Pushing the soundtrack to three discs would probably have been a good call, even if that would have pushed up the price.</p>
+
+<p>Despite the good sound quality, it doesn&rsquo;t feel like iam8bit actually has the experience it takes to release a premium package like Undertale was meant to be. It&rsquo;s pretty clear they have big ambitions, and I hope they learn from their mistakes so they get to the point that their quality lives up, but they&rsquo;re not there yet. The stuff they&rsquo;re good at&mdash;art and graphic design&mdash;is offset by poor physical design and unreliable QC. I can&rsquo;t really recommend this as-is, especially with the high chance of getting a dud.</p>
+
+<p><img src="http://mistys-internet.website/blog/images/undertale/dogsong.jpg" title="Dogsong sleeve" ></p>
+
+<p>Aside from the main album, preorders came with a special dogsong single. This one-sided 7&#8221; single has an extended version of dogsong, and is pressed on transparent vinyl with an image of the annoying dog on the other side. It&rsquo;s very cute, and for what it is it&rsquo;s well-produced and pretty-looking.</p>
+
+<p><img src="http://mistys-internet.website/blog/images/undertale/dogsong_disc.jpg" title="Dogsong disc" ></p>
+]]></content>
+  </entry>
+  
+  <entry>
     <title type="html"><![CDATA[Elegance]]></title>
-    <link href="http://mistys-internet.website/blog/blog/2016/01/26/elegance/"/>
-    <updated>2016-01-26T20:37:58-08:00</updated>
-    <id>http://mistys-internet.website/blog/blog/2016/01/26/elegance</id>
+    <link href="http://mistys-internet.website/blog/blog/2016/01/27/elegance/"/>
+    <updated>2016-01-27T15:37:58+11:00</updated>
+    <id>http://mistys-internet.website/blog/blog/2016/01/27/elegance</id>
     <content type="html"><![CDATA[<p>A few months ago, I wrote <a href="https://github.com/mistydemeo/lucia">decoders</a> for the PCM formats used by the Sega CD and Sega Saturn versions of the game Lunar: Eternal Blue<sup id="fnref:1"><a href="#fn:1" rel="footnote">1</a></sup>.
 I wanted to write up a few notes on the format of the Sega CD version&rsquo;s uncompressed PCM format, and some interesting lessons I learned from it.</p>
 
@@ -64,9 +96,9 @@ Aligning every single detail of a format or API with the job which needs to be d
   
   <entry>
     <title type="html"><![CDATA[Flat Whites in Vancouver]]></title>
-    <link href="http://mistys-internet.website/blog/blog/2015/12/03/flat-whites-in-vancouver/"/>
-    <updated>2015-12-03T22:07:24-08:00</updated>
-    <id>http://mistys-internet.website/blog/blog/2015/12/03/flat-whites-in-vancouver</id>
+    <link href="http://mistys-internet.website/blog/blog/2015/12/04/flat-whites-in-vancouver/"/>
+    <updated>2015-12-04T17:07:24+11:00</updated>
+    <id>http://mistys-internet.website/blog/blog/2015/12/04/flat-whites-in-vancouver</id>
     <content type="html"><![CDATA[<p>This post is completely off-topic.
 Please indulge me.</p>
 
@@ -176,9 +208,9 @@ I make my own flat whites at home using ristretto shots.</p>
   
   <entry>
     <title type="html"><![CDATA[Release: Asuka 120% Limit Over English Translation]]></title>
-    <link href="http://mistys-internet.website/blog/blog/2015/06/21/release-asuka-120-percent-limit-over-english-translation/"/>
-    <updated>2015-06-21T21:36:00-07:00</updated>
-    <id>http://mistys-internet.website/blog/blog/2015/06/21/release-asuka-120-percent-limit-over-english-translation</id>
+    <link href="http://mistys-internet.website/blog/blog/2015/06/22/release-asuka-120-percent-limit-over-english-translation/"/>
+    <updated>2015-06-22T14:36:00+10:00</updated>
+    <id>http://mistys-internet.website/blog/blog/2015/06/22/release-asuka-120-percent-limit-over-english-translation</id>
     <content type="html"><![CDATA[<p>Asuka 120% Limited was a 1997 fighting game for the Sega Saturn, the final<sup id="fnref:1"><a href="#fn:1" rel="footnote">1</a></sup> game in a long-running series. The Asuka 120% games were always underdog favourites of mine; despite looking like throwaway anime fan-pandering, they were surprisingly deep, innovative games with unique mechanics that paved the way for later, more famous games like Guilty Gear and X-Men vs Street Fighter.</p>
 
 <p><img class="right" src="http://mistys-internet.website/blog/images/asuka/cover.gif" title="Asuka 120% Limit Over cover art" >
@@ -262,9 +294,9 @@ In 1999, an unofficial mod titled <a href="http://www5.ocn.ne.jp/~afc/limitover/
   
   <entry>
     <title type="html"><![CDATA[Attack the Vector]]></title>
-    <link href="http://mistys-internet.website/blog/blog/2015/05/16/attack-the-vector/"/>
-    <updated>2015-05-16T21:12:00-07:00</updated>
-    <id>http://mistys-internet.website/blog/blog/2015/05/16/attack-the-vector</id>
+    <link href="http://mistys-internet.website/blog/blog/2015/05/17/attack-the-vector/"/>
+    <updated>2015-05-17T14:12:00+10:00</updated>
+    <id>http://mistys-internet.website/blog/blog/2015/05/17/attack-the-vector</id>
     <content type="html"><![CDATA[<p>One downside of working with ancient OSs is coming across bugs that will never be fixed.</p>
 
 <p>In the early days of Tigerbrew, I had just started experimenting with GCC 4.2 as a replacement for Xcode 2.5&rsquo;s GCC 4.0. Everything was going great until I built something that uses Cocoa, which blew up with this message:</p>
@@ -347,12 +379,12 @@ In 1999, an unofficial mod titled <a href="http://www5.ocn.ne.jp/~afc/limitover/
   
   <entry>
     <title type="html"><![CDATA[Reevaluate]]></title>
-    <link href="http://mistys-internet.website/blog/blog/2015/05/02/reevaluate/"/>
-    <updated>2015-05-02T10:41:08-07:00</updated>
-    <id>http://mistys-internet.website/blog/blog/2015/05/02/reevaluate</id>
+    <link href="http://mistys-internet.website/blog/blog/2015/05/03/reevaluate/"/>
+    <updated>2015-05-03T03:41:08+10:00</updated>
+    <id>http://mistys-internet.website/blog/blog/2015/05/03/reevaluate</id>
     <content type="html"><![CDATA[<p>My least favourite backtrace is a backtrace that doesn&rsquo;t include my own code.</p>
 
-<p>Tigerbrew on OS X 10.4 uses <a href="http://mistys-internet.website/blog/blog/2013/04/02/adventures-with-ruby-1-8-2/">Ruby 1.8.2</a>, which was shipped on Christmas Day, 2004, and it has more than its fair share of interesting bugs. In today&rsquo;s lesson we break Ruby&rsquo;s stdlib class OpenStruct.</p>
+<p>Tigerbrew on OS X 10.4 uses <a href="http://mistys-internet.website/blog/blog/2013/04/03/adventures-with-ruby-1-8-2/">Ruby 1.8.2</a>, which was shipped on Christmas Day, 2004, and it has more than its fair share of interesting bugs. In today&rsquo;s lesson we break Ruby&rsquo;s stdlib class OpenStruct.</p>
 
 <p>OpenStruct is a simple data structure that provides a JavaScript object-like interface to Ruby hashes. It&rsquo;s essentially a hash that provides getter and setter methods for each defined attribute. For example:</p>
 
@@ -481,9 +513,9 @@ In 1999, an unofficial mod titled <a href="http://www5.ocn.ne.jp/~afc/limitover/
   
   <entry>
     <title type="html"><![CDATA[Widescreen Gaming in the 90s]]></title>
-    <link href="http://mistys-internet.website/blog/blog/2015/01/02/widescreen-gaming-in-the-90s/"/>
-    <updated>2015-01-02T14:02:49-08:00</updated>
-    <id>http://mistys-internet.website/blog/blog/2015/01/02/widescreen-gaming-in-the-90s</id>
+    <link href="http://mistys-internet.website/blog/blog/2015/01/03/widescreen-gaming-in-the-90s/"/>
+    <updated>2015-01-03T09:02:49+11:00</updated>
+    <id>http://mistys-internet.website/blog/blog/2015/01/03/widescreen-gaming-in-the-90s</id>
     <content type="html"><![CDATA[<p>Most people got their first taste of widescreen gaming with the Wii, Xbox 360, and PS3, but not a lot of people know that companies were experimenting with widescreen all the way back in the fifth console generation (PS1, Saturn, N64). A tiny number of games have full widescreen support, which looks great on modern widescreen TVs.</p>
 
 <h2>Anamorphic widescreen</h2>
@@ -556,9 +588,9 @@ In 1999, an unofficial mod titled <a href="http://www5.ocn.ne.jp/~afc/limitover/
   
   <entry>
     <title type="html"><![CDATA[Homebrew GCC Changes Coming]]></title>
-    <link href="http://mistys-internet.website/blog/blog/2014/12/05/homebrew-gcc-changes-coming/"/>
-    <updated>2014-12-05T18:57:06-08:00</updated>
-    <id>http://mistys-internet.website/blog/blog/2014/12/05/homebrew-gcc-changes-coming</id>
+    <link href="http://mistys-internet.website/blog/blog/2014/12/06/homebrew-gcc-changes-coming/"/>
+    <updated>2014-12-06T13:57:06+11:00</updated>
+    <id>http://mistys-internet.website/blog/blog/2014/12/06/homebrew-gcc-changes-coming</id>
     <content type="html"><![CDATA[<p>Big GCC changes are a-coming to <a href="http://brew.sh">Homebrew</a>, which will make building your own software against Homebrew-provided GCCs much more reliable. There&rsquo;s going to be a transition period, though, and any software built against GCC will need to be rebuilt against the new package to work. We&rsquo;ll be pushing the changes on <strong>December 12th, 2014</strong>, and this post is here to help you get ready for it!</p>
 
 <p>(This only affects software built using Homebrew&rsquo;s GCC. Any software built using Clang, which is the compiler that Apple ships, will be unaffected. If you don&rsquo;t know what this means: you&rsquo;re probably fine.)</p>
@@ -611,9 +643,9 @@ In 1999, an unofficial mod titled <a href="http://www5.ocn.ne.jp/~afc/limitover/
   
   <entry>
     <title type="html"><![CDATA[Thank You, Ada]]></title>
-    <link href="http://mistys-internet.website/blog/blog/2014/09/10/thank-you/"/>
-    <updated>2014-09-10T08:46:54-07:00</updated>
-    <id>http://mistys-internet.website/blog/blog/2014/09/10/thank-you</id>
+    <link href="http://mistys-internet.website/blog/blog/2014/09/11/thank-you/"/>
+    <updated>2014-09-11T01:46:54+10:00</updated>
+    <id>http://mistys-internet.website/blog/blog/2014/09/11/thank-you</id>
     <content type="html"><![CDATA[<p><a href="http://www.ibiblio.org/bess/">Bess Sadler</a>, <a href="http://andromedayelton.com/">Andromeda Yelton</a>, <a href="http://chrisbourg.wordpress.com/">Chris Bourg</a> and <a href="http://matienzo.org/">Mark Matienzo</a> have stepped forward to pledge to <a href="https://adainitiative.org/donate/?campaign=libraries">match up to $5120 of donations</a> to the <a href="http://adainitiative.org/">Ada Initiative</a>, a non-profit organization that supports the participation of women in open source and culture. I completely support this very generous act; the Ada Initiative does <a href="http://adainitiative.org/what-we-do/">incredibly important</a> work, and I&rsquo;m extremely proud of my friends and of the library community for supporting them.</p>
 
 <p>I&rsquo;ve <a href="http://modelviewculture.com/pieces/there-and-back-again">written before</a> about how I stopped pursuing a career in tech in my late teens. I saw few female (or trans) role models in the tech industry; at a time when my self-image and self-identity was its most fragile, I pivoted away from something I saw as too masculine, without room for me. The Ada Initiative&rsquo;s conferences and advocacy work have done a lot to help make the open tech world a more welcoming space.</p>
@@ -628,18 +660,18 @@ In 1999, an unofficial mod titled <a href="http://www5.ocn.ne.jp/~afc/limitover/
   
   <entry>
     <title type="html"><![CDATA[Mind the Dust]]></title>
-    <link href="http://mistys-internet.website/blog/blog/2014/09/10/mind-the-dust/"/>
-    <updated>2014-09-10T08:42:12-07:00</updated>
-    <id>http://mistys-internet.website/blog/blog/2014/09/10/mind-the-dust</id>
+    <link href="http://mistys-internet.website/blog/blog/2014/09/11/mind-the-dust/"/>
+    <updated>2014-09-11T01:42:12+10:00</updated>
+    <id>http://mistys-internet.website/blog/blog/2014/09/11/mind-the-dust</id>
     <content type="html"><![CDATA[<p>Please excuse the sparseness! I&rsquo;m in the process of migrating from Wordpress to Octopress; I haven&rsquo;t had time to change the default team or migrate over my older posts.</p>
 ]]></content>
   </entry>
   
   <entry>
     <title type="html"><![CDATA[-no-cpp-precomp: The Compiler Flag That Time Forgot]]></title>
-    <link href="http://mistys-internet.website/blog/blog/2013/10/19/no-cpp-precomp-the-compiler-flag-that-time-forgot/"/>
-    <updated>2013-10-19T22:58:00-07:00</updated>
-    <id>http://mistys-internet.website/blog/blog/2013/10/19/no-cpp-precomp-the-compiler-flag-that-time-forgot</id>
+    <link href="http://mistys-internet.website/blog/blog/2013/10/20/no-cpp-precomp-the-compiler-flag-that-time-forgot/"/>
+    <updated>2013-10-20T16:58:00+11:00</updated>
+    <id>http://mistys-internet.website/blog/blog/2013/10/20/no-cpp-precomp-the-compiler-flag-that-time-forgot</id>
     <content type="html"><![CDATA[<p>I’m often surprised how long software can keep trying to use compatibility features ages after their best-by date.</p>
 
 <p>Now that GCC 4.8 builds on Tiger<sup id="fnref:1"><a href="#fn:1" rel="footnote">1</a></sup>, I’ve been testing as much software with it as I can. When building ncurses using GCC 4.8.1, though, I came across a strange error message:</p>
@@ -702,9 +734,9 @@ In 1999, an unofficial mod titled <a href="http://www5.ocn.ne.jp/~afc/limitover/
   
   <entry>
     <title type="html"><![CDATA[Software Archaeology: Apple’s Cctools]]></title>
-    <link href="http://mistys-internet.website/blog/blog/2013/04/09/software-archaeology-apples-cctools/"/>
-    <updated>2013-04-09T20:08:00-07:00</updated>
-    <id>http://mistys-internet.website/blog/blog/2013/04/09/software-archaeology-apples-cctools</id>
+    <link href="http://mistys-internet.website/blog/blog/2013/04/10/software-archaeology-apples-cctools/"/>
+    <updated>2013-04-10T13:08:00+10:00</updated>
+    <id>http://mistys-internet.website/blog/blog/2013/04/10/software-archaeology-apples-cctools</id>
     <content type="html"><![CDATA[<p>One of the things I’ve been working on in Tigerbrew is backporting modern Apple build tools. The latest official versions, bundled with Xcode 2.5, are simply too old to be able to build some software. (For example, the latest GCC version available is 4.0.)</p>
 
 <p>In the process, I’ve found some pretty fascinating bits of history littered through the code and makefiles for Apple’s build tools. Here are some findings from Apple’s cctools<sup id="fnref:1"><a href="#fn:1" rel="footnote">1</a></sup> package:</p>
@@ -818,9 +850,9 @@ In 1999, an unofficial mod titled <a href="http://www5.ocn.ne.jp/~afc/limitover/
   
   <entry>
     <title type="html"><![CDATA[Tiger’s `which` Is Terrible; or, Necessity Is the Mother of Invention]]></title>
-    <link href="http://mistys-internet.website/blog/blog/2013/04/04/tigers-which-is-terrible/"/>
-    <updated>2013-04-04T07:11:00-07:00</updated>
-    <id>http://mistys-internet.website/blog/blog/2013/04/04/tigers-which-is-terrible</id>
+    <link href="http://mistys-internet.website/blog/blog/2013/04/05/tigers-which-is-terrible/"/>
+    <updated>2013-04-05T01:11:00+11:00</updated>
+    <id>http://mistys-internet.website/blog/blog/2013/04/05/tigers-which-is-terrible</id>
     <content type="html"><![CDATA[<p>One of the most useful things about running software in unusual configurations is that sometimes it exposes unexpected flaws you never knew you had.</p>
 
 <p>The <code>which</code> utility is one of those commandline niceties you never really think about until it’s not there anymore. While sometimes implemented as a shell builtin<sup id="fnref:1"><a href="#fn:1" rel="footnote">1</a></sup>, it’s also frequently shipped as a standalone utility. Apple’s modern version, which is part of the shell_utils package and crystallized around Snow Leopard, works like this:</p>
@@ -872,9 +904,9 @@ In 1999, an unofficial mod titled <a href="http://www5.ocn.ne.jp/~afc/limitover/
   
   <entry>
     <title type="html"><![CDATA[Adventures With Ruby 1.8.2]]></title>
-    <link href="http://mistys-internet.website/blog/blog/2013/04/02/adventures-with-ruby-1-8-2/"/>
-    <updated>2013-04-02T21:59:00-07:00</updated>
-    <id>http://mistys-internet.website/blog/blog/2013/04/02/adventures-with-ruby-1-8-2</id>
+    <link href="http://mistys-internet.website/blog/blog/2013/04/03/adventures-with-ruby-1-8-2/"/>
+    <updated>2013-04-03T15:59:00+11:00</updated>
+    <id>http://mistys-internet.website/blog/blog/2013/04/03/adventures-with-ruby-1-8-2</id>
     <content type="html"><![CDATA[<p>Homebrew has always used the version of Ruby which comes with OS X,<sup id="fnref:1"><a href="#fn:1" rel="footnote">1</a></sup> a design decision I decided to keep with Tigerbrew. Tiger comes with Ruby 1.8.2, built on Christmas Day, 2004, and with a version of Ruby that old I went in steeling myself for the inevitable ton of compatibility issues.</p>
 
 <p>On the whole I was pleasantly surprised. Most of what Homebrew uses is provided in exactly the same form, and while there are differences that range from puzzling<sup id="fnref:2"><a href="#fn:2" rel="footnote">2</a></sup> to major<sup id="fnref:3"><a href="#fn:3" rel="footnote">3</a></sup>, pretty much everything Just Works.</p>
@@ -912,9 +944,9 @@ In 1999, an unofficial mod titled <a href="http://www5.ocn.ne.jp/~afc/limitover/
   
   <entry>
     <title type="html"><![CDATA[Introducing Tigerbrew]]></title>
-    <link href="http://mistys-internet.website/blog/blog/2013/04/01/introducing-tigerbrew/"/>
-    <updated>2013-04-01T19:21:00-07:00</updated>
-    <id>http://mistys-internet.website/blog/blog/2013/04/01/introducing-tigerbrew</id>
+    <link href="http://mistys-internet.website/blog/blog/2013/04/02/introducing-tigerbrew/"/>
+    <updated>2013-04-02T13:21:00+11:00</updated>
+    <id>http://mistys-internet.website/blog/blog/2013/04/02/introducing-tigerbrew</id>
     <content type="html"><![CDATA[<p>Some of you may know that my other gig is <a href="http://brew.sh/">Homebrew</a>, the package manager for Mac OS X. Over the last few months, I’ve been spending some time on a fork of Homebrew that’s starting to become usable enough that I think it’s ready to be announced.</p>
 
 <p>When I was attending the AMIA<sup id="fnref:1"><a href="#fn:1" rel="footnote">1</a></sup> conference in December, my partner and I were travelling together; while I was at the conference during the day, she worked from various places in Seattle on her laptop. Since it’s practically impossible to attend a modern conference without a laptop, and she uses a desktop at home, I dug out my 2005-era PowerBook G4 to take notes. It may be eight years old, but as soon as I opened it up I remembered why I loved that laptop so much. It’s still in great shape, and it feels like a crime to leave it sitting unused so much of the time.</p>
@@ -947,18 +979,18 @@ In 1999, an unofficial mod titled <a href="http://www5.ocn.ne.jp/~afc/limitover/
   
   <entry>
     <title type="html"><![CDATA[PSA: Homebrew-digipres Repository Now Available!]]></title>
-    <link href="http://mistys-internet.website/blog/blog/2012/11/21/psa-homebrew-digipres-repository-now-available/"/>
-    <updated>2012-11-21T22:13:00-08:00</updated>
-    <id>http://mistys-internet.website/blog/blog/2012/11/21/psa-homebrew-digipres-repository-now-available</id>
+    <link href="http://mistys-internet.website/blog/blog/2012/11/22/psa-homebrew-digipres-repository-now-available/"/>
+    <updated>2012-11-22T17:13:00+11:00</updated>
+    <id>http://mistys-internet.website/blog/blog/2012/11/22/psa-homebrew-digipres-repository-now-available</id>
     <content type="html"><![CDATA[<p>Outside of archivy, I’m also a collaborator on <a href="http://brew.sh">Homebrew</a>, the awesome, lightweight package manager for OS X. I’ve been building a private repository of niche packages which aren’t available in the core repository for some reason or another, and ended up collecting enough digital preservation tools to create a new digital preservation-focused repository. You can find the new homebrew-digipres here: <a href="https://github.com/mistydemeo/homebrew-digipres">https://github.com/mistydemeo/homebrew-digipres</a> I’d welcome any contributions if you want to improve an existing formula, submit updates, or add a new package! Fork away.</p>
 ]]></content>
   </entry>
   
   <entry>
     <title type="html"><![CDATA[File ID Hackathon Debrief: FITS Handles Video Now!]]></title>
-    <link href="http://mistys-internet.website/blog/blog/2012/05/01/file-id-hackathon-debrief-fits-handles-video-now/"/>
-    <updated>2012-05-01T22:44:42-07:00</updated>
-    <id>http://mistys-internet.website/blog/blog/2012/05/01/file-id-hackathon-debrief-fits-handles-video-now</id>
+    <link href="http://mistys-internet.website/blog/blog/2012/05/02/file-id-hackathon-debrief-fits-handles-video-now/"/>
+    <updated>2012-05-02T15:44:42+10:00</updated>
+    <id>http://mistys-internet.website/blog/blog/2012/05/02/file-id-hackathon-debrief-fits-handles-video-now</id>
     <content type="html"><![CDATA[<p>I took part in the 24-hour file ID hackathon November 16th. It was a fantastic event, and between us the 15-ish participants got a lot of practical work done. You can read more about it and what was accomplished at the <a href="http://wiki.curatecamp.org/index.php/CURATEcamp_24_hour_worldwide_file_id_hackathon_Nov_16_2012">CURATEcamp wiki</a>.</p>
 
 <p>I spent most of my time working with video content and with <a href="http://fitstool.org/">FITS</a>, the File Identification Tool Set. FITS is a useful tool, but it’s traditionally had some problems that have held it back from being as effective as it could for digital preservation. Aside from its performance, which is an issue that still needs to be addressed, its support for audio-visual material has been pretty poor. I addressed a couple of the more serious items:</p>
@@ -1111,9 +1143,9 @@ In 1999, an unofficial mod titled <a href="http://www5.ocn.ne.jp/~afc/limitover/
   
   <entry>
     <title type="html"><![CDATA[Revisiting Archival Description – LOD-LAM Session Idea]]></title>
-    <link href="http://mistys-internet.website/blog/blog/2011/05/30/revisiting-archival-description/"/>
-    <updated>2011-05-30T15:29:00-07:00</updated>
-    <id>http://mistys-internet.website/blog/blog/2011/05/30/revisiting-archival-description</id>
+    <link href="http://mistys-internet.website/blog/blog/2011/05/31/revisiting-archival-description/"/>
+    <updated>2011-05-31T08:29:00+10:00</updated>
+    <id>http://mistys-internet.website/blog/blog/2011/05/31/revisiting-archival-description</id>
     <content type="html"><![CDATA[<p>Apologies for the brevity of this blog post – I’m keeping this brief to make sure I get it posted before LOD-LAM.</p>
 
 <p>So, archival description.</p>
