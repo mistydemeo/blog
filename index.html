@@ -9,7 +9,7 @@
   <meta name="author" content="Misty De Meo">
 
   
-  <meta name="description" content="I got my copy of the Undertale vinyl soundtrack in the mail the other day. While I&rsquo;ve seen a lot of excitement for it, I haven&rsquo;t seen &hellip;">
+  <meta name="description" content="Just upgraded to Mojave? Getting the 🚫 of doom when you try to boot your Mac? Worried you&rsquo;ve lost all your data? Don&rsquo;t panic! Your Mac is &hellip;">
   
 
   <!-- http://t.co/dKP3o1e -->
@@ -69,7 +69,7 @@
       
   <header>
     
-      <h1 class="entry-title"><a href="/blog/blog/2017/02/19/review-undertale-vinyl-soundtrack/">Review: Undertale Vinyl Soundtrack</a></h1>
+      <h1 class="entry-title"><a href="/blog/blog/2018/10/18/recover-from-filevault-doom/">Recover From FileVault Doom</a></h1>
     
     
       <p class="meta">
@@ -78,7 +78,102 @@
 
 
 
-<time class='entry-date' datetime='2017-02-19T13:05:40+11:00'><span class='date'><span class='date-month'>Feb</span> <span class='date-day'>19</span><span class='date-suffix'>th</span>, <span class='date-year'>2017</span></span> <span class='time'>1:05 pm</span></time>
+<time class='entry-date' datetime='2018-10-18T19:19:04-03:00'><span class='date'><span class='date-month'>Oct</span> <span class='date-day'>18</span><span class='date-suffix'>th</span>, <span class='date-year'>2018</span></span> <span class='time'>7:19 pm</span></time>
+        
+      </p>
+    
+  </header>
+
+
+  <div class="entry-content"><p>Just upgraded to Mojave? Getting the 🚫 of doom when you try to boot your Mac? Worried you&rsquo;ve lost all your data? <strong>Don&rsquo;t panic!</strong> Your Mac is recoverable, and this guide will help you get your drive back in shape.</p>
+
+<p>This bug is caused by a new limitation introduced for FileVault encryption. As mentioned in the <a href="https://developer.apple.com/documentation/macos_release_notes/macos_mojave_10_14_release_notes">release notes</a>, any APFS volume encrypted using Mojave&rsquo;s implementation of FileVault becomes invisible to earlier versions of macOS until the encryption or decryption process completes. By itself, this is mostly harmless. However, this is rendered much worse by a bug<sup id="fnref:1"><a href="#fn:1" rel="footnote">1</a></sup> that causes the Mojave installer to incorrectly trigger reencryption of an already-encrypted FileVault volume during the install process. Because full drive encryption cannot complete in a timely manner, the Mojave installer times out before encryption completes. The result is a macOS 10.13 (or older) install with a macOS 10.14 FileVault volume that hasn&rsquo;t yet finished encrypting. This volume can&rsquo;t be read by the startup manager, and so becomes unbootable.</p>
+
+<p>In order to fix this issue, we&rsquo;ll need to let your drive finish encrypting. This guide will walk you through the process. Before we get started, make sure you have the right supplies on hand. You&rsquo;ll need a USB key with a capacity of at least 8GB and access to a working Mac.</p>
+
+<h3>1. Create a USB Mojave installer</h3>
+
+<p>Download the Mojave installer application on your working Mac using the App Store. Don&rsquo;t worry, you won&rsquo;t be using that to install - just to create a USB installer for your broken Mac. Then follow <a href="https://support.apple.com/en-us/HT201372">these instructions from Apple</a>. This will erase your USB key and turn it into a bootable USB install drive.</p>
+
+<h3>2. Boot into the USB installer</h3>
+
+<p>Turn off the Mac that you&rsquo;re upgrading to Mojave and insert the USB drive you just created. Turn the Mac back on, and immediately hold the option key until the Startup Manager appears. Select the drive you created.</p>
+
+<h3>3. Enter Recovery Mode</h3>
+
+<p>The installer should provide an option to enter Recovery Mode. This is a different version of Recovery Mode than the one that&rsquo;s builtin to your Mac, and it will be able to see your hard drive.</p>
+
+<h3>4. Unlock and mount your hard drive</h3>
+
+<p>From the Utilities menu bar at the top of the screen, select Terminal. From the terminal prompt, type <code>diskutil apfs list</code>. In the output, you should see one volume whose FileVault status is listed as <code>FileVault: in progress</code> (or something similar). If it&rsquo;s already listed as &ldquo;unlocked&rdquo;, then you&rsquo;re good - proceed to step 5.</p>
+
+<p>Unlock this drive by running <code>diskutil apfs unlockVolume DISK</code>, where <code>DISK</code> is the identifier listed after <code>APFS Volume Disk</code> for the volume you identified in the previous paragraph. For example, you might type <code>diskutil apfs unlockVolume disk1s1</code>. This command will ask you for a password; enter either your personal log in password, or a FileVault recovery key.</p>
+
+<p>Once you&rsquo;ve completed this step, exit Terminal. You should be returned to the Recovery Mode main menu.</p>
+
+<h3>5. Create a new APFS volume</h3>
+
+<p>Open Disk Utility from the Recovery Mode main menu. Select your main hard drive, right-click it, and choose &ldquo;Add APFS Volume&rdquo;. Don&rsquo;t worry, this isn&rsquo;t repartitioning your drive - this bootable volume will live on the same volume as your main volume, and you will be able to delete it later. Name it &ldquo;Temporary&rdquo;, then click &ldquo;Add&rdquo;.</p>
+
+<p><img src="/blog/images/mojave/1_volume.png" width="264" title="Creating a volume" ></p>
+
+<p><img src="/blog/images/mojave/2_volume.png" width="442" title="Volume options" ></p>
+
+<p>Once you&rsquo;ve completed this step, exit Disk Utility. You should be returned to the Recovery Mode main menu. Return to the main Mojave installer menu.</p>
+
+<h3>6. Install Mojave on the new volume</h3>
+
+<p>Choose to install Mojave on the volume named &ldquo;Temporary&rdquo; that you created in the previous step. This will be a temporary fresh install, so don&rsquo;t worry too much about it - go ahead and keep all the options at their defaults.</p>
+
+<h3>7. Allow drive encryption to finish</h3>
+
+<p>Once your install has finished and you&rsquo;ve logged in, open Disk Utility. Unlock your normal hard drive by clicking on it and clicking the &ldquo;mount&rdquo; button in the toolbar. You will be asked for a password; like in the previous step in the terminal, you will need to provide either your login password (from your old Mac install), or your recovery key.</p>
+
+<p>At this point, drive encryption will start back up again. You will need to wait for that to finish; this could take a few hours. If you want to check on the progress, you can open a terminal and look at the output of <code>diskutil apfs list</code>; encryption is finished when you run that command and see the status read <code>FileVault: Yes</code>.</p>
+
+<h3>8. Upgrade your main drive to Mojave</h3>
+
+<p>Now you&rsquo;re finally (finally!) ready to let the Mojave install complete. Open up your USB drive in the Finder and run the macOS installer app. This time, instead of picking the temporary volume, pick your original Mac volume. Let the installer complete. This time, your Mac should boot up like normal. You&rsquo;re saved!</p>
+
+<h3>9. Clean up</h3>
+
+<p>Now that your main Mac volume is bootable again, you can get rid of the temporary volume we created in the previous step. To do that, open Disk Utility and right-click the volume named &ldquo;Temporary&rdquo;. Click &ldquo;Delete APFS Volume&rdquo;, then confirm by clicking &ldquo;Delete&rdquo; again.</p>
+
+<p><img src="/blog/images/mojave/3_volume.png" width="205" title="Deleting the temporary volume" ></p>
+
+<h3>You&rsquo;re done!</h3>
+
+<p>With any luck, you should be all set at this point. Feel free to reach out to me if you&rsquo;re still having trouble! Big thanks to <a href="https://twitter.com/mikeymikey">@mikeymikey</a> for the suggestion of using a second APFS volume to install the temporary macOS 10.14. Thanks also to my manager, who allowed me to use my internal blog post as the basis for this post.</p>
+<div class="footnotes">
+<hr/>
+<ol>
+<li id="fn:1">
+<p>I wish I could provide more detail about this bug, but as far as I know no details have been published. I&rsquo;ve filed a radar but haven&rsquo;t received a response. All I know is that this occurs, seemingly at random, to a small percentage of people who try to upgrade from macOS 10.13.6 to macOS 10.14 when FileVault is already enabled.<a href="#fnref:1" rev="footnote">&#8617;</a></p></li>
+</ol>
+</div>
+
+</div>
+  
+  
+
+
+    </article>
+  
+  
+    <article>
+      
+  <header>
+    
+      <h1 class="entry-title"><a href="/blog/blog/2017/02/18/review-undertale-vinyl-soundtrack/">Review: Undertale Vinyl Soundtrack</a></h1>
+    
+    
+      <p class="meta">
+        
+
+
+
+
+<time class='entry-date' datetime='2017-02-18T22:05:40-04:00'><span class='date'><span class='date-month'>Feb</span> <span class='date-day'>18</span><span class='date-suffix'>th</span>, <span class='date-year'>2017</span></span> <span class='time'>10:05 pm</span></time>
         
       </p>
     
@@ -130,7 +225,7 @@ Unfortunately, my copy shipped with large scratches on sides A and B. (See the p
 
 
 
-<time class='entry-date' datetime='2016-01-27T15:37:58+11:00'><span class='date'><span class='date-month'>Jan</span> <span class='date-day'>27</span><span class='date-suffix'>th</span>, <span class='date-year'>2016</span></span> <span class='time'>3:37 pm</span></time>
+<time class='entry-date' datetime='2016-01-27T00:37:58-04:00'><span class='date'><span class='date-month'>Jan</span> <span class='date-day'>27</span><span class='date-suffix'>th</span>, <span class='date-year'>2016</span></span> <span class='time'>12:37 am</span></time>
         
       </p>
     
@@ -199,7 +294,7 @@ Aligning every single detail of a format or API with the job which needs to be d
 
 
 
-<time class='entry-date' datetime='2015-12-04T17:07:24+11:00'><span class='date'><span class='date-month'>Dec</span> <span class='date-day'>4</span><span class='date-suffix'>th</span>, <span class='date-year'>2015</span></span> <span class='time'>5:07 pm</span></time>
+<time class='entry-date' datetime='2015-12-04T02:07:24-04:00'><span class='date'><span class='date-month'>Dec</span> <span class='date-day'>4</span><span class='date-suffix'>th</span>, <span class='date-year'>2015</span></span> <span class='time'>2:07 am</span></time>
         
       </p>
     
@@ -331,7 +426,7 @@ I make my own flat whites at home using ristretto shots.</p>
 
 
 
-<time class='entry-date' datetime='2015-06-22T14:36:00+10:00'><span class='date'><span class='date-month'>Jun</span> <span class='date-day'>22</span><span class='date-suffix'>nd</span>, <span class='date-year'>2015</span></span> <span class='time'>2:36 pm</span></time>
+<time class='entry-date' datetime='2015-06-22T01:36:00-03:00'><span class='date'><span class='date-month'>Jun</span> <span class='date-day'>22</span><span class='date-suffix'>nd</span>, <span class='date-year'>2015</span></span> <span class='time'>1:36 am</span></time>
         
       </p>
     
@@ -437,7 +532,7 @@ In 1999, an unofficial mod titled <a href="http://www5.ocn.ne.jp/~afc/limitover/
 
 
 
-<time class='entry-date' datetime='2015-05-17T14:12:00+10:00'><span class='date'><span class='date-month'>May</span> <span class='date-day'>17</span><span class='date-suffix'>th</span>, <span class='date-year'>2015</span></span> <span class='time'>2:12 pm</span></time>
+<time class='entry-date' datetime='2015-05-17T01:12:00-03:00'><span class='date'><span class='date-month'>May</span> <span class='date-day'>17</span><span class='date-suffix'>th</span>, <span class='date-year'>2015</span></span> <span class='time'>1:12 am</span></time>
         
       </p>
     
@@ -533,7 +628,7 @@ In 1999, an unofficial mod titled <a href="http://www5.ocn.ne.jp/~afc/limitover/
       
   <header>
     
-      <h1 class="entry-title"><a href="/blog/blog/2015/05/03/reevaluate/">Reevaluate</a></h1>
+      <h1 class="entry-title"><a href="/blog/blog/2015/05/02/reevaluate/">Reevaluate</a></h1>
     
     
       <p class="meta">
@@ -542,7 +637,7 @@ In 1999, an unofficial mod titled <a href="http://www5.ocn.ne.jp/~afc/limitover/
 
 
 
-<time class='entry-date' datetime='2015-05-03T03:41:08+10:00'><span class='date'><span class='date-month'>May</span> <span class='date-day'>3</span><span class='date-suffix'>rd</span>, <span class='date-year'>2015</span></span> <span class='time'>3:41 am</span></time>
+<time class='entry-date' datetime='2015-05-02T14:41:08-03:00'><span class='date'><span class='date-month'>May</span> <span class='date-day'>2</span><span class='date-suffix'>nd</span>, <span class='date-year'>2015</span></span> <span class='time'>2:41 pm</span></time>
         
       </p>
     
@@ -687,7 +782,7 @@ In 1999, an unofficial mod titled <a href="http://www5.ocn.ne.jp/~afc/limitover/
       
   <header>
     
-      <h1 class="entry-title"><a href="/blog/blog/2015/01/03/widescreen-gaming-in-the-90s/">Widescreen Gaming in the 90s</a></h1>
+      <h1 class="entry-title"><a href="/blog/blog/2015/01/02/widescreen-gaming-in-the-90s/">Widescreen Gaming in the 90s</a></h1>
     
     
       <p class="meta">
@@ -696,7 +791,7 @@ In 1999, an unofficial mod titled <a href="http://www5.ocn.ne.jp/~afc/limitover/
 
 
 
-<time class='entry-date' datetime='2015-01-03T09:02:49+11:00'><span class='date'><span class='date-month'>Jan</span> <span class='date-day'>3</span><span class='date-suffix'>rd</span>, <span class='date-year'>2015</span></span> <span class='time'>9:02 am</span></time>
+<time class='entry-date' datetime='2015-01-02T18:02:49-04:00'><span class='date'><span class='date-month'>Jan</span> <span class='date-day'>2</span><span class='date-suffix'>nd</span>, <span class='date-year'>2015</span></span> <span class='time'>6:02 pm</span></time>
         
       </p>
     
@@ -782,7 +877,7 @@ In 1999, an unofficial mod titled <a href="http://www5.ocn.ne.jp/~afc/limitover/
       
   <header>
     
-      <h1 class="entry-title"><a href="/blog/blog/2014/12/06/homebrew-gcc-changes-coming/">Homebrew GCC Changes Coming</a></h1>
+      <h1 class="entry-title"><a href="/blog/blog/2014/12/05/homebrew-gcc-changes-coming/">Homebrew GCC Changes Coming</a></h1>
     
     
       <p class="meta">
@@ -791,7 +886,7 @@ In 1999, an unofficial mod titled <a href="http://www5.ocn.ne.jp/~afc/limitover/
 
 
 
-<time class='entry-date' datetime='2014-12-06T13:57:06+11:00'><span class='date'><span class='date-month'>Dec</span> <span class='date-day'>6</span><span class='date-suffix'>th</span>, <span class='date-year'>2014</span></span> <span class='time'>1:57 pm</span></time>
+<time class='entry-date' datetime='2014-12-05T22:57:06-04:00'><span class='date'><span class='date-month'>Dec</span> <span class='date-day'>5</span><span class='date-suffix'>th</span>, <span class='date-year'>2014</span></span> <span class='time'>10:57 pm</span></time>
         
       </p>
     
@@ -857,7 +952,7 @@ In 1999, an unofficial mod titled <a href="http://www5.ocn.ne.jp/~afc/limitover/
       
   <header>
     
-      <h1 class="entry-title"><a href="/blog/blog/2014/09/11/thank-you/">Thank You, Ada</a></h1>
+      <h1 class="entry-title"><a href="/blog/blog/2014/09/10/thank-you/">Thank You, Ada</a></h1>
     
     
       <p class="meta">
@@ -866,7 +961,7 @@ In 1999, an unofficial mod titled <a href="http://www5.ocn.ne.jp/~afc/limitover/
 
 
 
-<time class='entry-date' datetime='2014-09-11T01:46:54+10:00'><span class='date'><span class='date-month'>Sep</span> <span class='date-day'>11</span><span class='date-suffix'>th</span>, <span class='date-year'>2014</span></span> <span class='time'>1:46 am</span></time>
+<time class='entry-date' datetime='2014-09-10T12:46:54-03:00'><span class='date'><span class='date-month'>Sep</span> <span class='date-day'>10</span><span class='date-suffix'>th</span>, <span class='date-year'>2014</span></span> <span class='time'>12:46 pm</span></time>
         
       </p>
     
@@ -889,35 +984,6 @@ In 1999, an unofficial mod titled <a href="http://www5.ocn.ne.jp/~afc/limitover/
 
     </article>
   
-  
-    <article>
-      
-  <header>
-    
-      <h1 class="entry-title"><a href="/blog/blog/2014/09/11/mind-the-dust/">Mind the Dust</a></h1>
-    
-    
-      <p class="meta">
-        
-
-
-
-
-<time class='entry-date' datetime='2014-09-11T01:42:12+10:00'><span class='date'><span class='date-month'>Sep</span> <span class='date-day'>11</span><span class='date-suffix'>th</span>, <span class='date-year'>2014</span></span> <span class='time'>1:42 am</span></time>
-        
-      </p>
-    
-  </header>
-
-
-  <div class="entry-content"><p>Please excuse the sparseness! I&rsquo;m in the process of migrating from Wordpress to Octopress; I haven&rsquo;t had time to change the default team or migrate over my older posts.</p>
-</div>
-  
-  
-
-
-    </article>
-  
   <div class="pagination">
     
       <a class="prev" href="/blog/posts/2">&larr; Older</a>
@@ -933,7 +999,11 @@ In 1999, an unofficial mod titled <a href="http://www5.ocn.ne.jp/~afc/limitover/
   <ul id="recent_posts">
     
       <li class="post">
-        <a href="/blog/blog/2017/02/19/review-undertale-vinyl-soundtrack/">Review: Undertale Vinyl Soundtrack</a>
+        <a href="/blog/blog/2018/10/18/recover-from-filevault-doom/">Recover From FileVault Doom</a>
+      </li>
+    
+      <li class="post">
+        <a href="/blog/blog/2017/02/18/review-undertale-vinyl-soundtrack/">Review: Undertale Vinyl Soundtrack</a>
       </li>
     
       <li class="post">
@@ -946,10 +1016,6 @@ In 1999, an unofficial mod titled <a href="http://www5.ocn.ne.jp/~afc/limitover/
     
       <li class="post">
         <a href="/blog/blog/2015/06/22/release-asuka-120-percent-limit-over-english-translation/">Release: Asuka 120% Limit Over English Translation</a>
-      </li>
-    
-      <li class="post">
-        <a href="/blog/blog/2015/05/17/attack-the-vector/">Attack the Vector</a>
       </li>
     
   </ul>
@@ -965,7 +1031,7 @@ In 1999, an unofficial mod titled <a href="http://www5.ocn.ne.jp/~afc/limitover/
     </div>
   </div>
   <footer role="contentinfo"><p>
-  Copyright &copy; 2017 - Misty De Meo -
+  Copyright &copy; 2018 - Misty De Meo -
   <span class="credit">Powered by <a href="http://octopress.org">Octopress</a></span>
 </p>
 
