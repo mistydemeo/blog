@@ -4,7 +4,7 @@
   <title><![CDATA[The Future Is Now]]></title>
   <link href="http://mistys-internet.website/blog/atom.xml" rel="self"/>
   <link href="http://mistys-internet.website/blog/"/>
-  <updated>2018-10-18T20:12:49-03:00</updated>
+  <updated>2019-02-20T20:44:15-08:00</updated>
   <id>http://mistys-internet.website/blog/</id>
   <author>
     <name><![CDATA[Misty De Meo]]></name>
@@ -14,9 +14,76 @@
 
   
   <entry>
+    <title type="html"><![CDATA[The Hunt for the Lost Phoenix Games]]></title>
+    <link href="http://mistys-internet.website/blog/blog/2019/02/20/the-hunt-for-the-lost-phoenix-games/"/>
+    <updated>2019-02-20T20:22:52-08:00</updated>
+    <id>http://mistys-internet.website/blog/blog/2019/02/20/the-hunt-for-the-lost-phoenix-games</id>
+    <content type="html"><![CDATA[<p>Among trashgame fans, Phoenix Games are one of the most infamous game publishers of all time. They&rsquo;re famous for making games of the lowest possible quality for the lowest possible price; their most infamous &ldquo;games&rdquo; <a href="https://youtu.be/j4sMwSWoSJY">were just poorly-animated movies on a PS2 disc</a>. They&rsquo;re the kind of fascinating bad you just can&rsquo;t help but love for their own sake.</p>
+
+<p>In their last year of life, Phoenix started publishing Nintendo DS games. They had an aggressive release schedule; in 2008 they announced plans to release 20 games inside of a year, most of which never came out. <em>Which</em> games did or didn&rsquo;t come out is still hard to figure out. Many online release lists take Phoenix Games&rsquo;s estimated release dates at face value, including many games that probably never came out. I&rsquo;ve put together a list of what I&rsquo;ve been able to confirm in the hopes that anyone with more information can help out.</p>
+
+<p>Out of the 20 games Phoenix announced, only five definitely came out under Phoenix themselves. There are confirmed physical copies of these games and ROM dumps on the internet. Three more were licensed to other publishes after Phoenix&rsquo;s bankruptcy. The other twelve are less certain; I&rsquo;ve divide these into three categories with explanations below. Phoenix declared bankruptcy in early 2009, and I haven&rsquo;t been able to confirm that any games were after the end of 2008. If you have any information, please contact me via email or <a href="https://twitter.com/mistydemeo">on Twitter</a>!</p>
+
+<p>Definitely released:</p>
+
+<ul>
+<li><em>12</em> - NorthPole Studio, 2008</li>
+<li><em>Adventures of Pinocchio</em> - Unknown, 2008</li>
+<li><em>Peter Pan&rsquo;s Playground</em> - Unknown, 2008</li>
+<li><em>Polar Rampage</em> - CyberPlanet, 2008</li>
+<li><em>Valentines Day</em> - NorthPole Studio, 2008</li>
+</ul>
+
+
+<p>Released by other developers:</p>
+
+<ul>
+<li><em>Coral Savior</em> - NorthPole Studio; released as <em>Bermuda Triangle: Saving the Coral</em> by Storm City Games, in North America, 2010; and as <em>Bermuda Triangle</em> by Funbox Media, in Europe, 2011</li>
+<li><em>Hoppie II</em> - CyberPlanet; released as <em>Hoppie</em>, by Maximum Family Games, in North America, 2011</li>
+<li><em>Veggy World</em> - CyberPlanet; released by Maximum Family Games, in North America, 2011</li>
+</ul>
+
+
+<p>Possibly released:</p>
+
+<p>These games had finalized cover art and announced release dates. The games in this category have been found in some online store catalogues, suggesting they may have either been released or at least had already been offered to stores.</p>
+
+<ul>
+<li><em>Jungle Gang: Perfect Plans</em> - Listed in an <a href="https://www.mcvuk.com/business/whats-new-october-17th-08">MCV article</a> as having been released October 17, 2008. Listed in a few online store catalogues as sold out.</li>
+<li><em>Love Heart</em> - Reviewed by Polish site <a href="https://www.gry-online.pl/gry/love-heart/zb24cb">GRYOnline.pl</a>, who gave it a 2008 release date.</li>
+</ul>
+
+
+<p>Probably not released:</p>
+
+<p>Included in release lists, but with no store pages to indicate they were ever actually released. Some of these games were given multiple release dates, probably because they were delayed and solicited multiple times.</p>
+
+<ul>
+<li><em>Dalmatians 4</em> - Listed in a <a href="http://playstationcollecting.com/forum/messageview.cfm?catid=76&amp;threadid=73644&amp;StartRow=26">PlayStation Collecting forums</a> catalogue as having been released on February 13, 2009.</li>
+<li><em>Lion and the King 3</em> - Listed in a <a href="http://playstationcollecting.com/forum/messageview.cfm?catid=76&amp;threadid=73644&amp;StartRow=26">PlayStation Collecting forums</a> catalogue as having been released on both October 24, 2008 and February 13, 2009.</li>
+<li><em>Monster Egg II</em> - Listed in a <a href="http://playstationcollecting.com/forum/messageview.cfm?catid=76&amp;threadid=73644&amp;StartRow=26">PlayStation Collecting forums</a> catalogue as having been released on both November 28, 2008 and March 13, 2009.</li>
+<li><em>Rat-A-Box</em> - Listed in an <a href="https://www.mcvuk.com/business/whats-new-october-17th-08">MCV article</a> as having been released October 17, 2008, but no store catalogue entries.</li>
+</ul>
+
+
+<p>Definitely not released:</p>
+
+<ul>
+<li><em>Cinderella&rsquo;s Fairy Tale</em> - Final cover art, but never included in any release lists.</li>
+<li><em>Greatest Flood</em> - No cover art or homepage.</li>
+<li><em>Iron Chef II</em> - Final cover art, but never included in any release lists.</li>
+<li><em>Monster Dessert</em> - No cover art or homepage.</li>
+<li><em>Princess Snow White</em> - No cover art or homepage.</li>
+<li><em>War in Heaven</em> - Final cover art, but never included in any release lists.</li>
+</ul>
+
+]]></content>
+  </entry>
+  
+  <entry>
     <title type="html"><![CDATA[Recover From FileVault Doom]]></title>
     <link href="http://mistys-internet.website/blog/blog/2018/10/18/recover-from-filevault-doom/"/>
-    <updated>2018-10-18T19:19:04-03:00</updated>
+    <updated>2018-10-18T15:19:04-07:00</updated>
     <id>http://mistys-internet.website/blog/blog/2018/10/18/recover-from-filevault-doom</id>
     <content type="html"><![CDATA[<p>Just upgraded to Mojave? Getting the 🚫 of doom when you try to boot your Mac? Worried you&rsquo;ve lost all your data? <strong>Don&rsquo;t panic!</strong> Your Mac is recoverable, and this guide will help you get your drive back in shape.</p>
 
@@ -91,7 +158,7 @@
   <entry>
     <title type="html"><![CDATA[Review: Undertale Vinyl Soundtrack]]></title>
     <link href="http://mistys-internet.website/blog/blog/2017/02/18/review-undertale-vinyl-soundtrack/"/>
-    <updated>2017-02-18T22:05:40-04:00</updated>
+    <updated>2017-02-18T18:05:40-08:00</updated>
     <id>http://mistys-internet.website/blog/blog/2017/02/18/review-undertale-vinyl-soundtrack</id>
     <content type="html"><![CDATA[<p>I got my copy of the Undertale vinyl soundtrack in the mail the other day. While I&rsquo;ve seen a lot of excitement for it, I haven&rsquo;t seen many people talk about what it&rsquo;s like, so I decided to write up my impressions.</p>
 
@@ -122,9 +189,9 @@ Unfortunately, my copy shipped with large scratches on sides A and B. (See the p
   
   <entry>
     <title type="html"><![CDATA[Elegance]]></title>
-    <link href="http://mistys-internet.website/blog/blog/2016/01/27/elegance/"/>
-    <updated>2016-01-27T00:37:58-04:00</updated>
-    <id>http://mistys-internet.website/blog/blog/2016/01/27/elegance</id>
+    <link href="http://mistys-internet.website/blog/blog/2016/01/26/elegance/"/>
+    <updated>2016-01-26T20:37:58-08:00</updated>
+    <id>http://mistys-internet.website/blog/blog/2016/01/26/elegance</id>
     <content type="html"><![CDATA[<p>A few months ago, I wrote <a href="https://github.com/mistydemeo/lucia">decoders</a> for the PCM formats used by the Sega CD and Sega Saturn versions of the game Lunar: Eternal Blue<sup id="fnref:1"><a href="#fn:1" rel="footnote">1</a></sup>.
 I wanted to write up a few notes on the format of the Sega CD version&rsquo;s uncompressed PCM format, and some interesting lessons I learned from it.</p>
 
@@ -171,9 +238,9 @@ Aligning every single detail of a format or API with the job which needs to be d
   
   <entry>
     <title type="html"><![CDATA[Flat Whites in Vancouver]]></title>
-    <link href="http://mistys-internet.website/blog/blog/2015/12/04/flat-whites-in-vancouver/"/>
-    <updated>2015-12-04T02:07:24-04:00</updated>
-    <id>http://mistys-internet.website/blog/blog/2015/12/04/flat-whites-in-vancouver</id>
+    <link href="http://mistys-internet.website/blog/blog/2015/12/03/flat-whites-in-vancouver/"/>
+    <updated>2015-12-03T22:07:24-08:00</updated>
+    <id>http://mistys-internet.website/blog/blog/2015/12/03/flat-whites-in-vancouver</id>
     <content type="html"><![CDATA[<p>This post is completely off-topic.
 Please indulge me.</p>
 
@@ -283,9 +350,9 @@ I make my own flat whites at home using ristretto shots.</p>
   
   <entry>
     <title type="html"><![CDATA[Release: Asuka 120% Limit Over English Translation]]></title>
-    <link href="http://mistys-internet.website/blog/blog/2015/06/22/release-asuka-120-percent-limit-over-english-translation/"/>
-    <updated>2015-06-22T01:36:00-03:00</updated>
-    <id>http://mistys-internet.website/blog/blog/2015/06/22/release-asuka-120-percent-limit-over-english-translation</id>
+    <link href="http://mistys-internet.website/blog/blog/2015/06/21/release-asuka-120-percent-limit-over-english-translation/"/>
+    <updated>2015-06-21T21:36:00-07:00</updated>
+    <id>http://mistys-internet.website/blog/blog/2015/06/21/release-asuka-120-percent-limit-over-english-translation</id>
     <content type="html"><![CDATA[<p>Asuka 120% Limited was a 1997 fighting game for the Sega Saturn, the final<sup id="fnref:1"><a href="#fn:1" rel="footnote">1</a></sup> game in a long-running series. The Asuka 120% games were always underdog favourites of mine; despite looking like throwaway anime fan-pandering, they were surprisingly deep, innovative games with unique mechanics that paved the way for later, more famous games like Guilty Gear and X-Men vs Street Fighter.</p>
 
 <p><img class="right" src="http://mistys-internet.website/blog/images/asuka/cover.gif" title="Asuka 120% Limit Over cover art" >
@@ -369,9 +436,9 @@ In 1999, an unofficial mod titled <a href="http://www5.ocn.ne.jp/~afc/limitover/
   
   <entry>
     <title type="html"><![CDATA[Attack the Vector]]></title>
-    <link href="http://mistys-internet.website/blog/blog/2015/05/17/attack-the-vector/"/>
-    <updated>2015-05-17T01:12:00-03:00</updated>
-    <id>http://mistys-internet.website/blog/blog/2015/05/17/attack-the-vector</id>
+    <link href="http://mistys-internet.website/blog/blog/2015/05/16/attack-the-vector/"/>
+    <updated>2015-05-16T21:12:00-07:00</updated>
+    <id>http://mistys-internet.website/blog/blog/2015/05/16/attack-the-vector</id>
     <content type="html"><![CDATA[<p>One downside of working with ancient OSs is coming across bugs that will never be fixed.</p>
 
 <p>In the early days of Tigerbrew, I had just started experimenting with GCC 4.2 as a replacement for Xcode 2.5&rsquo;s GCC 4.0. Everything was going great until I built something that uses Cocoa, which blew up with this message:</p>
@@ -455,11 +522,11 @@ In 1999, an unofficial mod titled <a href="http://www5.ocn.ne.jp/~afc/limitover/
   <entry>
     <title type="html"><![CDATA[Reevaluate]]></title>
     <link href="http://mistys-internet.website/blog/blog/2015/05/02/reevaluate/"/>
-    <updated>2015-05-02T14:41:08-03:00</updated>
+    <updated>2015-05-02T10:41:08-07:00</updated>
     <id>http://mistys-internet.website/blog/blog/2015/05/02/reevaluate</id>
     <content type="html"><![CDATA[<p>My least favourite backtrace is a backtrace that doesn&rsquo;t include my own code.</p>
 
-<p>Tigerbrew on OS X 10.4 uses <a href="http://mistys-internet.website/blog/blog/2013/04/03/adventures-with-ruby-1-8-2/">Ruby 1.8.2</a>, which was shipped on Christmas Day, 2004, and it has more than its fair share of interesting bugs. In today&rsquo;s lesson we break Ruby&rsquo;s stdlib class OpenStruct.</p>
+<p>Tigerbrew on OS X 10.4 uses <a href="http://mistys-internet.website/blog/blog/2013/04/02/adventures-with-ruby-1-8-2/">Ruby 1.8.2</a>, which was shipped on Christmas Day, 2004, and it has more than its fair share of interesting bugs. In today&rsquo;s lesson we break Ruby&rsquo;s stdlib class OpenStruct.</p>
 
 <p>OpenStruct is a simple data structure that provides a JavaScript object-like interface to Ruby hashes. It&rsquo;s essentially a hash that provides getter and setter methods for each defined attribute. For example:</p>
 
@@ -589,7 +656,7 @@ In 1999, an unofficial mod titled <a href="http://www5.ocn.ne.jp/~afc/limitover/
   <entry>
     <title type="html"><![CDATA[Widescreen Gaming in the 90s]]></title>
     <link href="http://mistys-internet.website/blog/blog/2015/01/02/widescreen-gaming-in-the-90s/"/>
-    <updated>2015-01-02T18:02:49-04:00</updated>
+    <updated>2015-01-02T14:02:49-08:00</updated>
     <id>http://mistys-internet.website/blog/blog/2015/01/02/widescreen-gaming-in-the-90s</id>
     <content type="html"><![CDATA[<p>Most people got their first taste of widescreen gaming with the Wii, Xbox 360, and PS3, but not a lot of people know that companies were experimenting with widescreen all the way back in the fifth console generation (PS1, Saturn, N64). A tiny number of games have full widescreen support, which looks great on modern widescreen TVs.</p>
 
@@ -664,7 +731,7 @@ In 1999, an unofficial mod titled <a href="http://www5.ocn.ne.jp/~afc/limitover/
   <entry>
     <title type="html"><![CDATA[Homebrew GCC Changes Coming]]></title>
     <link href="http://mistys-internet.website/blog/blog/2014/12/05/homebrew-gcc-changes-coming/"/>
-    <updated>2014-12-05T22:57:06-04:00</updated>
+    <updated>2014-12-05T18:57:06-08:00</updated>
     <id>http://mistys-internet.website/blog/blog/2014/12/05/homebrew-gcc-changes-coming</id>
     <content type="html"><![CDATA[<p>Big GCC changes are a-coming to <a href="http://brew.sh">Homebrew</a>, which will make building your own software against Homebrew-provided GCCs much more reliable. There&rsquo;s going to be a transition period, though, and any software built against GCC will need to be rebuilt against the new package to work. We&rsquo;ll be pushing the changes on <strong>December 12th, 2014</strong>, and this post is here to help you get ready for it!</p>
 
@@ -719,7 +786,7 @@ In 1999, an unofficial mod titled <a href="http://www5.ocn.ne.jp/~afc/limitover/
   <entry>
     <title type="html"><![CDATA[Thank You, Ada]]></title>
     <link href="http://mistys-internet.website/blog/blog/2014/09/10/thank-you/"/>
-    <updated>2014-09-10T12:46:54-03:00</updated>
+    <updated>2014-09-10T08:46:54-07:00</updated>
     <id>http://mistys-internet.website/blog/blog/2014/09/10/thank-you</id>
     <content type="html"><![CDATA[<p><a href="http://www.ibiblio.org/bess/">Bess Sadler</a>, <a href="http://andromedayelton.com/">Andromeda Yelton</a>, <a href="http://chrisbourg.wordpress.com/">Chris Bourg</a> and <a href="http://matienzo.org/">Mark Matienzo</a> have stepped forward to pledge to <a href="https://adainitiative.org/donate/?campaign=libraries">match up to $5120 of donations</a> to the <a href="http://adainitiative.org/">Ada Initiative</a>, a non-profit organization that supports the participation of women in open source and culture. I completely support this very generous act; the Ada Initiative does <a href="http://adainitiative.org/what-we-do/">incredibly important</a> work, and I&rsquo;m extremely proud of my friends and of the library community for supporting them.</p>
 
@@ -736,7 +803,7 @@ In 1999, an unofficial mod titled <a href="http://www5.ocn.ne.jp/~afc/limitover/
   <entry>
     <title type="html"><![CDATA[Mind the Dust]]></title>
     <link href="http://mistys-internet.website/blog/blog/2014/09/10/mind-the-dust/"/>
-    <updated>2014-09-10T12:42:12-03:00</updated>
+    <updated>2014-09-10T08:42:12-07:00</updated>
     <id>http://mistys-internet.website/blog/blog/2014/09/10/mind-the-dust</id>
     <content type="html"><![CDATA[<p>Please excuse the sparseness! I&rsquo;m in the process of migrating from Wordpress to Octopress; I haven&rsquo;t had time to change the default team or migrate over my older posts.</p>
 ]]></content>
@@ -744,9 +811,9 @@ In 1999, an unofficial mod titled <a href="http://www5.ocn.ne.jp/~afc/limitover/
   
   <entry>
     <title type="html"><![CDATA[-no-cpp-precomp: The Compiler Flag That Time Forgot]]></title>
-    <link href="http://mistys-internet.website/blog/blog/2013/10/20/no-cpp-precomp-the-compiler-flag-that-time-forgot/"/>
-    <updated>2013-10-20T02:58:00-03:00</updated>
-    <id>http://mistys-internet.website/blog/blog/2013/10/20/no-cpp-precomp-the-compiler-flag-that-time-forgot</id>
+    <link href="http://mistys-internet.website/blog/blog/2013/10/19/no-cpp-precomp-the-compiler-flag-that-time-forgot/"/>
+    <updated>2013-10-19T22:58:00-07:00</updated>
+    <id>http://mistys-internet.website/blog/blog/2013/10/19/no-cpp-precomp-the-compiler-flag-that-time-forgot</id>
     <content type="html"><![CDATA[<p>I’m often surprised how long software can keep trying to use compatibility features ages after their best-by date.</p>
 
 <p>Now that GCC 4.8 builds on Tiger<sup id="fnref:1"><a href="#fn:1" rel="footnote">1</a></sup>, I’ve been testing as much software with it as I can. When building ncurses using GCC 4.8.1, though, I came across a strange error message:</p>
@@ -809,9 +876,9 @@ In 1999, an unofficial mod titled <a href="http://www5.ocn.ne.jp/~afc/limitover/
   
   <entry>
     <title type="html"><![CDATA[Software Archaeology: Apple’s Cctools]]></title>
-    <link href="http://mistys-internet.website/blog/blog/2013/04/10/software-archaeology-apples-cctools/"/>
-    <updated>2013-04-10T00:08:00-03:00</updated>
-    <id>http://mistys-internet.website/blog/blog/2013/04/10/software-archaeology-apples-cctools</id>
+    <link href="http://mistys-internet.website/blog/blog/2013/04/09/software-archaeology-apples-cctools/"/>
+    <updated>2013-04-09T20:08:00-07:00</updated>
+    <id>http://mistys-internet.website/blog/blog/2013/04/09/software-archaeology-apples-cctools</id>
     <content type="html"><![CDATA[<p>One of the things I’ve been working on in Tigerbrew is backporting modern Apple build tools. The latest official versions, bundled with Xcode 2.5, are simply too old to be able to build some software. (For example, the latest GCC version available is 4.0.)</p>
 
 <p>In the process, I’ve found some pretty fascinating bits of history littered through the code and makefiles for Apple’s build tools. Here are some findings from Apple’s cctools<sup id="fnref:1"><a href="#fn:1" rel="footnote">1</a></sup> package:</p>
@@ -926,7 +993,7 @@ In 1999, an unofficial mod titled <a href="http://www5.ocn.ne.jp/~afc/limitover/
   <entry>
     <title type="html"><![CDATA[Tiger’s `which` Is Terrible; or, Necessity Is the Mother of Invention]]></title>
     <link href="http://mistys-internet.website/blog/blog/2013/04/04/tigers-which-is-terrible/"/>
-    <updated>2013-04-04T11:11:00-03:00</updated>
+    <updated>2013-04-04T07:11:00-07:00</updated>
     <id>http://mistys-internet.website/blog/blog/2013/04/04/tigers-which-is-terrible</id>
     <content type="html"><![CDATA[<p>One of the most useful things about running software in unusual configurations is that sometimes it exposes unexpected flaws you never knew you had.</p>
 
@@ -979,9 +1046,9 @@ In 1999, an unofficial mod titled <a href="http://www5.ocn.ne.jp/~afc/limitover/
   
   <entry>
     <title type="html"><![CDATA[Adventures With Ruby 1.8.2]]></title>
-    <link href="http://mistys-internet.website/blog/blog/2013/04/03/adventures-with-ruby-1-8-2/"/>
-    <updated>2013-04-03T01:59:00-03:00</updated>
-    <id>http://mistys-internet.website/blog/blog/2013/04/03/adventures-with-ruby-1-8-2</id>
+    <link href="http://mistys-internet.website/blog/blog/2013/04/02/adventures-with-ruby-1-8-2/"/>
+    <updated>2013-04-02T21:59:00-07:00</updated>
+    <id>http://mistys-internet.website/blog/blog/2013/04/02/adventures-with-ruby-1-8-2</id>
     <content type="html"><![CDATA[<p>Homebrew has always used the version of Ruby which comes with OS X,<sup id="fnref:1"><a href="#fn:1" rel="footnote">1</a></sup> a design decision I decided to keep with Tigerbrew. Tiger comes with Ruby 1.8.2, built on Christmas Day, 2004, and with a version of Ruby that old I went in steeling myself for the inevitable ton of compatibility issues.</p>
 
 <p>On the whole I was pleasantly surprised. Most of what Homebrew uses is provided in exactly the same form, and while there are differences that range from puzzling<sup id="fnref:2"><a href="#fn:2" rel="footnote">2</a></sup> to major<sup id="fnref:3"><a href="#fn:3" rel="footnote">3</a></sup>, pretty much everything Just Works.</p>
@@ -1020,7 +1087,7 @@ In 1999, an unofficial mod titled <a href="http://www5.ocn.ne.jp/~afc/limitover/
   <entry>
     <title type="html"><![CDATA[Introducing Tigerbrew]]></title>
     <link href="http://mistys-internet.website/blog/blog/2013/04/01/introducing-tigerbrew/"/>
-    <updated>2013-04-01T23:21:00-03:00</updated>
+    <updated>2013-04-01T19:21:00-07:00</updated>
     <id>http://mistys-internet.website/blog/blog/2013/04/01/introducing-tigerbrew</id>
     <content type="html"><![CDATA[<p>Some of you may know that my other gig is <a href="http://brew.sh/">Homebrew</a>, the package manager for Mac OS X. Over the last few months, I’ve been spending some time on a fork of Homebrew that’s starting to become usable enough that I think it’s ready to be announced.</p>
 
@@ -1054,18 +1121,18 @@ In 1999, an unofficial mod titled <a href="http://www5.ocn.ne.jp/~afc/limitover/
   
   <entry>
     <title type="html"><![CDATA[PSA: Homebrew-digipres Repository Now Available!]]></title>
-    <link href="http://mistys-internet.website/blog/blog/2012/11/22/psa-homebrew-digipres-repository-now-available/"/>
-    <updated>2012-11-22T02:13:00-04:00</updated>
-    <id>http://mistys-internet.website/blog/blog/2012/11/22/psa-homebrew-digipres-repository-now-available</id>
+    <link href="http://mistys-internet.website/blog/blog/2012/11/21/psa-homebrew-digipres-repository-now-available/"/>
+    <updated>2012-11-21T22:13:00-08:00</updated>
+    <id>http://mistys-internet.website/blog/blog/2012/11/21/psa-homebrew-digipres-repository-now-available</id>
     <content type="html"><![CDATA[<p>Outside of archivy, I’m also a collaborator on <a href="http://brew.sh">Homebrew</a>, the awesome, lightweight package manager for OS X. I’ve been building a private repository of niche packages which aren’t available in the core repository for some reason or another, and ended up collecting enough digital preservation tools to create a new digital preservation-focused repository. You can find the new homebrew-digipres here: <a href="https://github.com/mistydemeo/homebrew-digipres">https://github.com/mistydemeo/homebrew-digipres</a> I’d welcome any contributions if you want to improve an existing formula, submit updates, or add a new package! Fork away.</p>
 ]]></content>
   </entry>
   
   <entry>
     <title type="html"><![CDATA[File ID Hackathon Debrief: FITS Handles Video Now!]]></title>
-    <link href="http://mistys-internet.website/blog/blog/2012/05/02/file-id-hackathon-debrief-fits-handles-video-now/"/>
-    <updated>2012-05-02T02:44:42-03:00</updated>
-    <id>http://mistys-internet.website/blog/blog/2012/05/02/file-id-hackathon-debrief-fits-handles-video-now</id>
+    <link href="http://mistys-internet.website/blog/blog/2012/05/01/file-id-hackathon-debrief-fits-handles-video-now/"/>
+    <updated>2012-05-01T22:44:42-07:00</updated>
+    <id>http://mistys-internet.website/blog/blog/2012/05/01/file-id-hackathon-debrief-fits-handles-video-now</id>
     <content type="html"><![CDATA[<p>I took part in the 24-hour file ID hackathon November 16th. It was a fantastic event, and between us the 15-ish participants got a lot of practical work done. You can read more about it and what was accomplished at the <a href="http://wiki.curatecamp.org/index.php/CURATEcamp_24_hour_worldwide_file_id_hackathon_Nov_16_2012">CURATEcamp wiki</a>.</p>
 
 <p>I spent most of my time working with video content and with <a href="http://fitstool.org/">FITS</a>, the File Identification Tool Set. FITS is a useful tool, but it’s traditionally had some problems that have held it back from being as effective as it could for digital preservation. Aside from its performance, which is an issue that still needs to be addressed, its support for audio-visual material has been pretty poor. I addressed a couple of the more serious items:</p>
@@ -1219,7 +1286,7 @@ In 1999, an unofficial mod titled <a href="http://www5.ocn.ne.jp/~afc/limitover/
   <entry>
     <title type="html"><![CDATA[Revisiting Archival Description – LOD-LAM Session Idea]]></title>
     <link href="http://mistys-internet.website/blog/blog/2011/05/30/revisiting-archival-description/"/>
-    <updated>2011-05-30T19:29:00-03:00</updated>
+    <updated>2011-05-30T15:29:00-07:00</updated>
     <id>http://mistys-internet.website/blog/blog/2011/05/30/revisiting-archival-description</id>
     <content type="html"><![CDATA[<p>Apologies for the brevity of this blog post – I’m keeping this brief to make sure I get it posted before LOD-LAM.</p>
 
