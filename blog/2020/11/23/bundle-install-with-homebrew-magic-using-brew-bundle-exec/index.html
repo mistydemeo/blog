@@ -1,0 +1,256 @@
+
+<!DOCTYPE html>
+<!--[if IEMobile 7 ]><html class="no-js iem7"><![endif]-->
+<!--[if lt IE 9]><html class="no-js lte-ie8"><![endif]-->
+<!--[if (gt IE 8)|(gt IEMobile 7)|!(IEMobile)|!(IE)]><!--><html class="no-js" lang="en"><!--<![endif]-->
+<head>
+  <meta charset="utf-8">
+  <title>Bundle Install With Homebrew Magic Using Brew Bundle Exec - The Future Is Now</title>
+  <meta name="author" content="Misty De Meo">
+
+  
+  <meta name="description" content="Has this ever happened to you? You&rsquo;re writing a project in Ruby, JavaScript, Go, etc., and you have to build a dependency that uses a system &hellip;">
+  
+
+  <!-- http://t.co/dKP3o1e -->
+  <meta name="HandheldFriendly" content="True">
+  <meta name="MobileOptimized" content="320">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+
+  
+  <link rel="canonical" href="http://mistys-internet.website/blog/blog/2020/11/23/bundle-install-with-homebrew-magic-using-brew-bundle-exec">
+  <link href="/blog/favicon.png" rel="icon">
+  <link href="/blog/stylesheets/screen.css" media="screen, projection" rel="stylesheet" type="text/css">
+  <link href="/blog/atom.xml" rel="alternate" title="The Future Is Now" type="application/atom+xml">
+  <script src="/blog/javascripts/modernizr-2.0.js"></script>
+  <script src="//ajax.googleapis.com/ajax/libs/jquery/1.9.1/jquery.min.js"></script>
+  <script>!window.jQuery && document.write(unescape('%3Cscript src="./javascripts/libs/jquery.min.js"%3E%3C/script%3E'))</script>
+  <script src="/blog/javascripts/octopress.js" type="text/javascript"></script>
+  <!--Fonts from Google"s Web font directory at http://google.com/webfonts -->
+<link href="//fonts.googleapis.com/css?family=PT+Serif:regular,italic,bold,bolditalic" rel="stylesheet" type="text/css">
+<link href="//fonts.googleapis.com/css?family=PT+Sans:regular,italic,bold,bolditalic" rel="stylesheet" type="text/css">
+
+  
+
+</head>
+
+<body   >
+  <header role="banner"><hgroup>
+  <h1><a href="/blog/">The Future Is Now</a></h1>
+  
+</hgroup>
+
+</header>
+  <nav role="navigation"><ul class="subscription" data-subscription="rss">
+  <li><a href="/blog/atom.xml" rel="subscribe-rss" title="subscribe via RSS">RSS</a></li>
+  
+</ul>
+  
+<form action="https://www.google.com/search" method="get">
+  <fieldset role="search">
+    <input type="hidden" name="q" value="site:mistys-internet.website/blog" />
+    <input class="search" type="text" name="q" results="0" placeholder="Search"/>
+  </fieldset>
+</form>
+  
+<ul class="main-navigation">
+  <li><a href="/blog/">Blog</a></li>
+  <li><a href="/blog/blog/archives">Archives</a></li>
+</ul>
+
+</nav>
+  <div id="main">
+    <div id="content">
+      <div>
+<article class="hentry" role="article">
+  
+  <header>
+    
+      <h1 class="entry-title">Bundle Install With Homebrew Magic Using Brew Bundle Exec</h1>
+    
+    
+      <p class="meta">
+        
+
+
+
+
+<time class='entry-date' datetime='2020-11-23T20:30:00-08:00'><span class='date'><span class='date-month'>Nov</span> <span class='date-day'>23</span><span class='date-suffix'>rd</span>, <span class='date-year'>2020</span></span> <span class='time'>8:30 pm</span></time>
+        
+      </p>
+    
+  </header>
+
+
+<div class="entry-content"><p>Has this ever happened to you? You&rsquo;re writing a project in Ruby, JavaScript, Go, etc., and you have to build a dependency that uses a system library. So you <code>bundle install</code> and then, a few minutes later, your terminal spits up an ugly set of C compiler errors you don&rsquo;t know how to deal with. After dealing with this enough times I decided to do something about it.</p>
+
+<p><a href="https://brew.sh">Homebrew</a> already has a great tool in its arsenal for dealing with these problems. Homebrew needs to be able to build software reliably and robustly, after all - even if the user&rsquo;s system has weird software installed on it or strange misconfigurations. The <a href="https://docs.brew.sh/Formula-Cookbook#superenv-notes">&ldquo;superenv&rdquo; build environment</a> features intelligent automatic setup of build-related environment variables and <code>PATH</code>s based on just the requested dependencies, which filters out unrequested software and prevents a lot of common build failures that come from interfering software. It also uses shims for many common build tools to enforce just the right arguments passing through to the real tools.</p>
+
+<p>So I thought to myself - we solved that problem for Homebrew builds already, right? Wouldn&rsquo;t it be nice if I could just reuse that work for other things? So that&rsquo;s what I did. Homebrew already provides the <code>Brewfile</code> dependency declaration format and the <code>brew bundle</code> tool to library dependencies with Homebrew, and as a result there&rsquo;s already a great way to get the dependency information we&rsquo;d need to produce a reliable build environment. Since <code>brew bundle</code> is a Homebrew plugin, it has access to Homebrew&rsquo;s core code - including build environment setup. Putting these together, I wrote a feature called <code>brew bundle exec</code>. It takes the software you specify in your Brewfile and builds a dependency tree out of that, then sets up just the right build flags to let anything you want use them.</p>
+
+<p>For example, say I want to <code>gem install mysql2</code>. Often, you get something like this:</p>
+
+<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+</pre></td><td class='code'><pre><code class=''><span class='line'>$ gem install mysql2
+</span><span class='line'>Building native extensions. This could take a while...
+</span><span class='line'># several dozen lines later...
+</span><span class='line'>linking shared-object mysql2/mysql2.bundle
+</span><span class='line'>ld: library not found for -lssl
+</span><span class='line'>clang: error: linker command failed with exit code 1 (use -v to see invocation)
+</span><span class='line'>make: *** [mysql2.bundle] Error 1</span></code></pre></td></tr></table></div></figure>
+
+
+<p>Ew, right? Let&rsquo;s make that better.</p>
+
+<p>By creating a <code>Brewfile</code> with the line <code>brew "mysql"</code>, we can specify that we want to build against a Homebrew-installed MySQL <em>and</em> all of its dependencies. Just by running our command prefixed with <code>brew bundle exec --</code>, for example, <code>brew bundle exec -- gem install mysql2</code>, we can run that command in a build environment that knows exactly how to use its dependencies. Suddenly, everything works&mdash;no messing around with flags, no special options passed to <code>gem install</code>, and no fragile <code>bundle config</code> trickery.</p>
+
+<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+</pre></td><td class='code'><pre><code class=''><span class='line'>$ brew bundle exec -- gem install mysql2
+</span><span class='line'>Building native extensions. This could take a while...
+</span><span class='line'>Successfully installed mysql2-0.5.3
+</span><span class='line'>Parsing documentation for mysql2-0.5.3
+</span><span class='line'>Installing ri documentation for mysql2-0.5.3
+</span><span class='line'>Done installing documentation for mysql2 after 0 seconds
+</span><span class='line'>1 gem installed</span></code></pre></td></tr></table></div></figure>
+
+
+<p>What exactly does <code>brew bundle exec</code> set? There&rsquo;s a variety of flags set which are useful for a variety of different compilers and buildsystems.</p>
+
+<ul>
+<li><code>CC</code> and <code>CXX</code>, the compiler specification flags, point to Homebrew&rsquo;s compiler shims which help ensure that the right flags are passed to the real compiler being used.</li>
+<li><code>CFLAGS</code>, <code>CXXFLAGS</code>, and <code>CPPFLAGS</code> ensure that C and C++ compilers know about the header and library lookup paths for all of the <code>Brewfile</code> dependencies.</li>
+<li><code>PATH</code> ensures that all of the executables installed by <code>Brewfile</code> dependencies will be found first, before any tools of the same name that may be installed elsewhere on your system.</li>
+<li><code>PKG_CONFIG_LIBDIR</code> and <code>PKG_CONFIG_LIBDIR</code> ensure that the <code>pkg-config</code> tool finds <code>Brewfile</code> dependencies.</li>
+<li>Buildsystem-specific flags, such as <code>CMAKE_PREFIX_PATH</code>, ensure that buildsystems can make use of the <code>Brewfile</code> dependencies.</li>
+</ul>
+
+
+<p>So the next time you&rsquo;re bashing your head against build failures in your project, give <code>brew bundle exec</code> a try. It might just solve your problems for you!</p>
+</div>
+
+
+  <footer>
+    <p class="meta">
+      
+  
+
+<span class="byline author vcard">Posted by <span class="fn">Misty De Meo</span></span>
+
+      
+
+
+
+
+<time class='entry-date' datetime='2020-11-23T20:30:00-08:00'><span class='date'><span class='date-month'>Nov</span> <span class='date-day'>23</span><span class='date-suffix'>rd</span>, <span class='date-year'>2020</span></span> <span class='time'>8:30 pm</span></time>
+      
+
+<span class="categories">
+  
+    <a class='category' href='/blog/blog/categories/homebrew/'>homebrew</a>
+  
+</span>
+
+
+    </p>
+    
+      <div class="sharing">
+  
+  <a href="//twitter.com/share" class="twitter-share-button" data-url="http://mistys-internet.website/blog/blog/2020/11/23/bundle-install-with-homebrew-magic-using-brew-bundle-exec/" data-via="" data-counturl="http://mistys-internet.website/blog/blog/2020/11/23/bundle-install-with-homebrew-magic-using-brew-bundle-exec/" >Tweet</a>
+  
+  
+  
+</div>
+
+    
+    <p class="meta">
+      
+        <a class="basic-alignment left" href="/blog/blog/2019/02/20/the-hunt-for-the-lost-phoenix-games/" title="Previous Post: The Hunt for the Lost Phoenix Games">&laquo; The Hunt for the Lost Phoenix Games</a>
+      
+      
+    </p>
+  </footer>
+</article>
+
+</div>
+
+<aside class="sidebar">
+  
+    <section>
+  <h1>Recent Posts</h1>
+  <ul id="recent_posts">
+    
+      <li class="post">
+        <a href="/blog/blog/2020/11/23/bundle-install-with-homebrew-magic-using-brew-bundle-exec/">Bundle Install With Homebrew Magic Using Brew Bundle Exec</a>
+      </li>
+    
+      <li class="post">
+        <a href="/blog/blog/2019/02/20/the-hunt-for-the-lost-phoenix-games/">The Hunt for the Lost Phoenix Games</a>
+      </li>
+    
+      <li class="post">
+        <a href="/blog/blog/2018/10/18/recover-from-filevault-doom/">Recover From FileVault Doom</a>
+      </li>
+    
+      <li class="post">
+        <a href="/blog/blog/2017/02/18/review-undertale-vinyl-soundtrack/">Review: Undertale Vinyl Soundtrack</a>
+      </li>
+    
+      <li class="post">
+        <a href="/blog/blog/2016/01/26/elegance/">Elegance</a>
+      </li>
+    
+  </ul>
+</section>
+
+
+
+
+
+  
+</aside>
+
+
+    </div>
+  </div>
+  <footer role="contentinfo"><p>
+  Copyright &copy; 2020 - Misty De Meo -
+  <span class="credit">Powered by <a href="http://octopress.org">Octopress</a></span>
+</p>
+
+</footer>
+  
+
+
+
+
+
+
+
+  <script type="text/javascript">
+    (function(){
+      var twitterWidgets = document.createElement('script');
+      twitterWidgets.type = 'text/javascript';
+      twitterWidgets.async = true;
+      twitterWidgets.src = '//platform.twitter.com/widgets.js';
+      document.getElementsByTagName('head')[0].appendChild(twitterWidgets);
+    })();
+  </script>
+
+
+
+
+
+</body>
+</html>

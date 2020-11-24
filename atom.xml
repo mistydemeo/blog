@@ -4,7 +4,7 @@
   <title><![CDATA[The Future Is Now]]></title>
   <link href="http://mistys-internet.website/blog/atom.xml" rel="self"/>
   <link href="http://mistys-internet.website/blog/"/>
-  <updated>2019-02-20T22:11:04-08:00</updated>
+  <updated>2020-11-23T20:31:38-08:00</updated>
   <id>http://mistys-internet.website/blog/</id>
   <author>
     <name><![CDATA[Misty De Meo]]></name>
@@ -12,6 +12,70 @@
   </author>
   <generator uri="http://octopress.org/">Octopress</generator>
 
+  
+  <entry>
+    <title type="html"><![CDATA[Bundle Install With Homebrew Magic Using Brew Bundle Exec]]></title>
+    <link href="http://mistys-internet.website/blog/blog/2020/11/23/bundle-install-with-homebrew-magic-using-brew-bundle-exec/"/>
+    <updated>2020-11-23T20:30:00-08:00</updated>
+    <id>http://mistys-internet.website/blog/blog/2020/11/23/bundle-install-with-homebrew-magic-using-brew-bundle-exec</id>
+    <content type="html"><![CDATA[<p>Has this ever happened to you? You&rsquo;re writing a project in Ruby, JavaScript, Go, etc., and you have to build a dependency that uses a system library. So you <code>bundle install</code> and then, a few minutes later, your terminal spits up an ugly set of C compiler errors you don&rsquo;t know how to deal with. After dealing with this enough times I decided to do something about it.</p>
+
+<p><a href="https://brew.sh">Homebrew</a> already has a great tool in its arsenal for dealing with these problems. Homebrew needs to be able to build software reliably and robustly, after all - even if the user&rsquo;s system has weird software installed on it or strange misconfigurations. The <a href="https://docs.brew.sh/Formula-Cookbook#superenv-notes">&ldquo;superenv&rdquo; build environment</a> features intelligent automatic setup of build-related environment variables and <code>PATH</code>s based on just the requested dependencies, which filters out unrequested software and prevents a lot of common build failures that come from interfering software. It also uses shims for many common build tools to enforce just the right arguments passing through to the real tools.</p>
+
+<p>So I thought to myself - we solved that problem for Homebrew builds already, right? Wouldn&rsquo;t it be nice if I could just reuse that work for other things? So that&rsquo;s what I did. Homebrew already provides the <code>Brewfile</code> dependency declaration format and the <code>brew bundle</code> tool to library dependencies with Homebrew, and as a result there&rsquo;s already a great way to get the dependency information we&rsquo;d need to produce a reliable build environment. Since <code>brew bundle</code> is a Homebrew plugin, it has access to Homebrew&rsquo;s core code - including build environment setup. Putting these together, I wrote a feature called <code>brew bundle exec</code>. It takes the software you specify in your Brewfile and builds a dependency tree out of that, then sets up just the right build flags to let anything you want use them.</p>
+
+<p>For example, say I want to <code>gem install mysql2</code>. Often, you get something like this:</p>
+
+<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+</pre></td><td class='code'><pre><code class=''><span class='line'>$ gem install mysql2
+</span><span class='line'>Building native extensions. This could take a while...
+</span><span class='line'># several dozen lines later...
+</span><span class='line'>linking shared-object mysql2/mysql2.bundle
+</span><span class='line'>ld: library not found for -lssl
+</span><span class='line'>clang: error: linker command failed with exit code 1 (use -v to see invocation)
+</span><span class='line'>make: *** [mysql2.bundle] Error 1</span></code></pre></td></tr></table></div></figure>
+
+
+<p>Ew, right? Let&rsquo;s make that better.</p>
+
+<p>By creating a <code>Brewfile</code> with the line <code>brew "mysql"</code>, we can specify that we want to build against a Homebrew-installed MySQL <em>and</em> all of its dependencies. Just by running our command prefixed with <code>brew bundle exec --</code>, for example, <code>brew bundle exec -- gem install mysql2</code>, we can run that command in a build environment that knows exactly how to use its dependencies. Suddenly, everything works&mdash;no messing around with flags, no special options passed to <code>gem install</code>, and no fragile <code>bundle config</code> trickery.</p>
+
+<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+</pre></td><td class='code'><pre><code class=''><span class='line'>$ brew bundle exec -- gem install mysql2
+</span><span class='line'>Building native extensions. This could take a while...
+</span><span class='line'>Successfully installed mysql2-0.5.3
+</span><span class='line'>Parsing documentation for mysql2-0.5.3
+</span><span class='line'>Installing ri documentation for mysql2-0.5.3
+</span><span class='line'>Done installing documentation for mysql2 after 0 seconds
+</span><span class='line'>1 gem installed</span></code></pre></td></tr></table></div></figure>
+
+
+<p>What exactly does <code>brew bundle exec</code> set? There&rsquo;s a variety of flags set which are useful for a variety of different compilers and buildsystems.</p>
+
+<ul>
+<li><code>CC</code> and <code>CXX</code>, the compiler specification flags, point to Homebrew&rsquo;s compiler shims which help ensure that the right flags are passed to the real compiler being used.</li>
+<li><code>CFLAGS</code>, <code>CXXFLAGS</code>, and <code>CPPFLAGS</code> ensure that C and C++ compilers know about the header and library lookup paths for all of the <code>Brewfile</code> dependencies.</li>
+<li><code>PATH</code> ensures that all of the executables installed by <code>Brewfile</code> dependencies will be found first, before any tools of the same name that may be installed elsewhere on your system.</li>
+<li><code>PKG_CONFIG_LIBDIR</code> and <code>PKG_CONFIG_LIBDIR</code> ensure that the <code>pkg-config</code> tool finds <code>Brewfile</code> dependencies.</li>
+<li>Buildsystem-specific flags, such as <code>CMAKE_PREFIX_PATH</code>, ensure that buildsystems can make use of the <code>Brewfile</code> dependencies.</li>
+</ul>
+
+
+<p>So the next time you&rsquo;re bashing your head against build failures in your project, give <code>brew bundle exec</code> a try. It might just solve your problems for you!</p>
+]]></content>
+  </entry>
   
   <entry>
     <title type="html"><![CDATA[The Hunt for the Lost Phoenix Games]]></title>
@@ -1280,49 +1344,6 @@ In 1999, an unofficial mod titled <a href="http://www5.ocn.ne.jp/~afc/limitover/
 </span><span class='line'><span class="nt">&lt;/fits&gt;</span>
 </span></code></pre></td></tr></table></div></figure>
 
-]]></content>
-  </entry>
-  
-  <entry>
-    <title type="html"><![CDATA[Revisiting Archival Description – LOD-LAM Session Idea]]></title>
-    <link href="http://mistys-internet.website/blog/blog/2011/05/30/revisiting-archival-description/"/>
-    <updated>2011-05-30T15:29:00-07:00</updated>
-    <id>http://mistys-internet.website/blog/blog/2011/05/30/revisiting-archival-description</id>
-    <content type="html"><![CDATA[<p>Apologies for the brevity of this blog post – I’m keeping this brief to make sure I get it posted before LOD-LAM.</p>
-
-<p>So, archival description.</p>
-
-<p>Archival records are hard to find. They’re often in large bodies of records, difficult to browse through and generally less cut-and-dry than publications which are intended for formal publication and/or public consumption. Archival finding aids are the researcher’s traditional first point of contact, providing background biographical information on the organization and/or personal creator(s), as well as a description of how the records are arranged and description of the various levels of organizational hierarchy. They’re useful!</p>
-
-<p>But they’re also a bit old-fashioned, at least as typically implemented. The finding aid structure imposes a few issues for linked open data applications.</p>
-
-<p>I see two[^1] major problems with current archival description:</p>
-
-<h3>They’re hierarchical</h3>
-
-<p>Most countries’ archival description standards are based on a strict hierarchy from higher levels of description (fonds, etc.) to more precise levels of description (series, sub-series, file, item) with fairly rigidly prescribed relationships between items. The finding aid also assumes a “paper” whole-body approach, rather than a linking approach. This is kind of non-webby, and imposes a stricter order on documents than their creators may have had, in many cases.</p>
-
-<p>(The Australians, of course, are a few steps ahead of the rest of us already.)</p>
-
-<p>Perhaps even more though, a major problem is that:</p>
-
-<h3>They’re imprecise.</h3>
-
-<p>This is the real issue, or at least the most immediate issue. Archival descriptions are designed for human eyes in a paper world, and so they’re often encoded with a level of ambiguity that’s difficult for machines to extract. (<a href="http://archiveshub.ac.uk/blog/?p=2401">LOCAH</a> has been doing a great job of identifying points of concern and trying to route around them.)</p>
-
-<p>Archival descriptions have some inherent ambiguity because interpretation of archival holdings is not always cut and dry, but that doesn’t mean that we have to be ambiguous in how we create those descriptions. We can be precise about the ways in which our collections are ambiguous.</p>
-
-<p>I’d love to get a conversation going about revising descriptive standards to enhance precision in finding aids in order to enhance the ability to use them as computer-readable metadata. I can see a number of areas for improvement:</p>
-
-<ul>
-<li>More strongly-typed data fields, rather than “fuzzy” fields that can hold a variety of types of subjectively-defined data</li>
-<li>More focus on “globally-scoped” names rather than “locally scoped” (as pointed out by Pete@LOCAH <a href="http://blogs.ukoln.ac.uk/locah/2010/11/16/identifying-the-things-uri-patterns-for-the-hub-linked-data/">here</a>)</li>
-<li>A stricter, clearer inheritance model rather than ISAD(G)’s rule of non-repetition (Thanks to Pete <a href="http://web.archive.org/web/20110520025412/http://blogs.ukoln.ac.uk/locah/2010/09/28/model-a-first-cut/">again</a>)</li>
-<li>Certainly more, which we can talk about at LOD-LAM!</li>
-</ul>
-
-
-<p>The extent to which all this can be implemented will depend on the organization, of course – retrofitting older archival descriptions for all of this would be time-consuming, if practical at all. But I think there are a lot of benefits to be gained by changing practices going forward, and I see this as an enhancement to current descriptive standards/practices that can benefit more than just linked open data applications.</p>
 ]]></content>
   </entry>
   

@@ -1,6 +1,11 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <urlset xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.sitemaps.org/schemas/sitemap/0.9 http://www.sitemaps.org/schemas/sitemap/0.9/sitemap.xsd" xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
   <url>
+    <loc>http://mistys-internet.website/blog/blog/2020/11/23/bundle-install-with-homebrew-magic-using-brew-bundle-exec/</loc>
+    <lastmod>2020-11-23T20:30:00-08:00</lastmod>
+    <priority>0.8</priority>
+  </url>
+  <url>
     <loc>http://mistys-internet.website/blog/blog/2019/02/20/the-hunt-for-the-lost-phoenix-games/</loc>
     <lastmod>2019-02-20T20:22:52-08:00</lastmod>
     <priority>0.8</priority>
@@ -102,13 +107,13 @@
   </url>
   <url>
     <loc>http://mistys-internet.website/blog/</loc>
-    <lastmod>2019-02-20T22:11:04-08:00</lastmod>
+    <lastmod>2020-11-23T20:31:38-08:00</lastmod>
     <changefreq>weekly</changefreq>
     <priority>1.0</priority>
   </url>
   <url>
     <loc>http://mistys-internet.website/blog/blog/archives/</loc>
-    <lastmod>2019-02-20T22:11:04-08:00</lastmod>
+    <lastmod>2020-11-23T20:31:38-08:00</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.7</priority>
   </url>
