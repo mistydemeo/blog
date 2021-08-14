@@ -4,7 +4,7 @@
   <title><![CDATA[The Future Is Now]]></title>
   <link href="http://mistys-internet.website/blog/atom.xml" rel="self"/>
   <link href="http://mistys-internet.website/blog/"/>
-  <updated>2020-11-23T20:31:38-08:00</updated>
+  <updated>2021-08-14T13:56:07-07:00</updated>
   <id>http://mistys-internet.website/blog/</id>
   <author>
     <name><![CDATA[Misty De Meo]]></name>
@@ -12,6 +12,168 @@
   </author>
   <generator uri="http://octopress.org/">Octopress</generator>
 
+  
+  <entry>
+    <title type="html"><![CDATA[Exploring JVS]]></title>
+    <link href="http://mistys-internet.website/blog/blog/2021/08/14/exploring-jvs/"/>
+    <updated>2021-08-14T13:54:08-07:00</updated>
+    <id>http://mistys-internet.website/blog/blog/2021/08/14/exploring-jvs</id>
+    <content type="html"><![CDATA[<p>Everyone had their weird pandemic hobby, right? Well, mine is that I bought an arcade video game. Not the whole cabinet - just a board, to hook up to a TV and a game controller. If I can&rsquo;t go to the arcade, at least I can bring a favourite game home, right?</p>
+
+<p>As you might imagine, an arcade board isn&rsquo;t just plug and play; you can&rsquo;t just plug in a USB gamepad and call it a day. Finding out how to actually use it took some research. I looked up the different methods, and found I had more or less two options: a more expensive one involving repurposed arcade hardware, and an open-source one using off-the-shelf parts. While I was figuring out if the more expensive options were worth it, I decided I&rsquo;d try out the open source one, <a href="https://github.com/openjvs/openjvs">OpenJVS</a>. I started out as just a user, but ended up getting involved in development. Over the past few months, I&rsquo;ve contributed a bunch of new features and bugfixes. In the process I learned a lot about the specification&hellip; and quashed my fair share of weird bugs.</p>
+
+<h2>So what is JVS anyway?</h2>
+
+<p>Imagine this: you&rsquo;re an arcade machine manufacturer, and you need to make it easy for a machine operator to swap a new board into one of their cabinets. How do you make sure they don&rsquo;t have to run dozens of wires to get the controls hooked up? Video is easy; you can just use VGA, DVI, or HDMI. Power is easy too. What else is left? Well, there&rsquo;s many different kinds of input so players can actually play the game; coin inputs and money bookkeeping; smart cards to communicate information to a game; in other words, all kinds of input from the player.</p>
+
+<p>The solution? JAMMA Video Standard, or JVS, the standard used by most arcade games since the late 90s.<sup id="fnref:1"><a href="#fn:1" rel="footnote">1</a></sup> It&rsquo;s a serial protocol that makes arcade hardware close to plug and play: connect a single cable from your cabinet&rsquo;s I/O board to your new arcade board, and you get all of your controls and coin slots connected at once.</p>
+
+<p>If you want to use a JVS game at home, you could always put something together using an official I/O board, but - as it happens, the JVS spec is available<sup id="fnref:2"><a href="#fn:2" rel="footnote">2</a></sup>. There&rsquo;s nothing stopping you from making your own I/O board, and it turns out a few different people have. There are a few different open source options intended to work in a few different ways. I use OpenJVS, written by Bobby Dilley, which transforms a Raspberry Pi running Linux into a JVS I/O board.</p>
+
+<h2>How does JVS work?</h2>
+
+<p>So that&rsquo;s JVS, but how does it work? I won&rsquo;t go into deep detail, but here&rsquo;s the 10,000 meter view.</p>
+
+<p>JVS defines communication between an I/O board and a video game board. It uses the <a href="https://en.wikipedia.org/wiki/RS-485">RS-485</a> serial standard to communicate data, meaning that it&rsquo;s possible to use a standard USB RS-485 device to send and receive commands.<sup id="fnref:3"><a href="#fn:3" rel="footnote">3</a></sup> The I/O board handles tracking the state of all of the cabinet&rsquo;s inputs, and it&rsquo;s also responsible for all the coin management: it has its own count of how much money players have spent, and the game just reads that number instead of keeping track of it itself.</p>
+
+<p>The game board communicates with the I/O board by sending commands, then receiving packets of information in return. The game board tells the I/O board how many bytes of data to expect, then sends one or more messages as a set of raw bytes. The I/O board reads those bytes, interprets them, then sends a set of responses for each command.</p>
+
+<p>Open source JVS implementations don&rsquo;t just emulate the things a player would normally touch in the arcade, either. They also simulate features like the service and test buttons, which are tucked away inside a cabinet where only arcade employees can normally use them. The service button allows access to the operator menu, where employees can change hardware and software settings, while the test button does exactly what it sounds like. Arcade players will never get to use these, but for home players it&rsquo;s useful to be able to do things like change how many coins a play costs, turn on free play, or change the game language. OpenJVS supports both of these, and they seemed to work when I tested them. The test button did cause OpenJVS to log a message about an &ldquo;unsupported command&rdquo;, which seemed suspicious, but Bobby and I suspected this was just the board playing fast and loose with the spec so we ignored it. (This will come up again later.)</p>
+
+<p>OpenJVS was already basically complete and implemented all of the common parts of the protocol, so I started out as just a user. As I ran into a few bugs, I started contributing bugfixes and then implementations of more parts of the protocol.</p>
+
+<h2>Let&rsquo;s talk money</h2>
+
+<p>I mentioned coin management earlier. Obviously, in arcades, games are pay-to-play. Most game boards have a free play option so you can play as much as you want without paying, and a lot of home players will just switch their boards into the free play mode. There&rsquo;s nothing stopping you from emulating a coin slot though. OpenJVS lets you map a button on your controller to inserting a coin for something closer to the authentic arcade feeling. It seems like this might not be a common usecase, but the option is always there.</p>
+
+<p><img src="http://mistys-internet.website/blog/images/jvs/coins-253.png" title="Screenshot of the arcade board's coin counter with 253 coins" ></p>
+
+<p>Before long, I noticed a really strange bug. I&rsquo;d be playing games, and then notice that somehow I had over 200 credits in the machine. I definitely wasn&rsquo;t mashing the coin button that much, so I knew something had to be wrong. After some experimentation, I eventually figured out it only happened if you did a few specific things in exactly the right order:</p>
+
+<ul>
+<li>Insert one or more coins</li>
+<li>Enter the service menu and then the input test menu</li>
+<li>Exit the service menu</li>
+</ul>
+
+
+<p>At this point, I realized something suspicious was happening. I was always getting 200+ coins&hellip; but it was more specific than that. I was ending up with exactly 256 minus the number of coins I had when entering the service menu. For example, if I started with 3 coins, I&rsquo;d always have 253 coins after leaving the service menu. That was a pretty good sign I was seeing something in particular: integer underflow.</p>
+
+<p><img src="http://mistys-internet.website/blog/images/jvs/io_test.png" title="Screenshot of the IO test from the service menu" ></p>
+
+<p>Experienced programmers, feel free to skip this paragraph. But for those who aren&rsquo;t familiar: languages like C, which OpenJVS is written in, feature something called integer overflow and underflow. Number types have a maximum size which affects how many numbers it can represent. A 16-bit (or 2-byte) integer that can store only positive numbers, for example, can only represent numbers between 0 and 65535. Picture, for a moment, what happens if you ask a program to subtract 1 from a 16-bit integer that&rsquo;s already at 0, or add 1 to a number that&rsquo;s already at 65535. In C, and many other languages, it will underflow or underflow: subtract 1 from 0, and you get 65535; add 1 to 65535, and you get 0.</p>
+
+<p>Having figured out that I was probably seeing underflow, I took a look at the protocol. Since the JVS I/O board keeps track of the money balance, the protocol provides commands for dealing with that and it seemed like the most likely place I&rsquo;d find the bug. When I dug into OpenJVS&rsquo;s implementation of the &ldquo;decrease number of coins&rdquo; command, it wasn&rsquo;t too hard to find the culprit. It was right here:</p>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+</pre></td><td class='code'><pre><code class='c'><span class='line'><span class="cm">/* Prevent underflow of coins */</span>
+</span><span class='line'><span class="k">if</span> <span class="p">(</span><span class="n">coin_decrement</span> <span class="o">&gt;</span> <span class="n">jvsIO</span><span class="o">-&gt;</span><span class="n">state</span><span class="p">.</span><span class="n">coinCount</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span>
+</span><span class='line'>    <span class="n">coin_decrement</span> <span class="o">=</span> <span class="n">jvsIO</span><span class="o">-&gt;</span><span class="n">state</span><span class="p">.</span><span class="n">coinCount</span><span class="p">[</span><span class="mi">0</span><span class="p">];</span>
+</span><span class='line'>
+</span><span class='line'><span class="k">for</span> <span class="p">(</span><span class="kt">int</span> <span class="n">i</span> <span class="o">=</span> <span class="mi">0</span><span class="p">;</span> <span class="n">i</span> <span class="o">&lt;</span> <span class="n">jvsIO</span><span class="o">-&gt;</span><span class="n">capabilities</span><span class="p">.</span><span class="n">coins</span><span class="p">;</span> <span class="n">i</span><span class="o">++</span><span class="p">)</span>
+</span><span class='line'>    <span class="n">jvsIO</span><span class="o">-&gt;</span><span class="n">state</span><span class="p">.</span><span class="n">coinCount</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="o">-=</span> <span class="n">coin_decrement</span><span class="p">;</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>When OpenJVS received the command to decrement the number of coins by a certain amount, it tried to prevent underflows. Unfortunately, the underflow protection itself was buggy: it checked the number of coins in the first coin slot, but then decremented the number of coins in <em>every</em> slot. If slot 2 has fewer coins than slot 1, then slot 2 will end up underflowing by whatever the difference is. I still wasn&rsquo;t sure why it was trying to remove <em>256</em> coins, which seemed weird. I figured it must just be trying to clear the slot of all coins and trusting the I/O board to prevent underflows, and moved on.</p>
+
+<p>With that bug fixed, I decided to keep working at improving coin support. While I was working on that command, I noticed that OpenJVS was ignoring a similar command. While the board usually only needs to send commands to reduce the number of coins in the balance, like when the player starts a game, it can also send a command to increase the number of coins. I&rsquo;d noticed that my game board was trying to send that command, but OpenJVS had only implemented a placeholder that logged the request and then moved on without doing anything. The quickest way to figure out what was going on was just to implement the command myself. The actual command in the spec is pretty simple:</p>
+
+<table>
+<thead>
+<tr>
+<th> Purpose </th>
+<th> Sample </th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td> Command code (always 35) </td>
+<td> <code>0x35</code> </td>
+</tr>
+<tr>
+<td> Coin slot index </td>
+<td> <code>0x01</code> </td>
+</tr>
+<tr>
+<td> Amount (first half) </td>
+<td> <code>0x00</code> </td>
+</tr>
+<tr>
+<td> Amount (second half) </td>
+<td> <code>0x01</code> </td>
+</tr>
+</tbody>
+</table>
+
+
+<p>Easy enough: you can identify that it&rsquo;s the command to increase coins by the first byte, <code>35</code>, and then it tells you which coin slot to act on and how many coins to add to it. But when I was replacing the old placeholder command, I noticed something funny:</p>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+</pre></td><td class='code'><pre><code class='c'><span class='line'><span class="k">case</span> <span class="nl">CMD_WRITE_COINS</span><span class="p">:</span>
+</span><span class='line'><span class="p">{</span>
+</span><span class='line'>    <span class="n">debug</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="s">&quot;CMD_WRITE_COINS</span><span class="se">\n</span><span class="s">&quot;</span><span class="p">);</span>
+</span><span class='line'>    <span class="n">size</span> <span class="o">=</span> <span class="mi">3</span><span class="p">;</span>
+</span><span class='line'>    <span class="n">outputPacket</span><span class="p">.</span><span class="n">data</span><span class="p">[</span><span class="n">outputPacket</span><span class="p">.</span><span class="n">length</span><span class="o">++</span><span class="p">]</span> <span class="o">=</span> <span class="n">REPORT_SUCCESS</span><span class="p">;</span>
+</span><span class='line'><span class="p">}</span>
+</span><span class='line'><span class="k">break</span><span class="p">;</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>The placeholder command just reported success without doing anything, then jumped ahead in the stream by the command&rsquo;s length. But it jumped ahead <em>3</em> bytes, and according to the spec this command should be <em>4</em> bytes long. I tested OpenJVS with the command fully implemented, and noticed two things: pressing the test button now inserted 256 coins into the second coin slot, instead of doing nothing; and the &ldquo;unsupported command&rdquo; error I used to see went away. Why? When the buggy placeholder skipped ahead by three bytes, that left one byte in the buffer for OpenJVS to find and mistake for being a command. That byte, <code>0x01</code>, was actually the last byte of the &ldquo;insert coin&rdquo; command that was being sent when the test button was activated. I hadn&rsquo;t even set out to fix the &ldquo;unsupported command&rdquo; bug, but I fixed it anyway.</p>
+
+<p>At this point I&rsquo;d fixed all the bugs I set out to, but I was still seeing something that just didn&rsquo;t feel right. When exiting the service menu, the game board now withdrew coins from the balance; when pressing the test button, the board now added coins. But the number of coins looked wrong: it was happening in increments of 256, instead of 1, and even for test commands that seemed unlikely. So I took another look at the spec, and realized the answer had been staring me in the face the entire time. Let&rsquo;s take another look at the last part of that table from earlier:</p>
+
+<table>
+<thead>
+<tr>
+<th> Purpose </th>
+<th> Sample </th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td> Amount (first half) </td>
+<td> <code>0x00</code> </td>
+</tr>
+<tr>
+<td> Amount (second half) </td>
+<td> <code>0x01</code> </td>
+</tr>
+</tbody>
+</table>
+
+
+<p>The number of coins to add or remove is a two-byte, or 16-bit, value. Since JVS is communicating through single bytes, any multi-byte values have to be split up into single bytes for transmission. The spec helpfully tells us how to decode that: the numbers are stored in the big-endian, or most-significant byte first, format. But taking a look at OpenJVS&rsquo;s code shows that anywhere it was decoding these values, it was decoding them in little-endian format - in other words, it was reading the bytes backwards. What&rsquo;s 256 in little-endian format? It&rsquo;s the bytes &ldquo;0&rdquo; and &ldquo;1&rdquo;, in that order. What&rsquo;s 1 in big-endian format? It&rsquo;s those same two bytes in that same order. In other words, the game board hadn&rsquo;t been trying to add or subtract 256 coins all this time: it was just trying to add and remove single coins.</p>
+
+<p>Putting it all together, what exactly was happening when I saw coins being added and removed? It actually turns out to be pretty simple. Pressing the test button inserts a coin in the second coin slot. When the operator menu is activated, it can be used to test the coin counter. When the operator leaves the menu, the unit sends commands to remove all of the coins that were added by the test button; this should leave it with the same number of coins as it had when they started. The strange behaviour was a combination of all the bugs working together: the test button didn&rsquo;t do anything because the command wasn&rsquo;t implemented, and the buggy bounds checking and incomplete &ldquo;remove coins&rdquo; command meant it could underflow and leave the player with hundreds of coins.</p>
+
+<p>I originally set out to fix some pretty simple bugs, but every new bug I uncovered revealed a new one. The experience was quite a fun one. I can&rsquo;t say I ever thought I&rsquo;d be writing software for arcade machines, but not only did I fix my own problems, but I had the chance to learn more about how things work in a domain I might never otherwise have gotten the chance to touch.</p>
+<div class="footnotes">
+<hr/>
+<ol>
+<li id="fn:1">
+<p>This was actually the second JAMMA standard, following a simpler standard that was used internationally between 1985 and the late 90s.<a href="#fnref:1" rev="footnote">&#8617;</a></p></li>
+<li id="fn:2">
+<p>Including an excellent <a href="http://daifukkat.su/files/jvs_wip.pdf">English translation</a> by Alex Marshall!<a href="#fnref:2" rev="footnote">&#8617;</a></p></li>
+<li id="fn:3">
+<p>Mostly. JVS actually introduces an extra wire, known as the sync line, but I&rsquo;m going to ignore that here to keep the explanation simple.<a href="#fnref:3" rev="footnote">&#8617;</a></p></li>
+</ol>
+</div>
+
+]]></content>
+  </entry>
   
   <entry>
     <title type="html"><![CDATA[Bundle Install With Homebrew Magic Using Brew Bundle Exec]]></title>
@@ -147,7 +309,7 @@
   <entry>
     <title type="html"><![CDATA[Recover From FileVault Doom]]></title>
     <link href="http://mistys-internet.website/blog/blog/2018/10/18/recover-from-filevault-doom/"/>
-    <updated>2018-10-18T15:19:04-07:00</updated>
+    <updated>2018-10-18T19:19:04-03:00</updated>
     <id>http://mistys-internet.website/blog/blog/2018/10/18/recover-from-filevault-doom</id>
     <content type="html"><![CDATA[<p>Just upgraded to Mojave? Getting the 🚫 of doom when you try to boot your Mac? Worried you&rsquo;ve lost all your data? <strong>Don&rsquo;t panic!</strong> Your Mac is recoverable, and this guide will help you get your drive back in shape.</p>
 
@@ -221,9 +383,9 @@
   
   <entry>
     <title type="html"><![CDATA[Review: Undertale Vinyl Soundtrack]]></title>
-    <link href="http://mistys-internet.website/blog/blog/2017/02/18/review-undertale-vinyl-soundtrack/"/>
-    <updated>2017-02-18T18:05:40-08:00</updated>
-    <id>http://mistys-internet.website/blog/blog/2017/02/18/review-undertale-vinyl-soundtrack</id>
+    <link href="http://mistys-internet.website/blog/blog/2017/02/19/review-undertale-vinyl-soundtrack/"/>
+    <updated>2017-02-19T13:05:40+11:00</updated>
+    <id>http://mistys-internet.website/blog/blog/2017/02/19/review-undertale-vinyl-soundtrack</id>
     <content type="html"><![CDATA[<p>I got my copy of the Undertale vinyl soundtrack in the mail the other day. While I&rsquo;ve seen a lot of excitement for it, I haven&rsquo;t seen many people talk about what it&rsquo;s like, so I decided to write up my impressions.</p>
 
 <p><img src="http://mistys-internet.website/blog/images/undertale/front.jpg" title="Front cover" >
@@ -245,7 +407,7 @@ Unfortunately, my copy shipped with large scratches on sides A and B. (See the p
 
 <p><img src="http://mistys-internet.website/blog/images/undertale/dogsong.jpg" title="Dogsong sleeve" ></p>
 
-<p>Aside from the main album, preorders came with a special dogsong single. This one-sided 7&#8221; single has an extended version of dogsong, and is pressed on transparent vinyl with an image of the annoying dog on the other side. It&rsquo;s very cute, and for what it is it&rsquo;s well-produced and pretty-looking.</p>
+<p>Aside from the main album, preorders came with a special dogsong single. This one-sided 7" single has an extended version of dogsong, and is pressed on transparent vinyl with an image of the annoying dog on the other side. It&rsquo;s very cute, and for what it is it&rsquo;s well-produced and pretty-looking.</p>
 
 <p><img src="http://mistys-internet.website/blog/images/undertale/dogsong_disc.jpg" title="Dogsong disc" ></p>
 ]]></content>
@@ -466,7 +628,7 @@ In 1999, an unofficial mod titled <a href="http://www5.ocn.ne.jp/~afc/limitover/
 
 <h2>Text</h2>
 
-<p>The rest of the game&rsquo;s menu text is stored as ASCII strings in the main executable, and is completely in English. I did, however, make several changes to the character names displayed during loading screens. The one American character&rsquo;s name, Cathy, was misromanized as &ldquo;Cachy&rdquo;. This is an easy mistake to make, since her name was rendered in Japanese as &ldquo;きゃしい&rdquo; (Kyashii)<sup id="fnref:5"><a href="#fn:5" rel="footnote">5</a></sup>. I also changed the romanization of several characters&#8217; names from <a href="https://en.wikipedia.org/wiki/Kunrei-shiki_romanization">Kunrei-shiki</a> (Sinobu, Tetuko, Genitiro) to the more familiar <a href="https://en.wikipedia.org/wiki/Hepburn_romanization">Hepburn</a> (Shinobu, Tetsuko, Genichirou).</p>
+<p>The rest of the game&rsquo;s menu text is stored as ASCII strings in the main executable, and is completely in English. I did, however, make several changes to the character names displayed during loading screens. The one American character&rsquo;s name, Cathy, was misromanized as &ldquo;Cachy&rdquo;. This is an easy mistake to make, since her name was rendered in Japanese as &ldquo;きゃしい&rdquo; (Kyashii)<sup id="fnref:5"><a href="#fn:5" rel="footnote">5</a></sup>. I also changed the romanization of several characters' names from <a href="https://en.wikipedia.org/wiki/Kunrei-shiki_romanization">Kunrei-shiki</a> (Sinobu, Tetuko, Genitiro) to the more familiar <a href="https://en.wikipedia.org/wiki/Hepburn_romanization">Hepburn</a> (Shinobu, Tetsuko, Genichirou).</p>
 
 <h2>What&rsquo;s new in Limit Over?</h2>
 
@@ -1186,164 +1348,9 @@ In 1999, an unofficial mod titled <a href="http://www5.ocn.ne.jp/~afc/limitover/
   <entry>
     <title type="html"><![CDATA[PSA: Homebrew-digipres Repository Now Available!]]></title>
     <link href="http://mistys-internet.website/blog/blog/2012/11/21/psa-homebrew-digipres-repository-now-available/"/>
-    <updated>2012-11-21T22:13:00-08:00</updated>
+    <updated>2012-11-21T23:13:00-07:00</updated>
     <id>http://mistys-internet.website/blog/blog/2012/11/21/psa-homebrew-digipres-repository-now-available</id>
     <content type="html"><![CDATA[<p>Outside of archivy, I’m also a collaborator on <a href="http://brew.sh">Homebrew</a>, the awesome, lightweight package manager for OS X. I’ve been building a private repository of niche packages which aren’t available in the core repository for some reason or another, and ended up collecting enough digital preservation tools to create a new digital preservation-focused repository. You can find the new homebrew-digipres here: <a href="https://github.com/mistydemeo/homebrew-digipres">https://github.com/mistydemeo/homebrew-digipres</a> I’d welcome any contributions if you want to improve an existing formula, submit updates, or add a new package! Fork away.</p>
-]]></content>
-  </entry>
-  
-  <entry>
-    <title type="html"><![CDATA[File ID Hackathon Debrief: FITS Handles Video Now!]]></title>
-    <link href="http://mistys-internet.website/blog/blog/2012/05/01/file-id-hackathon-debrief-fits-handles-video-now/"/>
-    <updated>2012-05-01T22:44:42-07:00</updated>
-    <id>http://mistys-internet.website/blog/blog/2012/05/01/file-id-hackathon-debrief-fits-handles-video-now</id>
-    <content type="html"><![CDATA[<p>I took part in the 24-hour file ID hackathon November 16th. It was a fantastic event, and between us the 15-ish participants got a lot of practical work done. You can read more about it and what was accomplished at the <a href="http://wiki.curatecamp.org/index.php/CURATEcamp_24_hour_worldwide_file_id_hackathon_Nov_16_2012">CURATEcamp wiki</a>.</p>
-
-<p>I spent most of my time working with video content and with <a href="http://fitstool.org/">FITS</a>, the File Identification Tool Set. FITS is a useful tool, but it’s traditionally had some problems that have held it back from being as effective as it could for digital preservation. Aside from its performance, which is an issue that still needs to be addressed, its support for audio-visual material has been pretty poor. I addressed a couple of the more serious items:</p>
-
-<h3>Its embedded Exiftool was badly out of date</h3>
-
-<p>FITS bundles its own versions of the various tools it uses, rather than use the versions installed elsewhere on the machine. In theory this is a good idea; incompatibilities in the tools it uses could subtly break its output. In practice, however, it means that FITS has missed out on a lot of format identification improvements its tools have made. Before the hackathon FITS included exiftool 7.74, which was released in April, 2009. Back then exiftool had only rudimentary video support, but it’s made enormous strides in past several years and now has very robust video metadata extraction. The first thing I did in FITS was update the embedded exiftool to the current release. That alone has made a big difference in format detection.</p>
-
-<p>In the future I think it would be best to rethink the policy of embedding tools rather than using external copies, or at least provide the option to use another version the user has installed. exiftool is updated once every week or two and changes rapidly. I doubt FITS will be updated that frequently. A better option might be to recommend specific known-good versions of tools, but allow the user the option of running whichever tool version they prefer.</p>
-
-<h3>Its metadata mapping for video formats was primitive</h3>
-
-<p>FITS uses XSLT to map metadata fields from their native tag names to its own vocabulary, but the list of tags used for video was very short compared to other formats. As a result, a lot of potentially useful information from exiftool’s output was being discarded. Based on videos in my collection which had extensive embedded metadata, I beefed up FITS’s mapping table to enable it to grab many more common tags.</p>
-
-<p>While this made a good short-term solution, it made me think a bit more about how FITS approaches mapping fields. In particular,</p>
-
-<ol>
-<li><p>FITS has separate mappings for types such as “image”, “video”, “audio.” In practice, though, many of these formats use the exact same tags to mean the same things; this means either some mapping logic is duplicated, or certain fields are skipped for some files even though they’re mapped for others. After looking at practical examples of how FITS maps images and videos, I’m not convinced that treating them separately is practical.</p></li>
-<li><p>Beyond that, FITS uses file extension to determine whether a file is an image, video, etc. In practice many container file extensions can represent many kinds of files; extension is a pretty fragile way of determining type. If FITS keeps a distinction between file type mappings, it should move to using something like mimetype instead of extension.</p></li>
-</ol>
-
-
-<p>Aside from my work improving FITS, I also submitted a set of Quicktime videos to the OpenPlanets Format Corpus on GitHub. The 61-video set covers almost every codec Apple ships with Quicktime and Final Cut Pro, and should be useful for anyone who wants to try to identify individual codec/container combinations. They’re available at: <a href="https://github.com/openpreserve/format-corpus/tree/master/video/Quicktime">https://github.com/openplanets/format-corpus/tree/master/video/Quicktime</a></p>
-
-<p>I’ll end this off with some eye candy, to show how nicely FITS’s video support has improved.</p>
-
-<p>Before. The video is detected only as “Unknown Binary” (this was sadly common for video), and no meaningful metadata is extracted.</p>
-
-<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-<span class='line-number'>2</span>
-<span class='line-number'>3</span>
-<span class='line-number'>4</span>
-<span class='line-number'>5</span>
-<span class='line-number'>6</span>
-<span class='line-number'>7</span>
-<span class='line-number'>8</span>
-<span class='line-number'>9</span>
-<span class='line-number'>10</span>
-<span class='line-number'>11</span>
-<span class='line-number'>12</span>
-<span class='line-number'>13</span>
-<span class='line-number'>14</span>
-<span class='line-number'>15</span>
-<span class='line-number'>16</span>
-<span class='line-number'>17</span>
-</pre></td><td class='code'><pre><code class='xml'><span class='line'><span class="cp">&lt;?xml version=&quot;1.0&quot; encoding=&quot;UTF-8&quot;?&gt;</span>
-</span><span class='line'><span class="nt">&lt;fits</span> <span class="na">xmlns=</span><span class="s">&quot;http://hul.harvard.edu/ois/xml/ns/fits/fits_output&quot;</span> <span class="na">xmlns:xsi=</span><span class="s">&quot;http://www.w3.org/2001/XMLSchema-instance&quot;</span> <span class="na">xsi:schemaLocation=</span><span class="s">&quot;http://hul.harvard.edu/ois/xml/ns/fits/fits_output http://hul.harvard.edu/ois/xml/xsd/fits/fits_output.xsd&quot;</span> <span class="na">version=</span><span class="s">&quot;0.6.1&quot;</span> <span class="na">timestamp=</span><span class="s">&quot;11/17/12 10:18 PM&quot;</span><span class="nt">&gt;</span>
-</span><span class='line'><span class="nt">&lt;identification</span> <span class="na">status=</span><span class="s">&quot;UNKNOWN&quot;</span><span class="nt">&gt;</span>
-</span><span class='line'><span class="nt">&lt;identity</span> <span class="na">format=</span><span class="s">&quot;Unknown Binary&quot;</span> <span class="na">mimetype=</span><span class="s">&quot;application/octet-stream&quot;</span> <span class="na">toolname=</span><span class="s">&quot;FITS&quot;</span> <span class="na">toolversion=</span><span class="s">&quot;0.6.1&quot;</span><span class="nt">&gt;</span>
-</span><span class='line'><span class="nt">&lt;tool</span> <span class="na">toolname=</span><span class="s">&quot;Jhove&quot;</span> <span class="na">toolversion=</span><span class="s">&quot;1.5&quot;</span> <span class="nt">/&gt;</span>
-</span><span class='line'><span class="nt">&lt;/identity&gt;</span>
-</span><span class='line'><span class="nt">&lt;/identification&gt;</span>
-</span><span class='line'><span class="nt">&lt;fileinfo&gt;</span>
-</span><span class='line'><span class="nt">&lt;filepath</span> <span class="na">toolname=</span><span class="s">&quot;OIS File Information&quot;</span> <span class="na">toolversion=</span><span class="s">&quot;0.1&quot;</span> <span class="na">status=</span><span class="s">&quot;SINGLE_RESULT&quot;</span><span class="nt">&gt;</span>/Users/mistydemeo/Downloads/set1/00000.MTS<span class="nt">&lt;/filepath&gt;</span>
-</span><span class='line'><span class="nt">&lt;filename</span> <span class="na">toolname=</span><span class="s">&quot;OIS File Information&quot;</span> <span class="na">toolversion=</span><span class="s">&quot;0.1&quot;</span> <span class="na">status=</span><span class="s">&quot;SINGLE_RESULT&quot;</span><span class="nt">&gt;</span>/Users/mistydemeo/Downloads/set1/00000.MTS<span class="nt">&lt;/filename&gt;</span>
-</span><span class='line'><span class="nt">&lt;size</span> <span class="na">toolname=</span><span class="s">&quot;OIS File Information&quot;</span> <span class="na">toolversion=</span><span class="s">&quot;0.1&quot;</span> <span class="na">status=</span><span class="s">&quot;SINGLE_RESULT&quot;</span><span class="nt">&gt;</span>6039552<span class="nt">&lt;/size&gt;</span>
-</span><span class='line'><span class="nt">&lt;md5checksum</span> <span class="na">toolname=</span><span class="s">&quot;OIS File Information&quot;</span> <span class="na">toolversion=</span><span class="s">&quot;0.1&quot;</span> <span class="na">status=</span><span class="s">&quot;SINGLE_RESULT&quot;</span><span class="nt">&gt;</span>8c7c728334017a3ab4caff6e78b30037<span class="nt">&lt;/md5checksum&gt;</span>
-</span><span class='line'><span class="nt">&lt;fslastmodified</span> <span class="na">toolname=</span><span class="s">&quot;OIS File Information&quot;</span> <span class="na">toolversion=</span><span class="s">&quot;0.1&quot;</span> <span class="na">status=</span><span class="s">&quot;SINGLE_RESULT&quot;</span><span class="nt">&gt;</span>1261684470000<span class="nt">&lt;/fslastmodified&gt;</span>
-</span><span class='line'><span class="nt">&lt;/fileinfo&gt;</span>
-</span><span class='line'><span class="nt">&lt;filestatus</span> <span class="nt">/&gt;</span>
-</span><span class='line'><span class="nt">&lt;metadata</span> <span class="nt">/&gt;</span>
-</span><span class='line'><span class="nt">&lt;/fits&gt;</span>
-</span></code></pre></td></tr></table></div></figure>
-
-
-<p>After. Not only is the video format extracted, but a good 18 video tags are extracted.</p>
-
-<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-<span class='line-number'>2</span>
-<span class='line-number'>3</span>
-<span class='line-number'>4</span>
-<span class='line-number'>5</span>
-<span class='line-number'>6</span>
-<span class='line-number'>7</span>
-<span class='line-number'>8</span>
-<span class='line-number'>9</span>
-<span class='line-number'>10</span>
-<span class='line-number'>11</span>
-<span class='line-number'>12</span>
-<span class='line-number'>13</span>
-<span class='line-number'>14</span>
-<span class='line-number'>15</span>
-<span class='line-number'>16</span>
-<span class='line-number'>17</span>
-<span class='line-number'>18</span>
-<span class='line-number'>19</span>
-<span class='line-number'>20</span>
-<span class='line-number'>21</span>
-<span class='line-number'>22</span>
-<span class='line-number'>23</span>
-<span class='line-number'>24</span>
-<span class='line-number'>25</span>
-<span class='line-number'>26</span>
-<span class='line-number'>27</span>
-<span class='line-number'>28</span>
-<span class='line-number'>29</span>
-<span class='line-number'>30</span>
-<span class='line-number'>31</span>
-<span class='line-number'>32</span>
-<span class='line-number'>33</span>
-<span class='line-number'>34</span>
-<span class='line-number'>35</span>
-<span class='line-number'>36</span>
-<span class='line-number'>37</span>
-<span class='line-number'>38</span>
-<span class='line-number'>39</span>
-</pre></td><td class='code'><pre><code class='xml'><span class='line'><span class="cp">&lt;?xml version=&quot;1.0&quot; encoding=&quot;UTF-8&quot;?&gt;</span>
-</span><span class='line'><span class="nt">&lt;fits</span> <span class="na">xmlns=</span><span class="s">&quot;http://hul.harvard.edu/ois/xml/ns/fits/fits_output&quot;</span> <span class="na">xmlns:xsi=</span><span class="s">&quot;http://www.w3.org/2001/XMLSchema-instance&quot;</span> <span class="na">xsi:schemaLocation=</span><span class="s">&quot;http://hul.harvard.edu/ois/xml/ns/fits/fits_output http://hul.harvard.edu/ois/xml/xsd/fits/fits_output.xsd&quot;</span> <span class="na">version=</span><span class="s">&quot;0.6.1&quot;</span> <span class="na">timestamp=</span><span class="s">&quot;11/17/12 10:20 PM&quot;</span><span class="nt">&gt;</span>
-</span><span class='line'><span class="nt">&lt;identification</span> <span class="na">status=</span><span class="s">&quot;SINGLE_RESULT&quot;</span><span class="nt">&gt;</span>
-</span><span class='line'><span class="nt">&lt;identity</span> <span class="na">format=</span><span class="s">&quot;M2TS&quot;</span> <span class="na">mimetype=</span><span class="s">&quot;video/m2ts&quot;</span> <span class="na">toolname=</span><span class="s">&quot;FITS&quot;</span> <span class="na">toolversion=</span><span class="s">&quot;0.6.1&quot;</span><span class="nt">&gt;</span>
-</span><span class='line'><span class="nt">&lt;tool</span> <span class="na">toolname=</span><span class="s">&quot;Exiftool&quot;</span> <span class="na">toolversion=</span><span class="s">&quot;9.05&quot;</span> <span class="nt">/&gt;</span>
-</span><span class='line'><span class="nt">&lt;/identity&gt;</span>
-</span><span class='line'><span class="nt">&lt;/identification&gt;</span>
-</span><span class='line'><span class="nt">&lt;fileinfo&gt;</span>
-</span><span class='line'><span class="nt">&lt;lastmodified</span> <span class="na">toolname=</span><span class="s">&quot;Exiftool&quot;</span> <span class="na">toolversion=</span><span class="s">&quot;9.05&quot;</span> <span class="na">status=</span><span class="s">&quot;SINGLE_RESULT&quot;</span><span class="nt">&gt;</span>2009:12:24 13:54:36-06:00<span class="nt">&lt;/lastmodified&gt;</span>
-</span><span class='line'><span class="nt">&lt;filepath</span> <span class="na">toolname=</span><span class="s">&quot;OIS File Information&quot;</span> <span class="na">toolversion=</span><span class="s">&quot;0.1&quot;</span> <span class="na">status=</span><span class="s">&quot;SINGLE_RESULT&quot;</span><span class="nt">&gt;</span>/Users/mistydemeo/Downloads/set1/00001.MTS<span class="nt">&lt;/filepath&gt;</span>
-</span><span class='line'><span class="nt">&lt;filename</span> <span class="na">toolname=</span><span class="s">&quot;OIS File Information&quot;</span> <span class="na">toolversion=</span><span class="s">&quot;0.1&quot;</span> <span class="na">status=</span><span class="s">&quot;SINGLE_RESULT&quot;</span><span class="nt">&gt;</span>/Users/mistydemeo/Downloads/set1/00001.MTS<span class="nt">&lt;/filename&gt;</span>
-</span><span class='line'><span class="nt">&lt;size</span> <span class="na">toolname=</span><span class="s">&quot;OIS File Information&quot;</span> <span class="na">toolversion=</span><span class="s">&quot;0.1&quot;</span> <span class="na">status=</span><span class="s">&quot;SINGLE_RESULT&quot;</span><span class="nt">&gt;</span>4552704<span class="nt">&lt;/size&gt;</span>
-</span><span class='line'><span class="nt">&lt;md5checksum</span> <span class="na">toolname=</span><span class="s">&quot;OIS File Information&quot;</span> <span class="na">toolversion=</span><span class="s">&quot;0.1&quot;</span> <span class="na">status=</span><span class="s">&quot;SINGLE_RESULT&quot;</span><span class="nt">&gt;</span>770fd667d68ca8e6509670b0ef50e61c<span class="nt">&lt;/md5checksum&gt;</span>
-</span><span class='line'><span class="nt">&lt;fslastmodified</span> <span class="na">toolname=</span><span class="s">&quot;OIS File Information&quot;</span> <span class="na">toolversion=</span><span class="s">&quot;0.1&quot;</span> <span class="na">status=</span><span class="s">&quot;SINGLE_RESULT&quot;</span><span class="nt">&gt;</span>1261684476000<span class="nt">&lt;/fslastmodified&gt;</span>
-</span><span class='line'><span class="nt">&lt;/fileinfo&gt;</span>
-</span><span class='line'><span class="nt">&lt;filestatus</span> <span class="nt">/&gt;</span>
-</span><span class='line'><span class="nt">&lt;metadata&gt;</span>
-</span><span class='line'><span class="nt">&lt;video&gt;</span>
-</span><span class='line'><span class="nt">&lt;digitalCameraManufacturer</span> <span class="na">toolname=</span><span class="s">&quot;Exiftool&quot;</span> <span class="na">toolversion=</span><span class="s">&quot;9.05&quot;</span> <span class="na">status=</span><span class="s">&quot;SINGLE_RESULT&quot;</span><span class="nt">&gt;</span>Sony<span class="nt">&lt;/digitalCameraManufacturer&gt;</span>
-</span><span class='line'><span class="nt">&lt;digitalCameraModelName</span> <span class="na">toolname=</span><span class="s">&quot;Exiftool&quot;</span> <span class="na">toolversion=</span><span class="s">&quot;9.05&quot;</span> <span class="na">status=</span><span class="s">&quot;SINGLE_RESULT&quot;</span><span class="nt">&gt;</span>HXR-NX5U<span class="nt">&lt;/digitalCameraModelName&gt;</span>
-</span><span class='line'><span class="nt">&lt;duration</span> <span class="na">toolname=</span><span class="s">&quot;Exiftool&quot;</span> <span class="na">toolversion=</span><span class="s">&quot;9.05&quot;</span> <span class="na">status=</span><span class="s">&quot;SINGLE_RESULT&quot;</span><span class="nt">&gt;</span>0.09 s<span class="nt">&lt;/duration&gt;</span>
-</span><span class='line'><span class="nt">&lt;imageWidth</span> <span class="na">toolname=</span><span class="s">&quot;Exiftool&quot;</span> <span class="na">toolversion=</span><span class="s">&quot;9.05&quot;</span> <span class="na">status=</span><span class="s">&quot;SINGLE_RESULT&quot;</span><span class="nt">&gt;</span>1920<span class="nt">&lt;/imageWidth&gt;</span>
-</span><span class='line'><span class="nt">&lt;imageHeight</span> <span class="na">toolname=</span><span class="s">&quot;Exiftool&quot;</span> <span class="na">toolversion=</span><span class="s">&quot;9.05&quot;</span> <span class="na">status=</span><span class="s">&quot;SINGLE_RESULT&quot;</span><span class="nt">&gt;</span>1080<span class="nt">&lt;/imageHeight&gt;</span>
-</span><span class='line'><span class="nt">&lt;videoStreamType</span> <span class="na">toolname=</span><span class="s">&quot;Exiftool&quot;</span> <span class="na">toolversion=</span><span class="s">&quot;9.05&quot;</span> <span class="na">status=</span><span class="s">&quot;SINGLE_RESULT&quot;</span><span class="nt">&gt;</span>DigiCipher II Video<span class="nt">&lt;/videoStreamType&gt;</span>
-</span><span class='line'><span class="nt">&lt;shutterSpeedValue</span> <span class="na">toolname=</span><span class="s">&quot;Exiftool&quot;</span> <span class="na">toolversion=</span><span class="s">&quot;9.05&quot;</span> <span class="na">status=</span><span class="s">&quot;SINGLE_RESULT&quot;</span><span class="nt">&gt;</span>1/60<span class="nt">&lt;/shutterSpeedValue&gt;</span>
-</span><span class='line'><span class="nt">&lt;apertureSetting</span> <span class="na">toolname=</span><span class="s">&quot;Exiftool&quot;</span> <span class="na">toolversion=</span><span class="s">&quot;9.05&quot;</span> <span class="na">status=</span><span class="s">&quot;SINGLE_RESULT&quot;</span><span class="nt">&gt;</span>Auto<span class="nt">&lt;/apertureSetting&gt;</span>
-</span><span class='line'><span class="nt">&lt;fNumber</span> <span class="na">toolname=</span><span class="s">&quot;Exiftool&quot;</span> <span class="na">toolversion=</span><span class="s">&quot;9.05&quot;</span> <span class="na">status=</span><span class="s">&quot;SINGLE_RESULT&quot;</span><span class="nt">&gt;</span>3.7<span class="nt">&lt;/fNumber&gt;</span>
-</span><span class='line'><span class="nt">&lt;gain</span> <span class="na">toolname=</span><span class="s">&quot;Exiftool&quot;</span> <span class="na">toolversion=</span><span class="s">&quot;9.05&quot;</span> <span class="na">status=</span><span class="s">&quot;SINGLE_RESULT&quot;</span><span class="nt">&gt;</span>-3 dB<span class="nt">&lt;/gain&gt;</span>
-</span><span class='line'><span class="nt">&lt;exposureTime</span> <span class="na">toolname=</span><span class="s">&quot;Exiftool&quot;</span> <span class="na">toolversion=</span><span class="s">&quot;9.05&quot;</span> <span class="na">status=</span><span class="s">&quot;SINGLE_RESULT&quot;</span><span class="nt">&gt;</span>1/60<span class="nt">&lt;/exposureTime&gt;</span>
-</span><span class='line'><span class="nt">&lt;exposureProgram</span> <span class="na">toolname=</span><span class="s">&quot;Exiftool&quot;</span> <span class="na">toolversion=</span><span class="s">&quot;9.05&quot;</span> <span class="na">status=</span><span class="s">&quot;SINGLE_RESULT&quot;</span><span class="nt">&gt;</span>Manual<span class="nt">&lt;/exposureProgram&gt;</span>
-</span><span class='line'><span class="nt">&lt;whiteBalance</span> <span class="na">toolname=</span><span class="s">&quot;Exiftool&quot;</span> <span class="na">toolversion=</span><span class="s">&quot;9.05&quot;</span> <span class="na">status=</span><span class="s">&quot;SINGLE_RESULT&quot;</span><span class="nt">&gt;</span>Daylight<span class="nt">&lt;/whiteBalance&gt;</span>
-</span><span class='line'><span class="nt">&lt;imageStabilization</span> <span class="na">toolname=</span><span class="s">&quot;Exiftool&quot;</span> <span class="na">toolversion=</span><span class="s">&quot;9.05&quot;</span> <span class="na">status=</span><span class="s">&quot;SINGLE_RESULT&quot;</span><span class="nt">&gt;</span>On (0x3f)<span class="nt">&lt;/imageStabilization&gt;</span>
-</span><span class='line'><span class="nt">&lt;focus</span> <span class="na">toolname=</span><span class="s">&quot;Exiftool&quot;</span> <span class="na">toolversion=</span><span class="s">&quot;9.05&quot;</span> <span class="na">status=</span><span class="s">&quot;SINGLE_RESULT&quot;</span><span class="nt">&gt;</span>Manual (2.3)<span class="nt">&lt;/focus&gt;</span>
-</span><span class='line'><span class="nt">&lt;gpsVersionID</span> <span class="na">toolname=</span><span class="s">&quot;Exiftool&quot;</span> <span class="na">toolversion=</span><span class="s">&quot;9.05&quot;</span> <span class="na">status=</span><span class="s">&quot;SINGLE_RESULT&quot;</span><span class="nt">&gt;</span>2.2.0.0<span class="nt">&lt;/gpsVersionID&gt;</span>
-</span><span class='line'><span class="nt">&lt;gpsStatus</span> <span class="na">toolname=</span><span class="s">&quot;Exiftool&quot;</span> <span class="na">toolversion=</span><span class="s">&quot;9.05&quot;</span> <span class="na">status=</span><span class="s">&quot;SINGLE_RESULT&quot;</span><span class="nt">&gt;</span>V<span class="nt">&lt;/gpsStatus&gt;</span>
-</span><span class='line'><span class="nt">&lt;gpsMapDatum</span> <span class="na">toolname=</span><span class="s">&quot;Exiftool&quot;</span> <span class="na">toolversion=</span><span class="s">&quot;9.05&quot;</span> <span class="na">status=</span><span class="s">&quot;SINGLE_RESULT&quot;</span><span class="nt">&gt;</span>WGS-84<span class="nt">&lt;/gpsMapDatum&gt;</span>
-</span><span class='line'><span class="nt">&lt;/video&gt;</span>
-</span><span class='line'><span class="nt">&lt;/metadata&gt;</span>
-</span><span class='line'><span class="nt">&lt;/fits&gt;</span>
-</span></code></pre></td></tr></table></div></figure>
-
 ]]></content>
   </entry>
   

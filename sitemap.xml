@@ -1,120 +1,118 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <urlset xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.sitemaps.org/schemas/sitemap/0.9 http://www.sitemaps.org/schemas/sitemap/0.9/sitemap.xsd" xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
-  <url>
-    <loc>http://mistys-internet.website/blog/blog/2020/11/23/bundle-install-with-homebrew-magic-using-brew-bundle-exec/</loc>
-    <lastmod>2020-11-23T20:30:00-08:00</lastmod>
-    <priority>0.8</priority>
-  </url>
-  <url>
-    <loc>http://mistys-internet.website/blog/blog/2019/02/20/the-hunt-for-the-lost-phoenix-games/</loc>
-    <lastmod>2019-02-20T20:22:52-08:00</lastmod>
-    <priority>0.8</priority>
-  </url>
-  <url>
-    <loc>http://mistys-internet.website/blog/blog/2018/10/18/recover-from-filevault-doom/</loc>
-    <lastmod>2018-10-18T15:19:04-07:00</lastmod>
-    <priority>0.8</priority>
-  </url>
-  <url>
-    <loc>http://mistys-internet.website/blog/blog/2017/02/18/review-undertale-vinyl-soundtrack/</loc>
-    <lastmod>2017-02-18T18:05:40-08:00</lastmod>
-    <priority>0.8</priority>
-  </url>
-  <url>
-    <loc>http://mistys-internet.website/blog/blog/2016/01/26/elegance/</loc>
-    <lastmod>2016-01-26T20:37:58-08:00</lastmod>
-    <priority>0.8</priority>
-  </url>
-  <url>
-    <loc>http://mistys-internet.website/blog/blog/2015/12/03/flat-whites-in-vancouver/</loc>
-    <lastmod>2015-12-03T22:07:24-08:00</lastmod>
-    <priority>0.8</priority>
-  </url>
-  <url>
-    <loc>http://mistys-internet.website/blog/blog/2015/06/21/release-asuka-120-percent-limit-over-english-translation/</loc>
-    <lastmod>2015-06-21T21:36:00-07:00</lastmod>
-    <priority>0.8</priority>
-  </url>
-  <url>
-    <loc>http://mistys-internet.website/blog/blog/2015/05/16/attack-the-vector/</loc>
-    <lastmod>2015-05-16T21:12:00-07:00</lastmod>
-    <priority>0.8</priority>
-  </url>
-  <url>
-    <loc>http://mistys-internet.website/blog/blog/2015/05/02/reevaluate/</loc>
-    <lastmod>2015-05-02T10:41:08-07:00</lastmod>
-    <priority>0.8</priority>
-  </url>
-  <url>
-    <loc>http://mistys-internet.website/blog/blog/2015/01/02/widescreen-gaming-in-the-90s/</loc>
-    <lastmod>2015-01-02T14:02:49-08:00</lastmod>
-    <priority>0.8</priority>
-  </url>
-  <url>
-    <loc>http://mistys-internet.website/blog/blog/2014/12/05/homebrew-gcc-changes-coming/</loc>
-    <lastmod>2014-12-05T18:57:06-08:00</lastmod>
-    <priority>0.8</priority>
-  </url>
-  <url>
-    <loc>http://mistys-internet.website/blog/blog/2014/09/10/thank-you/</loc>
-    <lastmod>2014-09-10T08:46:54-07:00</lastmod>
-    <priority>0.8</priority>
-  </url>
-  <url>
-    <loc>http://mistys-internet.website/blog/blog/2014/09/10/mind-the-dust/</loc>
-    <lastmod>2014-09-10T08:42:12-07:00</lastmod>
-    <priority>0.8</priority>
-  </url>
-  <url>
-    <loc>http://mistys-internet.website/blog/blog/2013/10/19/no-cpp-precomp-the-compiler-flag-that-time-forgot/</loc>
-    <lastmod>2013-10-19T22:58:00-07:00</lastmod>
-    <priority>0.8</priority>
-  </url>
-  <url>
-    <loc>http://mistys-internet.website/blog/blog/2013/04/09/software-archaeology-apples-cctools/</loc>
-    <lastmod>2013-04-09T20:08:00-07:00</lastmod>
-    <priority>0.8</priority>
-  </url>
-  <url>
-    <loc>http://mistys-internet.website/blog/blog/2013/04/04/tigers-which-is-terrible/</loc>
-    <lastmod>2013-04-04T07:11:00-07:00</lastmod>
-    <priority>0.8</priority>
-  </url>
-  <url>
-    <loc>http://mistys-internet.website/blog/blog/2013/04/02/adventures-with-ruby-1-8-2/</loc>
-    <lastmod>2013-04-02T21:59:00-07:00</lastmod>
-    <priority>0.8</priority>
-  </url>
-  <url>
-    <loc>http://mistys-internet.website/blog/blog/2013/04/01/introducing-tigerbrew/</loc>
-    <lastmod>2013-04-01T19:21:00-07:00</lastmod>
-    <priority>0.8</priority>
-  </url>
-  <url>
-    <loc>http://mistys-internet.website/blog/blog/2012/11/21/psa-homebrew-digipres-repository-now-available/</loc>
-    <lastmod>2012-11-21T22:13:00-08:00</lastmod>
-    <priority>0.8</priority>
-  </url>
-  <url>
-    <loc>http://mistys-internet.website/blog/blog/2012/05/01/file-id-hackathon-debrief-fits-handles-video-now/</loc>
-    <lastmod>2012-05-01T22:44:42-07:00</lastmod>
-    <priority>0.8</priority>
-  </url>
-  <url>
-    <loc>http://mistys-internet.website/blog/blog/2011/05/30/revisiting-archival-description/</loc>
-    <lastmod>2011-05-30T15:29:00-07:00</lastmod>
-    <priority>0.8</priority>
-  </url>
-  <url>
-    <loc>http://mistys-internet.website/blog/</loc>
-    <lastmod>2020-11-23T20:31:38-08:00</lastmod>
-    <changefreq>weekly</changefreq>
-    <priority>1.0</priority>
-  </url>
-  <url>
-    <loc>http://mistys-internet.website/blog/blog/archives/</loc>
-    <lastmod>2020-11-23T20:31:38-08:00</lastmod>
-    <changefreq>weekly</changefreq>
-    <priority>0.7</priority>
-  </url>
+<url>
+<loc>http://mistys-internet.website/blog/blog/2021/08/14/exploring-jvs/</loc>
+<lastmod>2021-08-14T13:54:08-07:00</lastmod>
+</url>
+<url>
+<loc>http://mistys-internet.website/blog/blog/2020/11/23/bundle-install-with-homebrew-magic-using-brew-bundle-exec/</loc>
+<lastmod>2020-11-23T20:30:00-08:00</lastmod>
+</url>
+<url>
+<loc>http://mistys-internet.website/blog/blog/2019/02/20/the-hunt-for-the-lost-phoenix-games/</loc>
+<lastmod>2019-02-20T20:22:52-08:00</lastmod>
+</url>
+<url>
+<loc>http://mistys-internet.website/blog/blog/2018/10/18/recover-from-filevault-doom/</loc>
+<lastmod>2018-10-18T19:19:04-03:00</lastmod>
+</url>
+<url>
+<loc>http://mistys-internet.website/blog/blog/2017/02/19/review-undertale-vinyl-soundtrack/</loc>
+<lastmod>2017-02-19T13:05:40+11:00</lastmod>
+</url>
+<url>
+<loc>http://mistys-internet.website/blog/blog/2016/01/26/elegance/</loc>
+<lastmod>2016-01-26T20:37:58-08:00</lastmod>
+</url>
+<url>
+<loc>http://mistys-internet.website/blog/blog/2015/12/03/flat-whites-in-vancouver/</loc>
+<lastmod>2015-12-03T22:07:24-08:00</lastmod>
+</url>
+<url>
+<loc>http://mistys-internet.website/blog/blog/2015/06/21/release-asuka-120-percent-limit-over-english-translation/</loc>
+<lastmod>2015-06-21T21:36:00-07:00</lastmod>
+</url>
+<url>
+<loc>http://mistys-internet.website/blog/blog/2015/05/16/attack-the-vector/</loc>
+<lastmod>2015-05-16T21:12:00-07:00</lastmod>
+</url>
+<url>
+<loc>http://mistys-internet.website/blog/blog/2015/05/02/reevaluate/</loc>
+<lastmod>2015-05-02T10:41:08-07:00</lastmod>
+</url>
+<url>
+<loc>http://mistys-internet.website/blog/blog/2015/01/02/widescreen-gaming-in-the-90s/</loc>
+<lastmod>2015-01-02T14:02:49-08:00</lastmod>
+</url>
+<url>
+<loc>http://mistys-internet.website/blog/blog/2014/12/05/homebrew-gcc-changes-coming/</loc>
+<lastmod>2014-12-05T18:57:06-08:00</lastmod>
+</url>
+<url>
+<loc>http://mistys-internet.website/blog/blog/2014/09/10/thank-you/</loc>
+<lastmod>2014-09-10T08:46:54-07:00</lastmod>
+</url>
+<url>
+<loc>http://mistys-internet.website/blog/blog/2014/09/10/mind-the-dust/</loc>
+<lastmod>2014-09-10T08:42:12-07:00</lastmod>
+</url>
+<url>
+<loc>http://mistys-internet.website/blog/blog/2013/10/19/no-cpp-precomp-the-compiler-flag-that-time-forgot/</loc>
+<lastmod>2013-10-19T22:58:00-07:00</lastmod>
+</url>
+<url>
+<loc>http://mistys-internet.website/blog/blog/2013/04/09/software-archaeology-apples-cctools/</loc>
+<lastmod>2013-04-09T20:08:00-07:00</lastmod>
+</url>
+<url>
+<loc>http://mistys-internet.website/blog/blog/2013/04/04/tigers-which-is-terrible/</loc>
+<lastmod>2013-04-04T07:11:00-07:00</lastmod>
+</url>
+<url>
+<loc>http://mistys-internet.website/blog/blog/2013/04/02/adventures-with-ruby-1-8-2/</loc>
+<lastmod>2013-04-02T21:59:00-07:00</lastmod>
+</url>
+<url>
+<loc>http://mistys-internet.website/blog/blog/2013/04/01/introducing-tigerbrew/</loc>
+<lastmod>2013-04-01T19:21:00-07:00</lastmod>
+</url>
+<url>
+<loc>http://mistys-internet.website/blog/blog/2012/11/21/psa-homebrew-digipres-repository-now-available/</loc>
+<lastmod>2012-11-21T23:13:00-07:00</lastmod>
+</url>
+<url>
+<loc>http://mistys-internet.website/blog/blog/2012/05/01/file-id-hackathon-debrief-fits-handles-video-now/</loc>
+<lastmod>2012-05-01T22:44:42-07:00</lastmod>
+</url>
+<url>
+<loc>http://mistys-internet.website/blog/blog/2011/05/30/revisiting-archival-description/</loc>
+<lastmod>2011-05-30T15:29:00-07:00</lastmod>
+</url>
+<url>
+<loc>http://mistys-internet.website/blog/</loc>
+</url>
+<url>
+<loc>http://mistys-internet.website/blog/blog/archives/</loc>
+</url>
+<url>
+<loc>http://mistys-internet.website/blog/blog/categories/review/</loc>
+</url>
+<url>
+<loc>http://mistys-internet.website/blog/blog/categories/music/</loc>
+</url>
+<url>
+<loc>http://mistys-internet.website/blog/blog/categories/vinyl/</loc>
+</url>
+<url>
+<loc>http://mistys-internet.website/blog/blog/categories/games/</loc>
+</url>
+<url>
+<loc>http://mistys-internet.website/blog/blog/categories/homebrew/</loc>
+</url>
+<url>
+<loc>http://mistys-internet.website/blog/posts/2/</loc>
+</url>
+<url>
+<loc>http://mistys-internet.website/blog/posts/3/</loc>
+</url>
 </urlset>
