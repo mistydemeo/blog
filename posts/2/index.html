@@ -9,7 +9,7 @@
   <meta name="author" content="Misty De Meo">
 
   
-  <meta name="description" content="Most people got their first taste of widescreen gaming with the Wii, Xbox 360, and PS3, but not a lot of people know that companies were &hellip;">
+  <meta name="description" content="My least favourite backtrace is a backtrace that doesn&rsquo;t include my own code. Tigerbrew on OS X 10.4 uses Ruby 1.8.2, which was shipped on &hellip;">
   
 
   <!-- http://t.co/dKP3o1e -->
@@ -63,6 +63,160 @@
     <div id="content">
       <div class="blog-index">
   
+  
+  
+    <article>
+      
+  <header>
+    
+      <h1 class="entry-title"><a href="/blog/blog/2015/05/02/reevaluate/">Reevaluate</a></h1>
+    
+    
+      <p class="meta">
+        
+
+
+
+
+<time class='entry-date' datetime='2015-05-02T10:41:08-07:00'><span class='date'><span class='date-month'>May</span> <span class='date-day'>2</span><span class='date-suffix'>nd</span>, <span class='date-year'>2015</span></span> <span class='time'>10:41 am</span></time>
+        
+      </p>
+    
+  </header>
+
+
+  <div class="entry-content"><p>My least favourite backtrace is a backtrace that doesn&rsquo;t include my own code.</p>
+
+<p>Tigerbrew on OS X 10.4 uses <a href="/blog/blog/2013/04/02/adventures-with-ruby-1-8-2/">Ruby 1.8.2</a>, which was shipped on Christmas Day, 2004, and it has more than its fair share of interesting bugs. In today&rsquo;s lesson we break Ruby&rsquo;s stdlib class OpenStruct.</p>
+
+<p>OpenStruct is a simple data structure that provides a JavaScript object-like interface to Ruby hashes. It&rsquo;s essentially a hash that provides getter and setter methods for each defined attribute. For example:</p>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+</pre></td><td class='code'><pre><code class='ruby'><span class='line'><span class="n">os</span> <span class="o">=</span> <span class="no">OpenStruct</span><span class="o">.</span><span class="n">new</span>
+</span><span class='line'><span class="n">os</span><span class="o">.</span><span class="n">key</span> <span class="o">=</span> <span class="s1">&#39;value&#39;</span>
+</span><span class='line'><span class="n">os</span><span class="o">.</span><span class="n">key</span> <span class="c1">#=&gt; &#39;value&#39;</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>Homebrew uses OpenStruct instances in place of hashes in code which only performs reading and writing of attributes, without using any other hash features. For example, in the <a href="https://github.com/Homebrew/homebrew/blob/8b35d842ec1d5e54418024e8afa4fa4ba4302eeb/Library/Homebrew/cmd/deps.rb#L6-L12"><code>deps</code> command</a>, OpenStruct is used for read-only access to a set of attributes read from ARGV:</p>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+</pre></td><td class='code'><pre><code class='ruby'><span class='line'><span class="n">mode</span> <span class="o">=</span> <span class="no">OpenStruct</span><span class="o">.</span><span class="n">new</span><span class="p">(</span>
+</span><span class='line'>  <span class="ss">:installed?</span>  <span class="o">=&gt;</span> <span class="no">ARGV</span><span class="o">.</span><span class="n">include?</span><span class="p">(</span><span class="s1">&#39;--installed&#39;</span><span class="p">),</span>
+</span><span class='line'>  <span class="ss">:tree?</span>       <span class="o">=&gt;</span> <span class="no">ARGV</span><span class="o">.</span><span class="n">include?</span><span class="p">(</span><span class="s1">&#39;--tree&#39;</span><span class="p">),</span>
+</span><span class='line'>  <span class="ss">:all?</span>        <span class="o">=&gt;</span> <span class="no">ARGV</span><span class="o">.</span><span class="n">include?</span><span class="p">(</span><span class="s1">&#39;--all&#39;</span><span class="p">),</span>
+</span><span class='line'>  <span class="ss">:topo_order?</span> <span class="o">=&gt;</span> <span class="no">ARGV</span><span class="o">.</span><span class="n">include?</span><span class="p">(</span><span class="s1">&#39;-n&#39;</span><span class="p">),</span>
+</span><span class='line'>  <span class="ss">:union?</span>      <span class="o">=&gt;</span> <span class="no">ARGV</span><span class="o">.</span><span class="n">include?</span><span class="p">(</span><span class="s1">&#39;--union&#39;</span><span class="p">)</span>
+</span><span class='line'><span class="p">)</span>
+</span><span class='line'>
+</span><span class='line'><span class="k">if</span> <span class="n">mode</span><span class="o">.</span><span class="n">installed?</span> <span class="o">&amp;&amp;</span> <span class="n">mode</span><span class="o">.</span><span class="n">tree?</span>
+</span><span class='line'>  <span class="c1"># ...</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>The first time I ran <code>brew deps</code> in Tigerbrew, however, I was greeted with this lovely backtrace:</p>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+<span class='line-number'>11</span>
+</pre></td><td class='code'><pre><code class='text'><span class='line'>SyntaxError: (eval):3:in `instance_eval&#39;: compile error
+</span><span class='line'>(eval):3: syntax error
+</span><span class='line'>        def topo_order?=(x); @table[:topo_order?] = x; end
+</span><span class='line'>                       ^
+</span><span class='line'>(eval):3: syntax error
+</span><span class='line'>    from /usr/lib/ruby/1.8/ostruct.rb:72:in `instance_eval&#39;
+</span><span class='line'>    from /usr/lib/ruby/1.8/ostruct.rb:72:in `instance_eval&#39;
+</span><span class='line'>    from /usr/lib/ruby/1.8/ostruct.rb:72:in `new_ostruct_member&#39;
+</span><span class='line'>    from /usr/lib/ruby/1.8/ostruct.rb:51:in `initialize&#39;
+</span><span class='line'>    from /usr/lib/ruby/1.8/ostruct.rb:49:in `each&#39;
+</span><span class='line'>    from /usr/lib/ruby/1.8/ostruct.rb:49:in `initialize&#39;
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>Given that the backtrace includes only stdlib code and nothing I wrote, I wasn&rsquo;t sure how to interpret this until I saw &ldquo;(eval)&rdquo;. It couldn&rsquo;t be, could it&hellip;? Of course it was.</p>
+
+<p>Accessors for attribute of OpenStruct instances are methods, and they are defined by OpenStruct a) whenever a new attribute is assigned, and b) when OpenStruct is initialized with a hash. This is achieved using the method <code>OpenStruct#new_ostruct_member</code><sup id="fnref:1"><a href="#fn:1" rel="footnote">1</a></sup>, which was <a href="https://github.com/ruby/ruby/blob/eed0809a08bf5d2c28349b12c23a33101b7d648e/lib/ostruct.rb#L70-L77">defined like this</a> in Ruby 1.8.2:</p>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+</pre></td><td class='code'><pre><code class='ruby'><span class='line'><span class="k">def</span> <span class="nf">new_ostruct_member</span><span class="p">(</span><span class="nb">name</span><span class="p">)</span>
+</span><span class='line'>  <span class="k">unless</span> <span class="nb">self</span><span class="o">.</span><span class="n">respond_to?</span><span class="p">(</span><span class="nb">name</span><span class="p">)</span>
+</span><span class='line'>    <span class="nb">self</span><span class="o">.</span><span class="n">instance_eval</span> <span class="sx">%{</span>
+</span><span class='line'><span class="sx">      def </span><span class="si">#{</span><span class="nb">name</span><span class="si">}</span><span class="sx">; @table[:</span><span class="si">#{</span><span class="nb">name</span><span class="si">}</span><span class="sx">]; end</span>
+</span><span class='line'><span class="sx">      def </span><span class="si">#{</span><span class="nb">name</span><span class="si">}</span><span class="sx">=(x); @table[:</span><span class="si">#{</span><span class="nb">name</span><span class="si">}</span><span class="sx">] = x; end</span>
+</span><span class='line'><span class="sx">    }</span>
+</span><span class='line'>  <span class="k">end</span>
+</span><span class='line'><span class="k">end</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>Yes: OpenStruct dynamically defines method names by interpolating the name of the variable into a string and evaluating the string in the context of the object. Unsurprisingly, this is very fragile. In our example, the attributes being defined end with a question mark; <code>#installed?</code> is a valid method name in Ruby, but <code>#installed?=</code> is not, and so a SyntaxError exception is raised inside <code>eval</code>.</p>
+
+<p>This was eventually fixed<sup id="fnref:2"><a href="#fn:2" rel="footnote">2</a></sup>; in <a href="https://github.com/ruby/ruby/blob/a9721a259665149b1b9ff0beabcf5f8dc0136120/lib/ostruct.rb#L166-L174">Ruby 2.2.2&rsquo;s definition</a>, the <code>#define_singleton_method</code> method is used instead; metaprogramming is not limited to the normal naming restrictions, so the unusual setters are defined properly<sup id="fnref:3"><a href="#fn:3" rel="footnote">3</a></sup>.</p>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+</pre></td><td class='code'><pre><code class='ruby'><span class='line'><span class="k">def</span> <span class="nf">new_ostruct_member</span><span class="p">(</span><span class="nb">name</span><span class="p">)</span>
+</span><span class='line'>  <span class="nb">name</span> <span class="o">=</span> <span class="nb">name</span><span class="o">.</span><span class="n">to_sym</span>
+</span><span class='line'>  <span class="k">unless</span> <span class="nb">respond_to?</span><span class="p">(</span><span class="nb">name</span><span class="p">)</span>
+</span><span class='line'>    <span class="n">define_singleton_method</span><span class="p">(</span><span class="nb">name</span><span class="p">)</span> <span class="p">{</span> <span class="vi">@table</span><span class="o">[</span><span class="nb">name</span><span class="o">]</span> <span class="p">}</span>
+</span><span class='line'>    <span class="n">define_singleton_method</span><span class="p">(</span><span class="s2">&quot;</span><span class="si">#{</span><span class="nb">name</span><span class="si">}</span><span class="s2">=&quot;</span><span class="p">)</span> <span class="p">{</span> <span class="o">|</span><span class="n">x</span><span class="o">|</span> <span class="n">modifiable</span><span class="o">[</span><span class="nb">name</span><span class="o">]</span> <span class="o">=</span> <span class="n">x</span> <span class="p">}</span>
+</span><span class='line'>  <span class="k">end</span>
+</span><span class='line'>  <span class="nb">name</span>
+</span><span class='line'><span class="k">end</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>Thankfully, the definiton of the method from modern versions of Ruby is fully compatible with Ruby 1.8.2, so Tigerbrew ships with <a href="https://github.com/mistydemeo/tigerbrew/blob/b63d347ab995697fb54bcaa5bfc75d1865d5e573/Library/Homebrew/extend/tiger.rb#L37-L56">a backported version of <code>OpenStruct#new_ostruct_member</code></a>.</p>
+<div class="footnotes">
+<hr/>
+<ol>
+<li id="fn:1">
+<p>This sounds like it should be a private method, and is <a href="http://ruby-doc.org/stdlib-1.9.3/libdoc/ostruct/rdoc/OpenStruct.html#method-i-new_ostruct_member">documented</a> as being &ldquo;used  internally&rdquo;, but for some reason this was a public instance method right up until <a href="https://github.com/ruby/ruby/commit/2dafb0f47a7ae70362aea7649b635e97bb33dcf2">Ruby 2.0</a>.<a href="#fnref:1" rev="footnote">&#8617;</a></p></li>
+<li id="fn:2">
+<p><a href="https://github.com/ruby/ruby/commit/48653d5ef0ed47469d64170d70c8c2a9f21f159e">Close to a year</a> after Ruby 1.8.2 was released.<a href="#fnref:2" rev="footnote">&#8617;</a></p></li>
+<li id="fn:3">
+<p>These illegal method names can&rsquo;t be called using the normal syntax, but they can be called via metaprogramming using the <a href="http://ruby-doc.org/core-2.2.2/Object.html#method-i-send"><code>#send</code></a> instance method, e.g. <code>os.send "foo?=", "baz"</code><a href="#fnref:3" rev="footnote">&#8617;</a></p></li>
+</ol>
+</div>
+
+</div>
+  
+  
+
+
+    </article>
   
   
     <article>
@@ -710,35 +864,6 @@
 
     </article>
   
-  
-    <article>
-      
-  <header>
-    
-      <h1 class="entry-title"><a href="/blog/blog/2012/11/21/psa-homebrew-digipres-repository-now-available/">PSA: Homebrew-digipres Repository Now Available!</a></h1>
-    
-    
-      <p class="meta">
-        
-
-
-
-
-<time class='entry-date' datetime='2012-11-21T23:13:00-07:00'><span class='date'><span class='date-month'>Nov</span> <span class='date-day'>21</span><span class='date-suffix'>st</span>, <span class='date-year'>2012</span></span> <span class='time'>11:13 pm</span></time>
-        
-      </p>
-    
-  </header>
-
-
-  <div class="entry-content"><p>Outside of archivy, I’m also a collaborator on <a href="http://brew.sh">Homebrew</a>, the awesome, lightweight package manager for OS X. I’ve been building a private repository of niche packages which aren’t available in the core repository for some reason or another, and ended up collecting enough digital preservation tools to create a new digital preservation-focused repository. You can find the new homebrew-digipres here: <a href="https://github.com/mistydemeo/homebrew-digipres">https://github.com/mistydemeo/homebrew-digipres</a> I’d welcome any contributions if you want to improve an existing formula, submit updates, or add a new package! Fork away.</p>
-</div>
-  
-  
-
-
-    </article>
-  
   <div class="pagination">
     
       <a class="prev" href="/blog/posts/3">&larr; Older</a>
@@ -756,6 +881,10 @@
   <ul id="recent_posts">
     
       <li class="post">
+        <a href="/blog/blog/2022/01/06/do-you-speak-the-lingo/">Do You Speak the Lingo?</a>
+      </li>
+    
+      <li class="post">
         <a href="/blog/blog/2021/08/14/exploring-jvs/">Exploring JVS</a>
       </li>
     
@@ -771,10 +900,6 @@
         <a href="/blog/blog/2018/10/18/recover-from-filevault-doom/">Recover From FileVault Doom</a>
       </li>
     
-      <li class="post">
-        <a href="/blog/blog/2017/02/19/review-undertale-vinyl-soundtrack/">Review: Undertale Vinyl Soundtrack</a>
-      </li>
-    
   </ul>
 </section>
 
@@ -788,7 +913,7 @@
     </div>
   </div>
   <footer role="contentinfo"><p>
-  Copyright &copy; 2021 - Misty De Meo -
+  Copyright &copy; 2022 - Misty De Meo -
   <span class="credit">Powered by <a href="http://octopress.org">Octopress</a></span>
 </p>
 
