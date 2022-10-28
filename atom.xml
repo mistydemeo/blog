@@ -4,7 +4,7 @@
   <title><![CDATA[The Future Is Now]]></title>
   <link href="http://mistys-internet.website/blog/atom.xml" rel="self"/>
   <link href="http://mistys-internet.website/blog/"/>
-  <updated>2022-01-06T15:24:18-08:00</updated>
+  <updated>2022-10-27T22:58:32-07:00</updated>
   <id>http://mistys-internet.website/blog/</id>
   <author>
     <name><![CDATA[Misty De Meo]]></name>
@@ -12,6 +12,47 @@
   </author>
   <generator uri="http://octopress.org/">Octopress</generator>
 
+  
+  <entry>
+    <title type="html"><![CDATA[How I Dumped an Arcade Game for MAME]]></title>
+    <link href="http://mistys-internet.website/blog/blog/2022/10/27/how-i-dumped-an-arcade-game-for-mame/"/>
+    <updated>2022-10-27T21:06:52-07:00</updated>
+    <id>http://mistys-internet.website/blog/blog/2022/10/27/how-i-dumped-an-arcade-game-for-mame</id>
+    <content type="html"><![CDATA[<p>I recently had the chance to do something that I&rsquo;ve wanted to do for years: dump an arcade game to add it to MAME.</p>
+
+<p><img src="http://mistys-internet.website/blog/images/theglad104/0005.big.png" alt="Screenshot of The Gladiator's title screen" /></p>
+
+<p>MAME is a massive emulator that covers thousands of arcade games across the history of gaming. It&rsquo;s one of those projects I&rsquo;ve used and loved for decades. I&rsquo;ve always wanted to give back, but it never felt like I had something to contribute&mdash;until recently.</p>
+
+<p>You might remember from <a href="https://www.mistys-internet.website/blog/blog/2021/08/14/exploring-jvs/">one of my other posts</a> that I recently got into collecting arcade games. This year I&rsquo;ve been collecting games for a Taiwanese system called the PolyGame Master (PGM), a cartridge-based system with interchangeable games sold by International Games System (IGS) between 1997 and 2005. It has a lot of great games that aren&rsquo;t very well-known, in particular some incredibly well-designed beat-em-ups.</p>
+
+<p>A couple months ago, I bought a copy of <em>The Gladiator</em>, a wuxia-themed beat em up set in the Song dynasty. My specific copy turns out to be an otherwise-undumped game revison. Many arcade games were released in many different versions, including regional variations and bugfix updates, and it can take collectors and MAME developers years to track them all down. In the case of <em>The Gladiator</em>, MAME has the final release, 1.07, and the first few revisions, but it&rsquo;s missing most of the versions in between. When my copy came here, I booted it up and found out it was one of those versions MAME was missing: 1.04.</p>
+
+<p>Luckily, I already had the hardware on hand to dump it. I own an EPROM burner that I&rsquo;d bought to <em>write</em> chips so that I could mod games I&rsquo;d bought, but EPROM burners can read chips as well. I own an adapter that supports several common chips that, luckily, can handle exactly the chips I needed for this game.</p>
+
+<div style="text-align: center; width: 33%; margin: 1em auto;"><img alt="Photo of an EPROM burner with a 27C160 chip in it" src="http://mistys-internet.website/blog/images/theglad104/IMG_5291.jpeg"></div>
+
+
+<p>It&rsquo;s easy to think of game cartridges as just being a single thing, but arcade game boards typically have a large number of chips. Why&rsquo;s that? It&rsquo;s partly technical; specific chips can be connected directly to particular regions of the system&rsquo;s hardware, like graphics or sound, which means that even though it&rsquo;s less flexible than an all-in-one ROM, it has some performance advantages too. The two chips I dumped here are program code for two different CPUs: one for the 68000 CPU in the system itself, and one for the ARM7 CPU in the game cartridge.</p>
+
+<p>The other advantage is that using a large number of chips can make it easier to update a game down the line. Making an overseas release? It would be much cheaper to update just a couple of your chips instead of producing new revisions of everything on your board. Releasing a bugfix update? It&rsquo;s much more quick and painless to update existing games if all your program code is on a single chip.</p>
+
+<p>From looking at MAME, I could tell that every other revision of <em>The Gladiator</em> used a single set of chips for almost everything. Only the two program ROM chips are different between versions, which made my life a lot easier. I was also lucky that these chips were easy to get to. Depending on the kind of game, chips might be attached straight to the board, or they might be in sockets where they can be easily removed and reattached. <em>The Gladiator</em> has two game boards, one of which uses two socketed chips. And, thankfully, those were the only two chips I had to remove and dump.</p>
+
+<p>To remove the chips, I used an EPROM removal tool&mdash;basically just a little set of pliers on a spring, with pair of needle noses that get in under the edge of the chip in the socket so you can pull it out. The two chips were both common types that my EPROM burner supports, so once I got them out they weren&rsquo;t difficult to read. The most important chip, which has the game&rsquo;s program code, is an EPROM chip known as the 27C160&mdash;a 2MB chip in a specific form factor. I already own a reader that supports that and the 4MB version of the same chip, which you can see in the above photo. The second chip is a 27C4096DC which has a much smaller 512KB capacity.</p>
+
+<div style="text-align: center; width: 33%; margin: 1em auto;"><img alt="Photo of an open game cartridge showing the boards and ROM chips" src="http://mistys-internet.website/blog/images/theglad104/IMG_5293.jpeg"></div>
+
+
+<p>Why are there two program ROMs? Many games for the PGM use a fascinating and pretty intense form of copy protection. As I mentioned earlier, the PGM motherboard has a 20MHz 68000 processor, a 16-bit CPU that was very widely used in the 90s. The game cartridge, meanwhile, has a 20MHz ARM7 coprocessor. For early games, that ARM7 was there just for copy protection. Game cartridges would feature an unencrypted 68000 ROM and an encrypted ARM7 ROM; the ARM7 must successfully decrypt and execute code from the encrypted ROM for the main program code to be allowed to boot and run. By the end of the PGM&rsquo;s life, they&rsquo;d clearly realized it was silly to be devoting the ARM7 just to copy protection when it was faster than the CPU on the motherboard, so they put it to use for actual game logic. On games like <em>The Gladiator</em>, the unencrypted 68000 ROM and the main CPU are only doing very basic bootstrapping work and then hand off the rest of the work to the ARM7, which runs the game using code on the encrypted ARM7 chip.</p>
+
+<p>I spent awhile fumbling around trying to get the dumped ARM7 ROM to work, but it turns out that&rsquo;s because I read it as the wrong kind. Oops. My reader has a switch that switches between the 2MB and 4MB versions of the chip&hellip; and I had it set to 4MB, even though the chip helpfully told me right on the package it&rsquo;s a 2MB chip. So, after I spent a half hour fumbling, I realize what I&rsquo;d done and went back to redump it&mdash;and <em>that</em> version worked first try. Phew.</p>
+
+<p><img src="http://mistys-internet.website/blog/images/theglad104/0004.big.png" alt="Screenshot of The Gladiator's boot screen with the program ROM versions" /></p>
+
+<p>Once I dumped it, I was able to figure out that one of the two program ROMs is identical to one that&rsquo;s already in MAME; only the ARM ROM is unique. That meant adding it to MAME was very easy; I could mostly copy and paste existing code defining the game cartridge, changing just one line with the new ROM and a few lines with some different metadata, and I was good to go. I submitted a <a href="https://github.com/mamedev/mame/pull/10306">pull request</a> and, after some discussion, it was merged. For something I&rsquo;ve wanted to be able to contribute to for <em>years</em>, feels good and, honestly pretty painless. And now, as of <a href="https://www.mamedev.org/?p=518">MAME 0.249</a>, <em>The Gladiator</em> 1.04 can finally be emulated!</p>
+]]></content>
+  </entry>
   
   <entry>
     <title type="html"><![CDATA[Do You Speak the Lingo?]]></title>
@@ -1433,41 +1474,6 @@ In 1999, an unofficial mod titled <a href="http://www5.ocn.ne.jp/~afc/limitover/
 <p>String’s <code>[]</code> operator always returns the sliced character’s ASCII ordinal, not a string.<a href="#fnref:2" rev="footnote">&#8617;</a></p></li>
 <li id="fn:3">
 <p>File#flock doesn’t exist in any form.<a href="#fnref:3" rev="footnote">&#8617;</a></p></li>
-</ol>
-</div>
-
-]]></content>
-  </entry>
-  
-  <entry>
-    <title type="html"><![CDATA[Introducing Tigerbrew]]></title>
-    <link href="http://mistys-internet.website/blog/blog/2013/04/01/introducing-tigerbrew/"/>
-    <updated>2013-04-01T19:21:00-07:00</updated>
-    <id>http://mistys-internet.website/blog/blog/2013/04/01/introducing-tigerbrew</id>
-    <content type="html"><![CDATA[<p>Some of you may know that my other gig is <a href="http://brew.sh/">Homebrew</a>, the package manager for Mac OS X. Over the last few months, I’ve been spending some time on a fork of Homebrew that’s starting to become usable enough that I think it’s ready to be announced.</p>
-
-<p>When I was attending the AMIA<sup id="fnref:1"><a href="#fn:1" rel="footnote">1</a></sup> conference in December, my partner and I were travelling together; while I was at the conference during the day, she worked from various places in Seattle on her laptop. Since it’s practically impossible to attend a modern conference without a laptop, and she uses a desktop at home, I dug out my 2005-era PowerBook G4 to take notes. It may be eight years old, but as soon as I opened it up I remembered why I loved that laptop so much. It’s still in great shape, and it feels like a crime to leave it sitting unused so much of the time.</p>
-
-<p>It’s slow by modern standards, of course, but the thing really keeping it from being usable all the time is software. Apple’s left PowerPC behind as of Mac OS X Leopard<sup id="fnref:2"><a href="#fn:2" rel="footnote">2</a></sup>, and so have nearly all developers at this point. There are still a few developers carrying the torch (shoutouts to <a href="http://www.floodgap.com/software/tenfourfox">TenFourFox</a>), but as a commandline junkie what I really need is an up-to-date shell[^2] and CLI software<sup id="fnref:3"><a href="#fn:3" rel="footnote">3</a></sup>. And as big Homebrew fan, as well as a developer, MacPorts just wasn’t going to cut it. <a href="https://github.com/mistydemeo/tigerbrew/">Tigerbrew</a> was born.</p>
-
-<p>The first version of Tigerbrew was pulled together over an evening at the hotel after the first day of the conference, and I’ve been plugging away at it regularly since. At this point I’m proud to say that a significant number of packages build flawlessly,<sup id="fnref:4"><a href="#fn:4" rel="footnote">4</a></sup> and thanks to <a href="https://github.com/mistydemeo/tigerbrew/wiki/New-formulae-in-Tigerbrew">some backports</a> from newer versions of OS X<sup id="fnref:5"><a href="#fn:5" rel="footnote">5</a></sup> Tigerbrew can supply a much more modern set of essential development tools than Apple provides.</p>
-
-<p>Tigerbrew’s still very much an alpha, and there’s some more work needed until it’s mature, but at this point I consider it ready enough to announce to the world.<sup id="fnref:6"><a href="#fn:6" rel="footnote">6</a></sup> If you have a PowerPC Mac yearning to be used again, why not <a href="https://github.com/mistydemeo/tigerbrew/">give it a go</a>?</p>
-<div class="footnotes">
-<hr/>
-<ol>
-<li id="fn:1">
-<p>Association of Moving Image Archivists<a href="#fnref:1" rev="footnote">&#8617;</a></p></li>
-<li id="fn:2">
-<p>And many hardcore PowerPC users stick with their old Macs for OS 9 compatibility, which was last supported in Tiger.<a href="#fnref:2" rev="footnote">&#8617;</a></p></li>
-<li id="fn:3">
-<p>bash 2.5 doesn’t cut it.<a href="#fnref:3" rev="footnote">&#8617;</a></p></li>
-<li id="fn:4">
-<p>Even complex software with a lot of moving parts, like FFmpeg.<a href="#fnref:4" rev="footnote">&#8617;</a></p></li>
-<li id="fn:5">
-<p>I’m very indebted to the MacPorts developers, whose portfiles served as a reference for the buildsystems for several of these.<a href="#fnref:5" rev="footnote">&#8617;</a></p></li>
-<li id="fn:6">
-<p>Development’s been happening in the public for months, of course, and there are already a few other users out there.<a href="#fnref:6" rev="footnote">&#8617;</a></p></li>
 </ol>
 </div>
 
