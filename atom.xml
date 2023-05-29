@@ -4,7 +4,7 @@
   <title><![CDATA[The Future Is Now]]></title>
   <link href="http://mistys-internet.website/blog/atom.xml" rel="self"/>
   <link href="http://mistys-internet.website/blog/"/>
-  <updated>2022-10-27T22:58:32-07:00</updated>
+  <updated>2023-05-29T15:53:43-07:00</updated>
   <id>http://mistys-internet.website/blog/</id>
   <author>
     <name><![CDATA[Misty De Meo]]></name>
@@ -12,6 +12,63 @@
   </author>
   <generator uri="http://octopress.org/">Octopress</generator>
 
+  
+  <entry>
+    <title type="html"><![CDATA[Untangling Another Lingo Parser Edge Case]]></title>
+    <link href="http://mistys-internet.website/blog/blog/2023/05/29/untangling-another-lingo-parser-edge-case/"/>
+    <updated>2023-05-29T15:53:18-07:00</updated>
+    <id>http://mistys-internet.website/blog/blog/2023/05/29/untangling-another-lingo-parser-edge-case</id>
+    <content type="html"><![CDATA[<p>I was testing out a new Macromedia Director CD in ScummVM, and I noticed a non-fatal error at startup:</p>
+
+<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+</pre></td><td class='code'><pre><code class=''><span class='line'>WARNING: ######################  LINGO: syntax error, unexpected tSTRING: expected ')' at line 2 col 70 in ScoreScript id: 2!
+</span><span class='line'>WARNING: #   2: set DiskChk = FileIO(mnew,"read"¬"The Source:Put Contents on Hard Drive:Journey to the Source:YZ.DATA")!
+</span><span class='line'>WARNING: #                                                                            ^ about here!</span></code></pre></td></tr></table></div></figure>
+
+
+<p>It was non-fatal, but seeing an error like that makes me uneasy anyway&mdash;I&rsquo;m never sure when it&rsquo;ll turn out to have ramifications down the line. This comes from the parser for Director&rsquo;s custom programming language, Lingo, so I opened up the code in question<sup id="fnref:1"><a href="#fn:1" rel="footnote">1</a></sup> to take a look. The whole script turned out to be only three straightforward lines. The part ScummVM complained about came right at the start of the file, and at first glance it looked pretty innocuous.</p>
+
+<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+</pre></td><td class='code'><pre><code class=''><span class='line'>set DiskChk = FileIO(mnew,"read"¬
+</span><span class='line'>"The Source:Put Contents on Hard Drive:Journey to the Source:YZ.DATA")
+</span><span class='line'>IF DiskChk = -35 THEN GO TO "No CD"</span></code></pre></td></tr></table></div></figure>
+
+
+<p>The symbol at the end of that first line is a continuation marker, which you might remember from a <a href="https://www.mistys-internet.website/blog/blog/2022/01/06/do-you-speak-the-lingo/">previous blog post</a> where I debugged a different issue with them. The continuation marker is a special kind of escape character with one specific purpose: it escapes newlines to allow statements to extend across more than one line of code, and nothing else.</p>
+
+<p>At first I thought maybe the issue was with the continuation marker itself being misparsed, like in the error I documented in that older blog post; maybe it was failing to be recognized and wasn&rsquo;t being replaced with whitespace? To figure that out, I started digging around in ScummVM&rsquo;s Lingo preprocessor. Spoiler: it turned out <em>not</em> to be an issue with the continuation marker, but it pointed me in the right direction anyway.</p>
+
+<p>ScummVM handles the continuation marker in two phases. In a preprocessor phase, it <a href="https://github.com/scummvm/scummvm/blob/6823514318a29fe9ec34956a97085117514a60dc/engines/director/lingo/lingo-preprocessor.cpp#L69-L73">removes the newline after the marker</a> in order to simplify parsing later. Afterwards, in the lexer, it <a href="https://github.com/scummvm/scummvm/blob/6823514318a29fe9ec34956a97085117514a60dc/engines/director/lingo/lingo-lex.l#L92">replaces the marker with a space</a> to produce a single normal line of code. The error message above contains a version of the line between those two steps: the preprocessor has combined the two lines of code into one, but the continuation marker hasn&rsquo;t been replaced with a space yet.</p>
+
+<p>If we do the work of the preprocessor/lexer ourselves, we get this copy of the line:</p>
+
+<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+</pre></td><td class='code'><pre><code class=''><span class='line'>set DiskChk = FileIO(mnew,"read" "The Source:Put Contents on Hard Drive:Journey to the Source:YZ.DATA")</span></code></pre></td></tr></table></div></figure>
+
+
+<p>In this form, the error is a bit more obvious than when it was spread across multiple lines. The problem is with how the arguments are passed to <code>FileIO</code>: the first two arguments are separated by a comma, but the second and third aren&rsquo;t. The newline between the second and third arguments makes it easy to miss, but as soon as we put it all together it becomes obvious.</p>
+
+<p>In the last case I looked at, described in the previous blog post, this was an ambiguous parse case: the same line of code was valid if you added the missing comma or not, but it was interpreted two totally different ways. This time is different. If you add the missing comma, this is a normal, valid line of code; if you don&rsquo;t, it&rsquo;s invalid syntax and you get the error we&rsquo;re seeing at the top.</p>
+
+<p>As far as I can tell, the original Director runtime actually accepts this without throwing an error even though this isn&rsquo;t documented as correct syntax. The official Director programming manual tells the user to use commas to separate arguments, but it&rsquo;s tolerant enough to support when they&rsquo;re forgotten like they are here<sup id="fnref:2"><a href="#fn:2" rel="footnote">2</a></sup>. ScummVM doesn&rsquo;t get that same luxury. As I mentioned in the previous blog post, later Director versions tightened up these ambiguous parse cases, and supporting the weird case in Director 3 would significantly complicate the parser. Since this is only the second case of this issue, though, it&rsquo;s not really <em>necessary</em> to support it either. ScummVM has builtin support for patching a specific disc&rsquo;s Lingo source code, so I was able to simply fix this by patching the code to the properly-formatted version.</p>
+
+<p>The disc in question still doesn&rsquo;t fully work, but I&rsquo;m putting some time into it. I&rsquo;m planning on writing a followup on the other fixes necessary to get it running as expected. And for today&rsquo;s lesson? Old software is weird. Just like new software.</p>
+<div class="footnotes">
+<hr/>
+<ol>
+<li id="fn:1">
+<p>Before version 4, Director software was interpreted from source code at runtime&mdash;so, conveniently, that means that you can peek at the source code to any early Director software.<a href="#fnref:1" rev="footnote">&#8617;</a></p></li>
+<li id="fn:2">
+<p><em>MacroMind Director Version 3.0: Interactivity Manual</em>. (1991). MacroMind, Inc. Page 64.<a href="#fnref:2" rev="footnote">&#8617;</a></p></li>
+</ol>
+</div>
+
+]]></content>
+  </entry>
   
   <entry>
     <title type="html"><![CDATA[How I Dumped an Arcade Game for MAME]]></title>
@@ -1434,46 +1491,6 @@ In 1999, an unofficial mod titled <a href="http://www5.ocn.ne.jp/~afc/limitover/
 <p>zsh does; bash doesn’t.<a href="#fnref:1" rev="footnote">&#8617;</a></p></li>
 <li id="fn:2">
 <p>On the millisecond scale, at least.<a href="#fnref:2" rev="footnote">&#8617;</a></p></li>
-</ol>
-</div>
-
-]]></content>
-  </entry>
-  
-  <entry>
-    <title type="html"><![CDATA[Adventures With Ruby 1.8.2]]></title>
-    <link href="http://mistys-internet.website/blog/blog/2013/04/02/adventures-with-ruby-1-8-2/"/>
-    <updated>2013-04-02T21:59:00-07:00</updated>
-    <id>http://mistys-internet.website/blog/blog/2013/04/02/adventures-with-ruby-1-8-2</id>
-    <content type="html"><![CDATA[<p>Homebrew has always used the version of Ruby which comes with OS X,<sup id="fnref:1"><a href="#fn:1" rel="footnote">1</a></sup> a design decision I decided to keep with Tigerbrew. Tiger comes with Ruby 1.8.2, built on Christmas Day, 2004, and with a version of Ruby that old I went in steeling myself for the inevitable ton of compatibility issues.</p>
-
-<p>On the whole I was pleasantly surprised. Most of what Homebrew uses is provided in exactly the same form, and while there are differences that range from puzzling<sup id="fnref:2"><a href="#fn:2" rel="footnote">2</a></sup> to major<sup id="fnref:3"><a href="#fn:3" rel="footnote">3</a></sup>, pretty much everything Just Works.</p>
-
-<p>Except, at first, for Pathname. Ruby’s Pathname class, which is an object-oriented wrapper around the File and Dir classes, is at the heart of Homebrew’s file management. The first time I tried to install something with the newborn Tigerbrew, I was quickly treated to a strange exception with an equally mysterious backtrace: <code>Errno::ENOTDIR: Not a directory</code>.</p>
-
-<p>Curious, I dug in. I soon discovered that the bug occurred while Homebrew was unlinking an existing version of a package before beginning to install an upgrade. (For those not in the know, Homebrew installs software into isolated versioned prefixes. The active version of a given package is symlinked into the standard <code>/usr/local</code> locations.) Most of the files were linked and unlinked just fine, but a few files caused the method Pathname#unlink to throw an exception every time. Eventually I noticed a pattern — every symlink that Pathname choked on represented a directory. Once I noticed that, it clicked.</p>
-
-<p>For those who don’t know, symlinks are actually treated on the filesystem level as special files containing their target as text. For most operations, symlinks transparently act as their targets. However, applications which hit the filesystem directly will see them as files — even when they point to directories. Since Pathname handles files and directories differently, handing its instance methods off to File or Dir as appropriate, the bug happened something like this:</p>
-
-<ul>
-<li>The #unlink method is called on a Pathname object representing a symlink to a directory.</li>
-<li>Pathname examines the object to see if it represents a file or directory, in order to determine whether to call File.unlink or Dir.unlink.</li>
-<li>In doing so, Pathname follows the symlink to its target and examines the properties <em>of the target</em>.</li>
-<li>Seeing that the target is a directory, Pathname calls Dir.unlink <em>on the original symlink</em>.</li>
-<li>Dir.unlink raises <code>Errno::ENOTDIR</code> because, of course, the symlink isn’t a directory.</li>
-</ul>
-
-
-<p>The overridden version of the method can be <a href="https://github.com/mistydemeo/tigerbrew/blob/992ec641652097bb619e9a8de153e436f7dbed16/Library/Homebrew/extend/pathname.rb#L476-L490">found here</a>. The rest of Tigerbrew’s current backports are in Tigerbrew’s file <a href="https://github.com/mistydemeo/tigerbrew/blob/master/Library/Homebrew/extend/tiger.rb">extend/tiger.rb</a>, for the curious.</p>
-<div class="footnotes">
-<hr/>
-<ol>
-<li id="fn:1">
-<p>For predictability, and so the user doesn’t have to install Ruby before installing Homebrew.<a href="#fnref:1" rev="footnote">&#8617;</a></p></li>
-<li id="fn:2">
-<p>String’s <code>[]</code> operator always returns the sliced character’s ASCII ordinal, not a string.<a href="#fnref:2" rev="footnote">&#8617;</a></p></li>
-<li id="fn:3">
-<p>File#flock doesn’t exist in any form.<a href="#fnref:3" rev="footnote">&#8617;</a></p></li>
 </ol>
 </div>
 

@@ -9,7 +9,10 @@
   <meta name="author" content="Misty De Meo">
 
   
-  <meta name="description" content="I recently had the chance to do something that I&rsquo;ve wanted to do for years: dump an arcade game to add it to MAME. MAME is a massive emulator &hellip;">
+  <meta name="description" content="I was testing out a new Macromedia Director CD in ScummVM, and I noticed a non-fatal error at startup: 1
+2
+3
+WARNING: ###################### LINGO: &hellip;">
   
 
   <!-- http://t.co/dKP3o1e -->
@@ -63,6 +66,83 @@
     <div id="content">
       <div class="blog-index">
   
+  
+  
+    <article>
+      
+  <header>
+    
+      <h1 class="entry-title"><a href="/blog/blog/2023/05/29/untangling-another-lingo-parser-edge-case/">Untangling Another Lingo Parser Edge Case</a></h1>
+    
+    
+      <p class="meta">
+        
+
+
+
+
+<time class='entry-date' datetime='2023-05-29T15:53:18-07:00'><span class='date'><span class='date-month'>May</span> <span class='date-day'>29</span><span class='date-suffix'>th</span>, <span class='date-year'>2023</span></span> <span class='time'>3:53 pm</span></time>
+        
+      </p>
+    
+  </header>
+
+
+  <div class="entry-content"><p>I was testing out a new Macromedia Director CD in ScummVM, and I noticed a non-fatal error at startup:</p>
+
+<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+</pre></td><td class='code'><pre><code class=''><span class='line'>WARNING: ######################  LINGO: syntax error, unexpected tSTRING: expected ')' at line 2 col 70 in ScoreScript id: 2!
+</span><span class='line'>WARNING: #   2: set DiskChk = FileIO(mnew,"read"¬"The Source:Put Contents on Hard Drive:Journey to the Source:YZ.DATA")!
+</span><span class='line'>WARNING: #                                                                            ^ about here!</span></code></pre></td></tr></table></div></figure>
+
+
+<p>It was non-fatal, but seeing an error like that makes me uneasy anyway&mdash;I&rsquo;m never sure when it&rsquo;ll turn out to have ramifications down the line. This comes from the parser for Director&rsquo;s custom programming language, Lingo, so I opened up the code in question<sup id="fnref:1"><a href="#fn:1" rel="footnote">1</a></sup> to take a look. The whole script turned out to be only three straightforward lines. The part ScummVM complained about came right at the start of the file, and at first glance it looked pretty innocuous.</p>
+
+<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+</pre></td><td class='code'><pre><code class=''><span class='line'>set DiskChk = FileIO(mnew,"read"¬
+</span><span class='line'>"The Source:Put Contents on Hard Drive:Journey to the Source:YZ.DATA")
+</span><span class='line'>IF DiskChk = -35 THEN GO TO "No CD"</span></code></pre></td></tr></table></div></figure>
+
+
+<p>The symbol at the end of that first line is a continuation marker, which you might remember from a <a href="https://www.mistys-internet.website/blog/blog/2022/01/06/do-you-speak-the-lingo/">previous blog post</a> where I debugged a different issue with them. The continuation marker is a special kind of escape character with one specific purpose: it escapes newlines to allow statements to extend across more than one line of code, and nothing else.</p>
+
+<p>At first I thought maybe the issue was with the continuation marker itself being misparsed, like in the error I documented in that older blog post; maybe it was failing to be recognized and wasn&rsquo;t being replaced with whitespace? To figure that out, I started digging around in ScummVM&rsquo;s Lingo preprocessor. Spoiler: it turned out <em>not</em> to be an issue with the continuation marker, but it pointed me in the right direction anyway.</p>
+
+<p>ScummVM handles the continuation marker in two phases. In a preprocessor phase, it <a href="https://github.com/scummvm/scummvm/blob/6823514318a29fe9ec34956a97085117514a60dc/engines/director/lingo/lingo-preprocessor.cpp#L69-L73">removes the newline after the marker</a> in order to simplify parsing later. Afterwards, in the lexer, it <a href="https://github.com/scummvm/scummvm/blob/6823514318a29fe9ec34956a97085117514a60dc/engines/director/lingo/lingo-lex.l#L92">replaces the marker with a space</a> to produce a single normal line of code. The error message above contains a version of the line between those two steps: the preprocessor has combined the two lines of code into one, but the continuation marker hasn&rsquo;t been replaced with a space yet.</p>
+
+<p>If we do the work of the preprocessor/lexer ourselves, we get this copy of the line:</p>
+
+<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+</pre></td><td class='code'><pre><code class=''><span class='line'>set DiskChk = FileIO(mnew,"read" "The Source:Put Contents on Hard Drive:Journey to the Source:YZ.DATA")</span></code></pre></td></tr></table></div></figure>
+
+
+<p>In this form, the error is a bit more obvious than when it was spread across multiple lines. The problem is with how the arguments are passed to <code>FileIO</code>: the first two arguments are separated by a comma, but the second and third aren&rsquo;t. The newline between the second and third arguments makes it easy to miss, but as soon as we put it all together it becomes obvious.</p>
+
+<p>In the last case I looked at, described in the previous blog post, this was an ambiguous parse case: the same line of code was valid if you added the missing comma or not, but it was interpreted two totally different ways. This time is different. If you add the missing comma, this is a normal, valid line of code; if you don&rsquo;t, it&rsquo;s invalid syntax and you get the error we&rsquo;re seeing at the top.</p>
+
+<p>As far as I can tell, the original Director runtime actually accepts this without throwing an error even though this isn&rsquo;t documented as correct syntax. The official Director programming manual tells the user to use commas to separate arguments, but it&rsquo;s tolerant enough to support when they&rsquo;re forgotten like they are here<sup id="fnref:2"><a href="#fn:2" rel="footnote">2</a></sup>. ScummVM doesn&rsquo;t get that same luxury. As I mentioned in the previous blog post, later Director versions tightened up these ambiguous parse cases, and supporting the weird case in Director 3 would significantly complicate the parser. Since this is only the second case of this issue, though, it&rsquo;s not really <em>necessary</em> to support it either. ScummVM has builtin support for patching a specific disc&rsquo;s Lingo source code, so I was able to simply fix this by patching the code to the properly-formatted version.</p>
+
+<p>The disc in question still doesn&rsquo;t fully work, but I&rsquo;m putting some time into it. I&rsquo;m planning on writing a followup on the other fixes necessary to get it running as expected. And for today&rsquo;s lesson? Old software is weird. Just like new software.</p>
+<div class="footnotes">
+<hr/>
+<ol>
+<li id="fn:1">
+<p>Before version 4, Director software was interpreted from source code at runtime&mdash;so, conveniently, that means that you can peek at the source code to any early Director software.<a href="#fnref:1" rev="footnote">&#8617;</a></p></li>
+<li id="fn:2">
+<p><em>MacroMind Director Version 3.0: Interactivity Manual</em>. (1991). MacroMind, Inc. Page 64.<a href="#fnref:2" rev="footnote">&#8617;</a></p></li>
+</ol>
+</div>
+
+</div>
+  
+  
+
+
+    </article>
   
   
     <article>
@@ -975,112 +1055,6 @@ I make my own flat whites at home using ristretto shots.</p>
 
     </article>
   
-  
-    <article>
-      
-  <header>
-    
-      <h1 class="entry-title"><a href="/blog/blog/2015/06/21/release-asuka-120-percent-limit-over-english-translation/">Release: Asuka 120% Limit Over English Translation</a></h1>
-    
-    
-      <p class="meta">
-        
-
-
-
-
-<time class='entry-date' datetime='2015-06-21T21:36:00-07:00'><span class='date'><span class='date-month'>Jun</span> <span class='date-day'>21</span><span class='date-suffix'>st</span>, <span class='date-year'>2015</span></span> <span class='time'>9:36 pm</span></time>
-        
-      </p>
-    
-  </header>
-
-
-  <div class="entry-content"><p>Asuka 120% Limited was a 1997 fighting game for the Sega Saturn, the final<sup id="fnref:1"><a href="#fn:1" rel="footnote">1</a></sup> game in a long-running series. The Asuka 120% games were always underdog favourites of mine; despite looking like throwaway anime fan-pandering, they were surprisingly deep, innovative games with unique mechanics that paved the way for later, more famous games like Guilty Gear and X-Men vs Street Fighter.</p>
-
-<p><img class="right" src="/blog/images/asuka/cover.gif" title="Asuka 120% Limit Over cover art" >
-In 1999, an unofficial mod titled <a href="http://www5.ocn.ne.jp/~afc/limitover/index.html">Asuka 120% Limit Over</a> was released. <a href="http://asuka-120.wikia.com/wiki/Asuka_120%25_Limited_BURNING_Fest.">Rumoured</a> to have been made by the original developers, Limit Over is a surprisingly polished update with many refinements and new gameplay mechanics. It went ignored by the English internet for many years, until the patch was discovered in 2007 by <a href="http://forums.lostlevels.org/viewtopic.php?t=1233">Lost Levels forum posters</a>; it&rsquo;s now also circulating as a prepatched ISO.</p>
-
-<p>Even though there isn&rsquo;t much text, Limit Over is hard to play without knowing Japanese, so I&rsquo;ve prepared a translation patch.</p>
-
-<h2>The patch</h2>
-
-<p><img src="/blog/images/asuka/kiyoko_vs_cathy.png" title="Kiyoko vs Cathy screenshot" >
-<img src="/blog/images/asuka/nana_vs_tamaki.png" title="Nana vs Tamaki screenshot" ></p>
-
-<p><a href="/blog/data/asuka_120_lo_english_10.zip">Asuka 120% Limit Over English patch, version 1.0</a></p>
-
-<p>This patch is compatible with the final release of Limit Over for the Saturn<sup id="fnref:2"><a href="#fn:2" rel="footnote">2</a></sup>. In order to use it, you need to have already built or obtained a disc image of Limit Over. The patch includes two options: a <a href="http://web.archive.org/web/20061016073657/http://www.paradogs.com/pdx_ppf2.htm">PPF</a> disc image patch, or individual patches for each file on the disc that was changed. Detailed installation instructions are included in the ZIP file.</p>
-
-<p>For more on what&rsquo;s been translated, and how it was done, read on.</p>
-
-<h2>Graphics</h2>
-
-<p>Limit Over contains very little text, almost all of it in English. Unfortunately, though, one critical thing is in Japanese: the character names. Since the barebones menus have no graphics, not even character portraits, it&rsquo;s very difficult to actually play without knowing Japanese. Have any idea who you&rsquo;re picking in the screenshot below? I don&rsquo;t&hellip;</p>
-
-<p><img src="/blog/images/asuka/Japanesecharacterselect.png" title="Japanese character select screen" ></p>
-
-<p>A few other minor bits of text are stored in Japanese: the &ldquo;N characters beaten&rdquo; text in ranking and deathmatch modes, and the round start and round end graphics. Their meaning is obvious without being able to read them, however, so I decided to leave them alone.</p>
-
-<h3>Finding the tiles</h3>
-
-<p>Like most games of this era, Asuka 120%&rsquo;s graphics are stored as sets of fixed-size tiles with a set, non-true colour palette. Since these are generally stored as raw pixel data without any form of header, it can be tricky to figure out where the tiles are and how they&rsquo;re stored; fortunately, however, there are many good <a href="http://www.romhacking.net/?page=utilities&amp;category=10&amp;platform=&amp;game=&amp;author=&amp;os=&amp;level=&amp;perpage=20&amp;title=&amp;desc=&amp;utilsearch=Go">tile editors</a> available that simplify the task.</p>
-
-<p><img src="/blog/images/asuka/CrystalTile.png" title="Crystal Tile 2" ></p>
-
-<p>I used a free Windows tile editor called <a href="http://www.romhacking.net/utilities/818/">Crystal Tile 2</a>, pictured above, which has some very useful features, including presets for a large number of common tile formats, support for arbitrary tile size, and the ability to import and export tiles to PNG. <img class="right" src="/blog/images/asuka/Debug.png" width="200" title="Yabause debug output" > Via trial and error, and with help from information gleaned via the <a href="http://yabause.org/">Yabause</a> emulator&rsquo;s debug mode, pictured right, I was able to locate three copies of the character name tiles in the TTLDAT.SSP<sup id="fnref:3"><a href="#fn:3" rel="footnote">3</a></sup>, V_GAGE.SSP and VS_SPR.SSP files. The latter two files are used to store the in-battle user interface and the menus, respectively.</p>
-
-<p><img class="left" src="/blog/images/asuka/AsukaJapanesename.png" title="Asuka Japanese name tile" ></p>
-
-<p>Each character name is a 4 bits per pixel 72x24<sup id="fnref:4"><a href="#fn:4" rel="footnote">4</a></sup> tile and, fortunately, Crystal Tile&rsquo;s &ldquo;N64/MD 4bpp&rdquo; preset supports them perfectly. After configuring the palette in Crystal Tile I exported every name to a set of 13 PNG files, like the tile to the left.</p>
-
-<h3>Editing</h3>
-
-<p>I redrew the text using a highly-edited version of a font lovingly stolen from the Neo-Geo game <a href="http://www.neogeosoft.com/?section=view&amp;game=pnyaa">Pochi &amp; Nyaa</a>. Compared to other fonts I looked at, it had the advantage of being both attractive and variable-width&mdash;which is important since the English names (which take up at least twice as many characters as the original Japanese) were very hard to fit in a width of 72 pixels. I also expanded the size of the characters compared to the original.</p>
-
-<p><img class="right" src="/blog/images/asuka/AsukaEnglishthin.png" title="Asuka name, with thin letters" >
-<img class="right" src="/blog/images/asuka/AsukaEnglishthick.png" title="Asuka name, with thick letters" ></p>
-
-<p>I briefly experimented with a thin variation of the character names for use in the game&rsquo;s menus, but abandoned it after determining legibility was poor; the menus are 480i, and the flicker inherent in an interlaced image on a CRT or a deinterlaced image rendered the thinner lines harder to read than necessary. To the right are the thick and thin variations of the main character&rsquo;s name.</p>
-
-<h2>Text</h2>
-
-<p>The rest of the game&rsquo;s menu text is stored as ASCII strings in the main executable, and is completely in English. I did, however, make several changes to the character names displayed during loading screens. The one American character&rsquo;s name, Cathy, was misromanized as &ldquo;Cachy&rdquo;. This is an easy mistake to make, since her name was rendered in Japanese as &ldquo;きゃしい&rdquo; (Kyashii)<sup id="fnref:5"><a href="#fn:5" rel="footnote">5</a></sup>. I also changed the romanization of several characters' names from <a href="https://en.wikipedia.org/wiki/Kunrei-shiki_romanization">Kunrei-shiki</a> (Sinobu, Tetuko, Genitiro) to the more familiar <a href="https://en.wikipedia.org/wiki/Hepburn_romanization">Hepburn</a> (Shinobu, Tetsuko, Genichirou).</p>
-
-<h2>What&rsquo;s new in Limit Over?</h2>
-
-<p>It&rsquo;s been many years since I&rsquo;ve played Limited, so this list is based on my imperfect memory.</p>
-
-<ul>
-<li>Every character has been rebalanced, and every single one of the core game mechanics has been refined.</li>
-<li>Every character now has three strengths of normals and special moves instead of two.</li>
-<li>A dodge button has been added, allowing characters to sidestep out of attacks.</li>
-<li>Many characters have new special or super moves.</li>
-</ul>
-
-<div class="footnotes">
-<hr/>
-<ol>
-<li id="fn:1">
-<p>The original developer, Fill-in-Cafe, went bankrupt after Limited was released in 1997, but a mediocre sequel and PC port were released in 1999 by another company.<a href="#fnref:1" rev="footnote">&#8617;</a></p></li>
-<li id="fn:2">
-<p>The only version readily available on the internet is dated &ldquo;12/31&rdquo;; I&rsquo;ve heard there were earlier versions, but I&rsquo;ve never seen them.<a href="#fnref:2" rev="footnote">&#8617;</a></p></li>
-<li id="fn:3">
-<p>This file is probably unused in Limit Over, since there is no graphical title screen.<a href="#fnref:3" rev="footnote">&#8617;</a></p></li>
-<li id="fn:4">
-<p>Except the tile for Genichirou, which is so long it&rsquo;s allocated two tiles.<a href="#fnref:4" rev="footnote">&#8617;</a></p></li>
-<li id="fn:5">
-<p>Cathy&rsquo;s name is rendered in Hiragana despite being a foreign name; it would more normally be rendered as &ldquo;キャシー&rdquo;.<a href="#fnref:5" rev="footnote">&#8617;</a></p></li>
-</ol>
-</div>
-
-</div>
-  
-  
-
-
-    </article>
-  
   <div class="pagination">
     
       <a class="prev" href="/blog/posts/2">&larr; Older</a>
@@ -1094,6 +1068,10 @@ In 1999, an unofficial mod titled <a href="http://www5.ocn.ne.jp/~afc/limitover/
     <section>
   <h1>Recent Posts</h1>
   <ul id="recent_posts">
+    
+      <li class="post">
+        <a href="/blog/blog/2023/05/29/untangling-another-lingo-parser-edge-case/">Untangling Another Lingo Parser Edge Case</a>
+      </li>
     
       <li class="post">
         <a href="/blog/blog/2022/10/27/how-i-dumped-an-arcade-game-for-mame/">How I Dumped an Arcade Game for MAME</a>
@@ -1111,10 +1089,6 @@ In 1999, an unofficial mod titled <a href="http://www5.ocn.ne.jp/~afc/limitover/
         <a href="/blog/blog/2020/11/23/bundle-install-with-homebrew-magic-using-brew-bundle-exec/">Bundle Install With Homebrew Magic Using Brew Bundle Exec</a>
       </li>
     
-      <li class="post">
-        <a href="/blog/blog/2019/02/20/the-hunt-for-the-lost-phoenix-games/">The Hunt for the Lost Phoenix Games</a>
-      </li>
-    
   </ul>
 </section>
 
@@ -1128,7 +1102,7 @@ In 1999, an unofficial mod titled <a href="http://www5.ocn.ne.jp/~afc/limitover/
     </div>
   </div>
   <footer role="contentinfo"><p>
-  Copyright &copy; 2022 - Misty De Meo -
+  Copyright &copy; 2023 - Misty De Meo -
   <span class="credit">Powered by <a href="http://octopress.org">Octopress</a></span>
 </p>
 
