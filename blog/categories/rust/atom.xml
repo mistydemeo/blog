@@ -1,0 +1,40 @@
+<?xml version="1.0" encoding="utf-8"?>
+<feed xmlns="http://www.w3.org/2005/Atom">
+
+  <title><![CDATA[Category: Rust | The Future Is Now]]></title>
+  <link href="http://mistys-internet.website/blog/blog/categories/rust/atom.xml" rel="self"/>
+  <link href="http://mistys-internet.website/blog/"/>
+  <updated>2023-10-25T14:34:42-07:00</updated>
+  <id>http://mistys-internet.website/blog/</id>
+  <author>
+    <name><![CDATA[Misty De Meo]]></name>
+    
+  </author>
+  <generator uri="http://octopress.org/">Octopress</generator>
+
+  
+  <entry>
+    <title type="html"><![CDATA[Cargo-dist: System Dependencies Are Hard (So We Made Them Easier)]]></title>
+    <link href="http://mistys-internet.website/blog/blog/2023/10/25/cargo-dist-system-dependencies-are-hard-so-we-made-them-easier/"/>
+    <updated>2023-10-25T14:26:42-07:00</updated>
+    <id>http://mistys-internet.website/blog/blog/2023/10/25/cargo-dist-system-dependencies-are-hard-so-we-made-them-easier</id>
+    <content type="html"><![CDATA[<p>My latest blog post is over at my employer&rsquo;s blog post and talks about the work I&rsquo;ve done to get system dependency management integrated into <a href="https://opensource.axo.dev/cargo-dist/"><code>cargo-dist</code></a>, an open source release management tool for Rust. The new release lets users specify non-Rust dependencies in <code>Cargo.toml</code> using a Cargo-like syntax and also provides a detailed report on the resulting binary&rsquo;s dynamic linkage. Here&rsquo;s a sample of the dependency syntax:</p>
+
+<pre><code>[workspace.metadata.dist.dependencies.homebrew]
+cmake = { targets = ["x86_64-apple-darwin"] }
+libcue = { version = "2.2.1", targets = ["x86_64-apple-darwin"] }
+
+[workspace.metadata.dist.dependencies.apt]
+cmake = '*'
+libcue-dev = { version = "2.2.1-2" }
+
+[workspace.metadata.dist.dependencies.chocolatey]
+lftp = '*'
+cmake = '3.27.6'
+</code></pre>
+
+<p>Go <a href="https://blog.axo.dev/2023/10/dependencies">read the blog post</a> to find out more!</p>
+]]></content>
+  </entry>
+  
+</feed>

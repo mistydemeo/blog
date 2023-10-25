@@ -4,7 +4,7 @@
   <title><![CDATA[The Future Is Now]]></title>
   <link href="http://mistys-internet.website/blog/atom.xml" rel="self"/>
   <link href="http://mistys-internet.website/blog/"/>
-  <updated>2023-05-29T16:36:13-07:00</updated>
+  <updated>2023-10-25T14:34:42-07:00</updated>
   <id>http://mistys-internet.website/blog/</id>
   <author>
     <name><![CDATA[Misty De Meo]]></name>
@@ -12,6 +12,41 @@
   </author>
   <generator uri="http://octopress.org/">Octopress</generator>
 
+  
+  <entry>
+    <title type="html"><![CDATA[Cargo-dist: System Dependencies Are Hard (So We Made Them Easier)]]></title>
+    <link href="http://mistys-internet.website/blog/blog/2023/10/25/cargo-dist-system-dependencies-are-hard-so-we-made-them-easier/"/>
+    <updated>2023-10-25T14:26:42-07:00</updated>
+    <id>http://mistys-internet.website/blog/blog/2023/10/25/cargo-dist-system-dependencies-are-hard-so-we-made-them-easier</id>
+    <content type="html"><![CDATA[<p>My latest blog post is over at my employer&rsquo;s blog post and talks about the work I&rsquo;ve done to get system dependency management integrated into <a href="https://opensource.axo.dev/cargo-dist/"><code>cargo-dist</code></a>, an open source release management tool for Rust. The new release lets users specify non-Rust dependencies in <code>Cargo.toml</code> using a Cargo-like syntax and also provides a detailed report on the resulting binary&rsquo;s dynamic linkage. Here&rsquo;s a sample of the dependency syntax:</p>
+
+<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+<span class='line-number'>11</span>
+</pre></td><td class='code'><pre><code class=''><span class='line'>[workspace.metadata.dist.dependencies.homebrew]
+</span><span class='line'>cmake = { targets = ["x86_64-apple-darwin"] }
+</span><span class='line'>libcue = { version = "2.2.1", targets = ["x86_64-apple-darwin"] }
+</span><span class='line'>
+</span><span class='line'>[workspace.metadata.dist.dependencies.apt]
+</span><span class='line'>cmake = '*'
+</span><span class='line'>libcue-dev = { version = "2.2.1-2" }
+</span><span class='line'>
+</span><span class='line'>[workspace.metadata.dist.dependencies.chocolatey]
+</span><span class='line'>lftp = '*'
+</span><span class='line'>cmake = '3.27.6'</span></code></pre></td></tr></table></div></figure>
+
+
+<p>Go <a href="https://blog.axo.dev/2023/10/dependencies">read the blog post</a> to find out more!</p>
+]]></content>
+  </entry>
   
   <entry>
     <title type="html"><![CDATA[Untangling Another Lingo Parser Edge Case]]></title>
@@ -1437,60 +1472,6 @@ In 1999, an unofficial mod titled <a href="http://www5.ocn.ne.jp/~afc/limitover/
 <ol>
 <li id="fn:1">
 <p>Apple’s equivalent of binutils.<a href="#fnref:1" rev="footnote">&#8617;</a></p></li>
-</ol>
-</div>
-
-]]></content>
-  </entry>
-  
-  <entry>
-    <title type="html"><![CDATA[Tiger’s `which` Is Terrible; or, Necessity Is the Mother of Invention]]></title>
-    <link href="http://mistys-internet.website/blog/blog/2013/04/04/tigers-which-is-terrible/"/>
-    <updated>2013-04-04T07:11:00-07:00</updated>
-    <id>http://mistys-internet.website/blog/blog/2013/04/04/tigers-which-is-terrible</id>
-    <content type="html"><![CDATA[<p>One of the most useful things about running software in unusual configurations is that sometimes it exposes unexpected flaws you never knew you had.</p>
-
-<p>The <code>which</code> utility is one of those commandline niceties you never really think about until it’s not there anymore. While sometimes implemented as a shell builtin<sup id="fnref:1"><a href="#fn:1" rel="footnote">1</a></sup>, it’s also frequently shipped as a standalone utility. Apple’s modern version, which is part of the shell_utils package and crystallized around Snow Leopard, works like this:</p>
-
-<ul>
-<li>If the specified tool is found on the path, prints the path to the first version found (e.g., the one the shell would execute), and exits 0.</li>
-<li>If the specified tool isn’t found, prints a newline and exits 1.</li>
-</ul>
-
-
-<p>This version of the tool is really useful in shell scripts to determine a) if a program is present, and b) where it’s located, and until fairly recently Homebrew used it extensively. Unfortunately, early on in my work on Tigerbrew, I discovered that Tiger’s version was… deficient. It works like this:</p>
-
-<ul>
-<li>If the specified tool is found on the path, prints the path to the first version found, and exits 0.</li>
-<li>If the specified tool isn’t found, prints a verbose message to stdout, and exits 0.</li>
-</ul>
-
-
-<p>The lack of a meaningful exit status and the error message on stdout are both pretty poor behaviour for a CLI app, and broke Homebrew’s assumptions about how it should work.</p>
-
-<p>To work around this, I replaced Homebrew’s wrapper function with a two-line native Ruby method for Tigerbrew, like so:</p>
-
-<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-<span class='line-number'>2</span>
-<span class='line-number'>3</span>
-<span class='line-number'>4</span>
-</pre></td><td class='code'><pre><code class='ruby'><span class='line'><span class="k">def</span> <span class="nf">which</span> <span class="n">cmd</span>
-</span><span class='line'>  <span class="n">dir</span> <span class="o">=</span> <span class="no">ENV</span><span class="o">[</span><span class="s1">&#39;PATH&#39;</span><span class="o">].</span><span class="n">split</span><span class="p">(</span><span class="s1">&#39;:&#39;</span><span class="p">)</span><span class="o">.</span><span class="n">find</span> <span class="p">{</span><span class="o">|</span><span class="nb">p</span><span class="o">|</span> <span class="no">File</span><span class="o">.</span><span class="n">executable?</span> <span class="no">File</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="nb">p</span><span class="p">,</span> <span class="n">cmd</span><span class="p">)}</span>
-</span><span class='line'>  <span class="no">Pathname</span><span class="o">.</span><span class="n">new</span><span class="p">(</span><span class="no">File</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">dir</span><span class="p">,</span> <span class="n">cmd</span><span class="p">))</span> <span class="k">unless</span> <span class="n">dir</span><span class="o">.</span><span class="n">nil?</span>
-</span><span class='line'><span class="k">end</span>
-</span></code></pre></td></tr></table></div></figure>
-
-
-<p>As it turns out, not only does it work better on Tiger, but this method is actually faster<sup id="fnref:2"><a href="#fn:2" rel="footnote">2</a></sup> than shelling out like Homebrew did; process spawning is relatively expensive. As a result, I ended up using the new helper in Homebrew even though it wasn’t strictly necessary.</p>
-
-<p>(And as for the commandline utility, Tigerbrew has a formula for the <a href="https://github.com/mistydemeo/tigerbrew/blob/master/Library/Formula/shell_cmds.rb">shell_cmds</a> collection of utilities.)</p>
-<div class="footnotes">
-<hr/>
-<ol>
-<li id="fn:1">
-<p>zsh does; bash doesn’t.<a href="#fnref:1" rev="footnote">&#8617;</a></p></li>
-<li id="fn:2">
-<p>On the millisecond scale, at least.<a href="#fnref:2" rev="footnote">&#8617;</a></p></li>
 </ol>
 </div>
 

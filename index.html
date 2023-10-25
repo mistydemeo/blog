@@ -9,10 +9,7 @@
   <meta name="author" content="Misty De Meo">
 
   
-  <meta name="description" content="I was testing out a new Macromedia Director CD in ScummVM, and I noticed a non-fatal error at startup: 1
-2
-3
-WARNING: ###################### LINGO: &hellip;">
+  <meta name="description" content="My latest blog post is over at my employer&rsquo;s blog post and talks about the work I&rsquo;ve done to get system dependency management integrated &hellip;">
   
 
   <!-- http://t.co/dKP3o1e -->
@@ -66,6 +63,61 @@ WARNING: ###################### LINGO: &hellip;">
     <div id="content">
       <div class="blog-index">
   
+  
+  
+    <article>
+      
+  <header>
+    
+      <h1 class="entry-title"><a href="/blog/blog/2023/10/25/cargo-dist-system-dependencies-are-hard-so-we-made-them-easier/">Cargo-dist: System Dependencies Are Hard (So We Made Them Easier)</a></h1>
+    
+    
+      <p class="meta">
+        
+
+
+
+
+<time class='entry-date' datetime='2023-10-25T14:26:42-07:00'><span class='date'><span class='date-month'>Oct</span> <span class='date-day'>25</span><span class='date-suffix'>th</span>, <span class='date-year'>2023</span></span> <span class='time'>2:26 pm</span></time>
+        
+      </p>
+    
+  </header>
+
+
+  <div class="entry-content"><p>My latest blog post is over at my employer&rsquo;s blog post and talks about the work I&rsquo;ve done to get system dependency management integrated into <a href="https://opensource.axo.dev/cargo-dist/"><code>cargo-dist</code></a>, an open source release management tool for Rust. The new release lets users specify non-Rust dependencies in <code>Cargo.toml</code> using a Cargo-like syntax and also provides a detailed report on the resulting binary&rsquo;s dynamic linkage. Here&rsquo;s a sample of the dependency syntax:</p>
+
+<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+<span class='line-number'>11</span>
+</pre></td><td class='code'><pre><code class=''><span class='line'>[workspace.metadata.dist.dependencies.homebrew]
+</span><span class='line'>cmake = { targets = ["x86_64-apple-darwin"] }
+</span><span class='line'>libcue = { version = "2.2.1", targets = ["x86_64-apple-darwin"] }
+</span><span class='line'>
+</span><span class='line'>[workspace.metadata.dist.dependencies.apt]
+</span><span class='line'>cmake = '*'
+</span><span class='line'>libcue-dev = { version = "2.2.1-2" }
+</span><span class='line'>
+</span><span class='line'>[workspace.metadata.dist.dependencies.chocolatey]
+</span><span class='line'>lftp = '*'
+</span><span class='line'>cmake = '3.27.6'</span></code></pre></td></tr></table></div></figure>
+
+
+<p>Go <a href="https://blog.axo.dev/2023/10/dependencies">read the blog post</a> to find out more!</p>
+</div>
+  
+  
+
+
+    </article>
   
   
     <article>
@@ -923,138 +975,6 @@ Aligning every single detail of a format or API with the job which needs to be d
 
     </article>
   
-  
-    <article>
-      
-  <header>
-    
-      <h1 class="entry-title"><a href="/blog/blog/2015/12/03/flat-whites-in-vancouver/">Flat Whites in Vancouver</a></h1>
-    
-    
-      <p class="meta">
-        
-
-
-
-
-<time class='entry-date' datetime='2015-12-03T22:07:24-08:00'><span class='date'><span class='date-month'>Dec</span> <span class='date-day'>3</span><span class='date-suffix'>rd</span>, <span class='date-year'>2015</span></span> <span class='time'>10:07 pm</span></time>
-        
-      </p>
-    
-  </header>
-
-
-  <div class="entry-content"><p>This post is completely off-topic.
-Please indulge me.</p>
-
-<p>I recently spent three lovely weeks in Melbourne, Australia.
-I&rsquo;m a big coffee fan, and Melbourne is one of the <a href="http://www.bbc.com/travel/story/20140421-living-in-the-worlds-top-coffee-cities">best cities for coffee in the world</a>, so I spent a lot of time in cafes acquainting myself with the native coffee&mdash;specifically the flat white.
-Now that I&rsquo;m back in Vancouver, I find myself craving flat whites nostalgically; sipping a flat white in a nice place reminds me of the wonderful time I spent there.
-(That nostalgia may have something to do with spending so many of those days out with a <a href="http://twitter.com/ticky">particular girl</a>.)
-Finding a good flat white locally is hard though, and while there isn&rsquo;t a really authentic one anywhere in the city there are a few good places I keep going back to.</p>
-
-<p>There are three things that define a good flat white: milk volume, milk texture, and espresso.
-The right combination isn&rsquo;t always easy to find on this side of the Pacific.</p>
-
-<h3>Milk</h3>
-
-<h4>Volume</h4>
-
-<p>In my experience in Melbourne, most flat whites are served in roughly 190mL (6.5oz) cups; this is smaller than the average North American small latte (235mL, 8oz), and larger than the New Zealand flat white (160mL, 5.5oz).
-The relatively lower milk volume helps more of the espresso taste come through, which I find very nice.</p>
-
-<p>Some Canadian coffeeshops I&rsquo;ve been to will serve their flat whites in much smaller cups&mdash;smaller than both North American lattes and Australian flat whites, presumably intended to be closer to the size of a New Zealand flat white.
-Or perhaps they&rsquo;ve simply heard that flat whites are served smaller and, having only too-small and too-large cups to choose from, they chose too-small.</p>
-
-<p>Purely as a personal preference, I&rsquo;ll take a bit too much milk over a bit too little, though 190mL as I had in Melbourne feels just right.</p>
-
-<h4>Foam</h4>
-
-<p>Flat whites are made using microfoam, a very fine, smoothly-textured, velvety foamed milk that gives the coffee the perfect texture.
-A good flat white also retains the crema from the espresso, merging the milk with the crema at the surface of the drink.</p>
-
-<h3>The espresso</h3>
-
-<p>Given the lower milk volume, it&rsquo;s important for the coffee to not be overpowering.
-An espresso that&rsquo;s too earthy or too bitter can ruin the drink for me; I like the flavour to be strong but not overly sharp.
-According to Wikipedia the kiwi flat white is usually served using a ristretto shot, and I find that can help cut the bitterness of certain beans; however I don&rsquo;t feel like it&rsquo;s a requirement for a good one.
-That said, a few of the Vancouver shops I&rsquo;ve been to served me overly earthy, bitter flat whites that didn&rsquo;t work for me.
-I make my own flat whites at home using ristretto shots.</p>
-
-<h3>The rankings</h3>
-
-<ol>
-<li><p><a href="https://www.facebook.com/oldcrowcoffeeco">Old Crow</a> (New Westminster)</p>
-
-<p> <blockquote class="instagram-media" data-instgrm-version="6" style=" background:#FFF; border:0; border-radius:3px; box-shadow:0 0 1px 0 rgba(0,0,0,0.5),0 1px 10px 0 rgba(0,0,0,0.15); margin: 1px; max-width:658px; padding:0; width:99.375%; width:-webkit-calc(100% - 2px); width:calc(100% - 2px);"><div style="padding:8px;"> <div style=" background:#F8F8F8; line-height:0; margin-top:40px; padding:50.0% 0; text-align:center; width:100%;"> <div style=" background:url(data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAACwAAAAsCAMAAAApWqozAAAAGFBMVEUiIiI9PT0eHh4gIB4hIBkcHBwcHBwcHBydr+JQAAAACHRSTlMABA4YHyQsM5jtaMwAAADfSURBVDjL7ZVBEgMhCAQBAf//42xcNbpAqakcM0ftUmFAAIBE81IqBJdS3lS6zs3bIpB9WED3YYXFPmHRfT8sgyrCP1x8uEUxLMzNWElFOYCV6mHWWwMzdPEKHlhLw7NWJqkHc4uIZphavDzA2JPzUDsBZziNae2S6owH8xPmX8G7zzgKEOPUoYHvGz1TBCxMkd3kwNVbU0gKHkx+iZILf77IofhrY1nYFnB/lQPb79drWOyJVa/DAvg9B/rLB4cC+Nqgdz/TvBbBnr6GBReqn/nRmDgaQEej7WhonozjF+Y2I/fZou/qAAAAAElFTkSuQmCC); display:block; height:44px; margin:0 auto -44px; position:relative; top:-22px; width:44px;"></div></div><p style=" color:#c9c8cd; font-family:Arial,sans-serif; font-size:14px; line-height:17px; margin-bottom:0; margin-top:8px; overflow:hidden; padding:8px 0 7px; text-align:center; text-overflow:ellipsis; white-space:nowrap;"><a href="https://www.instagram.com/p/-HxFq2n6-j/" style=" color:#c9c8cd; font-family:Arial,sans-serif; font-size:14px; font-style:normal; font-weight:normal; line-height:17px; text-decoration:none;" target="_blank">A photo posted by @mistydemeo</a> on <time style=" font-family:Arial,sans-serif; font-size:14px; line-height:17px;" datetime="2015-11-15T21:57:05+00:00">Nov 15, 2015 at 1:57pm PST</time></p></div></blockquote> <script async defer src="//platform.instagram.com/en_US/embeds.js"></script></p>
-
-<p> Old Crow serves their flat white in an 8oz cup, though they&rsquo;ll also do it in a 5oz glass on request.
- (I find it works better in the 8oz cup, personally.)
- They steam the milk very nicely, producing a good microfoam.
- Old Crow uses <a href="http://bowsandarrowscoffee.com">Bows X Arrows</a>&rsquo;s <a href="http://bowsandarrowscoffee.com/collections/coffees/products/st-66-espresso">St. 66</a> beans, which is one of my favourite espresso roasts&mdash;pleasant, low bitterness, wonderful flavour with good acidity.
- At my request they started making flat whites using ristretto shots, which works beautifully with these beans.
- The result is a velvety, smooth coffee with a lovely natural sweetness.
- If they had 190mL cups to serve this in instead of 8oz, this could easily be mistaken for a Melbournian flat white.</p></li>
-<li><p><a href="http://continental-coffee.ca">Continental Coffee</a> (Commercial Drive)</p>
-
-<p> <blockquote class="instagram-media" data-instgrm-version="6" style=" background:#FFF; border:0; border-radius:3px; box-shadow:0 0 1px 0 rgba(0,0,0,0.5),0 1px 10px 0 rgba(0,0,0,0.15); margin: 1px; max-width:658px; padding:0; width:99.375%; width:-webkit-calc(100% - 2px); width:calc(100% - 2px);"><div style="padding:8px;"> <div style=" background:#F8F8F8; line-height:0; margin-top:40px; padding:50.0% 0; text-align:center; width:100%;"> <div style=" background:url(data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAACwAAAAsCAMAAAApWqozAAAAGFBMVEUiIiI9PT0eHh4gIB4hIBkcHBwcHBwcHBydr+JQAAAACHRSTlMABA4YHyQsM5jtaMwAAADfSURBVDjL7ZVBEgMhCAQBAf//42xcNbpAqakcM0ftUmFAAIBE81IqBJdS3lS6zs3bIpB9WED3YYXFPmHRfT8sgyrCP1x8uEUxLMzNWElFOYCV6mHWWwMzdPEKHlhLw7NWJqkHc4uIZphavDzA2JPzUDsBZziNae2S6owH8xPmX8G7zzgKEOPUoYHvGz1TBCxMkd3kwNVbU0gKHkx+iZILf77IofhrY1nYFnB/lQPb79drWOyJVa/DAvg9B/rLB4cC+Nqgdz/TvBbBnr6GBReqn/nRmDgaQEej7WhonozjF+Y2I/fZou/qAAAAAElFTkSuQmCC); display:block; height:44px; margin:0 auto -44px; position:relative; top:-22px; width:44px;"></div></div><p style=" color:#c9c8cd; font-family:Arial,sans-serif; font-size:14px; line-height:17px; margin-bottom:0; margin-top:8px; overflow:hidden; padding:8px 0 7px; text-align:center; text-overflow:ellipsis; white-space:nowrap;"><a href="https://www.instagram.com/p/-Uu1-7H64b/" style=" color:#c9c8cd; font-family:Arial,sans-serif; font-size:14px; font-style:normal; font-weight:normal; line-height:17px; text-decoration:none;" target="_blank">A photo posted by @mistydemeo</a> on <time style=" font-family:Arial,sans-serif; font-size:14px; line-height:17px;" datetime="2015-11-20T22:47:35+00:00">Nov 20, 2015 at 2:47pm PST</time></p></div></blockquote> <script async defer src="//platform.instagram.com/en_US/embeds.js"></script></p>
-
-<p> Continental also produces a very nice flat white.
- Served in an 8oz cup, it&rsquo;s served with decently-foamed milk and an excellent ristretto shot.
- The foam on the milk as a bit thick compared to Old Crow and Prado, but it was delicious.</p></li>
-<li><p><a href="https://www.facebook.com/PradoCafe">Prado</a> (Commercial Drive)</p>
-
-<p> <blockquote class="instagram-media" data-instgrm-version="5" style=" background:#FFF; border:0; border-radius:3px; box-shadow:0 0 1px 0 rgba(0,0,0,0.5),0 1px 10px 0 rgba(0,0,0,0.15); margin: 1px; max-width:658px; padding:0; width:99.375%; width:-webkit-calc(100% - 2px); width:calc(100% - 2px);"><div style="padding:8px;"> <div style=" background:#F8F8F8; line-height:0; margin-top:40px; padding:50.0% 0; text-align:center; width:100%;"> <div style=" background:url(data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAACwAAAAsCAMAAAApWqozAAAAGFBMVEUiIiI9PT0eHh4gIB4hIBkcHBwcHBwcHBydr+JQAAAACHRSTlMABA4YHyQsM5jtaMwAAADfSURBVDjL7ZVBEgMhCAQBAf//42xcNbpAqakcM0ftUmFAAIBE81IqBJdS3lS6zs3bIpB9WED3YYXFPmHRfT8sgyrCP1x8uEUxLMzNWElFOYCV6mHWWwMzdPEKHlhLw7NWJqkHc4uIZphavDzA2JPzUDsBZziNae2S6owH8xPmX8G7zzgKEOPUoYHvGz1TBCxMkd3kwNVbU0gKHkx+iZILf77IofhrY1nYFnB/lQPb79drWOyJVa/DAvg9B/rLB4cC+Nqgdz/TvBbBnr6GBReqn/nRmDgaQEej7WhonozjF+Y2I/fZou/qAAAAAElFTkSuQmCC); display:block; height:44px; margin:0 auto -44px; position:relative; top:-22px; width:44px;"></div></div><p style=" color:#c9c8cd; font-family:Arial,sans-serif; font-size:14px; line-height:17px; margin-bottom:0; margin-top:8px; overflow:hidden; padding:8px 0 7px; text-align:center; text-overflow:ellipsis; white-space:nowrap;"><a href="https://instagram.com/p/-CGHgNH64F/" style=" color:#c9c8cd; font-family:Arial,sans-serif; font-size:14px; font-style:normal; font-weight:normal; line-height:17px; text-decoration:none;" target="_blank">A photo posted by @mistydemeo</a> on <time style=" font-family:Arial,sans-serif; font-size:14px; line-height:17px;" datetime="2015-11-13T17:05:23+00:00">Nov 13, 2015 at 9:05am PST</time></p></div></blockquote> <script async defer src="//platform.instagram.com/en_US/embeds.js"></script></p>
-
-<p> Just down the street from Continental, Prado also produces a nice flat white.
- The milk is textured beautifully, a bit better than Continental&rsquo;s, though I found the coffee a bit too sharp in comparison.</p></li>
-<li><p><a href="http://www.milanocoffee.ca">Milano</a> (Gastown)</p>
-
-<p> <blockquote class="instagram-media" data-instgrm-version="5" style=" background:#FFF; border:0; border-radius:3px; box-shadow:0 0 1px 0 rgba(0,0,0,0.5),0 1px 10px 0 rgba(0,0,0,0.15); margin: 1px; max-width:658px; padding:0; width:99.375%; width:-webkit-calc(100% - 2px); width:calc(100% - 2px);"><div style="padding:8px;"> <div style=" background:#F8F8F8; line-height:0; margin-top:40px; padding:50.0% 0; text-align:center; width:100%;"> <div style=" background:url(data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAACwAAAAsCAMAAAApWqozAAAAGFBMVEUiIiI9PT0eHh4gIB4hIBkcHBwcHBwcHBydr+JQAAAACHRSTlMABA4YHyQsM5jtaMwAAADfSURBVDjL7ZVBEgMhCAQBAf//42xcNbpAqakcM0ftUmFAAIBE81IqBJdS3lS6zs3bIpB9WED3YYXFPmHRfT8sgyrCP1x8uEUxLMzNWElFOYCV6mHWWwMzdPEKHlhLw7NWJqkHc4uIZphavDzA2JPzUDsBZziNae2S6owH8xPmX8G7zzgKEOPUoYHvGz1TBCxMkd3kwNVbU0gKHkx+iZILf77IofhrY1nYFnB/lQPb79drWOyJVa/DAvg9B/rLB4cC+Nqgdz/TvBbBnr6GBReqn/nRmDgaQEej7WhonozjF+Y2I/fZou/qAAAAAElFTkSuQmCC); display:block; height:44px; margin:0 auto -44px; position:relative; top:-22px; width:44px;"></div></div><p style=" color:#c9c8cd; font-family:Arial,sans-serif; font-size:14px; line-height:17px; margin-bottom:0; margin-top:8px; overflow:hidden; padding:8px 0 7px; text-align:center; text-overflow:ellipsis; white-space:nowrap;"><a href="https://instagram.com/p/9hXb1HH6w_/" style=" color:#c9c8cd; font-family:Arial,sans-serif; font-size:14px; font-style:normal; font-weight:normal; line-height:17px; text-decoration:none;" target="_blank">A photo posted by @mistydemeo</a> on <time style=" font-family:Arial,sans-serif; font-size:14px; line-height:17px;" datetime="2015-11-01T00:01:47+00:00">Oct 31, 2015 at 5:01pm PDT</time></p></div></blockquote> <script async defer src="//platform.instagram.com/en_US/embeds.js"></script></p>
-
-<p> Milano made their flat white with an very earthy coffee, which overpowered everything else for me&mdash;even given the higher milk volume (8oz).
- This wasn&rsquo;t a bad drink, but it wasn&rsquo;t great.
- Next time I&rsquo;d try ordering with a different espresso and see if that&rsquo;s any better, or ask them to do a ristretto shot.</p></li>
-<li><p><a href="http://www.nelsontheseagull.com">Nelson the Seagull</a> (Gastown)</p>
-
-<p> <blockquote class="instagram-media" data-instgrm-version="5" style=" background:#FFF; border:0; border-radius:3px; box-shadow:0 0 1px 0 rgba(0,0,0,0.5),0 1px 10px 0 rgba(0,0,0,0.15); margin: 1px; max-width:658px; padding:0; width:99.375%; width:-webkit-calc(100% - 2px); width:calc(100% - 2px);"><div style="padding:8px;"> <div style=" background:#F8F8F8; line-height:0; margin-top:40px; padding:50.0% 0; text-align:center; width:100%;"> <div style=" background:url(data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAACwAAAAsCAMAAAApWqozAAAAGFBMVEUiIiI9PT0eHh4gIB4hIBkcHBwcHBwcHBydr+JQAAAACHRSTlMABA4YHyQsM5jtaMwAAADfSURBVDjL7ZVBEgMhCAQBAf//42xcNbpAqakcM0ftUmFAAIBE81IqBJdS3lS6zs3bIpB9WED3YYXFPmHRfT8sgyrCP1x8uEUxLMzNWElFOYCV6mHWWwMzdPEKHlhLw7NWJqkHc4uIZphavDzA2JPzUDsBZziNae2S6owH8xPmX8G7zzgKEOPUoYHvGz1TBCxMkd3kwNVbU0gKHkx+iZILf77IofhrY1nYFnB/lQPb79drWOyJVa/DAvg9B/rLB4cC+Nqgdz/TvBbBnr6GBReqn/nRmDgaQEej7WhonozjF+Y2I/fZou/qAAAAAElFTkSuQmCC); display:block; height:44px; margin:0 auto -44px; position:relative; top:-22px; width:44px;"></div></div><p style=" color:#c9c8cd; font-family:Arial,sans-serif; font-size:14px; line-height:17px; margin-bottom:0; margin-top:8px; overflow:hidden; padding:8px 0 7px; text-align:center; text-overflow:ellipsis; white-space:nowrap;"><a href="https://instagram.com/p/9hK9QXH6yr/" style=" color:#c9c8cd; font-family:Arial,sans-serif; font-size:14px; font-style:normal; font-weight:normal; line-height:17px; text-decoration:none;" target="_blank">A photo posted by @mistydemeo</a> on <time style=" font-family:Arial,sans-serif; font-size:14px; line-height:17px;" datetime="2015-10-31T22:12:45+00:00">Oct 31, 2015 at 3:12pm PDT</time></p></div></blockquote> <script async defer src="//platform.instagram.com/en_US/embeds.js"></script></p>
-
-<p> Nelson&rsquo;s flat white suffers from basically the same problem as Milano&rsquo;s, though it&rsquo;s magnified by being served in a smaller cup.
- I also tried this a second time using their house almond milk; it has too much of a flavour of its own and ended up competing with the coffee.</p></li>
-<li><p><a href="http://revolvercoffee.ca/home/">Revolver</a> (Gastown)</p>
-
-<p> <blockquote class="instagram-media" data-instgrm-version="5" style=" background:#FFF; border:0; border-radius:3px; box-shadow:0 0 1px 0 rgba(0,0,0,0.5),0 1px 10px 0 rgba(0,0,0,0.15); margin: 1px; max-width:658px; padding:0; width:99.375%; width:-webkit-calc(100% - 2px); width:calc(100% - 2px);"><div style="padding:8px;"> <div style=" background:#F8F8F8; line-height:0; margin-top:40px; padding:50.0% 0; text-align:center; width:100%;"> <div style=" background:url(data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAACwAAAAsCAMAAAApWqozAAAAGFBMVEUiIiI9PT0eHh4gIB4hIBkcHBwcHBwcHBydr+JQAAAACHRSTlMABA4YHyQsM5jtaMwAAADfSURBVDjL7ZVBEgMhCAQBAf//42xcNbpAqakcM0ftUmFAAIBE81IqBJdS3lS6zs3bIpB9WED3YYXFPmHRfT8sgyrCP1x8uEUxLMzNWElFOYCV6mHWWwMzdPEKHlhLw7NWJqkHc4uIZphavDzA2JPzUDsBZziNae2S6owH8xPmX8G7zzgKEOPUoYHvGz1TBCxMkd3kwNVbU0gKHkx+iZILf77IofhrY1nYFnB/lQPb79drWOyJVa/DAvg9B/rLB4cC+Nqgdz/TvBbBnr6GBReqn/nRmDgaQEej7WhonozjF+Y2I/fZou/qAAAAAElFTkSuQmCC); display:block; height:44px; margin:0 auto -44px; position:relative; top:-22px; width:44px;"></div></div><p style=" color:#c9c8cd; font-family:Arial,sans-serif; font-size:14px; line-height:17px; margin-bottom:0; margin-top:8px; overflow:hidden; padding:8px 0 7px; text-align:center; text-overflow:ellipsis; white-space:nowrap;"><a href="https://instagram.com/p/99X_q-n6ye/" style=" color:#c9c8cd; font-family:Arial,sans-serif; font-size:14px; font-style:normal; font-weight:normal; line-height:17px; text-decoration:none;" target="_blank">A photo posted by @mistydemeo</a> on <time style=" font-family:Arial,sans-serif; font-size:14px; line-height:17px;" datetime="2015-11-11T21:05:24+00:00">Nov 11, 2015 at 1:05pm PST</time></p></div></blockquote> <script async defer src="//platform.instagram.com/en_US/embeds.js"></script></p>
-
-<p> Revolver serves their flat white in a small 5oz (150mL) glass, which from what I&rsquo;ve read is presumably closer to the kiwi style.
- The milk is steamed well, and the espresso is excellent&mdash;not that I&rsquo;d expect anything less from Revolver.</p>
-
-<p> This doesn&rsquo;t resemble anything I had in straya, but it is tasty.
- I&rsquo;m only rating this low for failing to rekindle my nostalgia; it&rsquo;s delicious taken on its own.</p></li>
-<li><p><a href="http://www.delanyscoffee.com">Delany&rsquo;s</a> (West End)</p>
-
-<p> <blockquote class="instagram-media" data-instgrm-version="6" style=" background:#FFF; border:0; border-radius:3px; box-shadow:0 0 1px 0 rgba(0,0,0,0.5),0 1px 10px 0 rgba(0,0,0,0.15); margin: 1px; max-width:658px; padding:0; width:99.375%; width:-webkit-calc(100% - 2px); width:calc(100% - 2px);"><div style="padding:8px;"> <div style=" background:#F8F8F8; line-height:0; margin-top:40px; padding:50.0% 0; text-align:center; width:100%;"> <div style=" background:url(data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAACwAAAAsCAMAAAApWqozAAAAGFBMVEUiIiI9PT0eHh4gIB4hIBkcHBwcHBwcHBydr+JQAAAACHRSTlMABA4YHyQsM5jtaMwAAADfSURBVDjL7ZVBEgMhCAQBAf//42xcNbpAqakcM0ftUmFAAIBE81IqBJdS3lS6zs3bIpB9WED3YYXFPmHRfT8sgyrCP1x8uEUxLMzNWElFOYCV6mHWWwMzdPEKHlhLw7NWJqkHc4uIZphavDzA2JPzUDsBZziNae2S6owH8xPmX8G7zzgKEOPUoYHvGz1TBCxMkd3kwNVbU0gKHkx+iZILf77IofhrY1nYFnB/lQPb79drWOyJVa/DAvg9B/rLB4cC+Nqgdz/TvBbBnr6GBReqn/nRmDgaQEej7WhonozjF+Y2I/fZou/qAAAAAElFTkSuQmCC); display:block; height:44px; margin:0 auto -44px; position:relative; top:-22px; width:44px;"></div></div><p style=" color:#c9c8cd; font-family:Arial,sans-serif; font-size:14px; line-height:17px; margin-bottom:0; margin-top:8px; overflow:hidden; padding:8px 0 7px; text-align:center; text-overflow:ellipsis; white-space:nowrap;"><a href="https://www.instagram.com/p/-FUphqn6-C/" style=" color:#c9c8cd; font-family:Arial,sans-serif; font-size:14px; font-style:normal; font-weight:normal; line-height:17px; text-decoration:none;" target="_blank">A photo posted by @mistydemeo</a> on <time style=" font-family:Arial,sans-serif; font-size:14px; line-height:17px;" datetime="2015-11-14T23:10:05+00:00">Nov 14, 2015 at 3:10pm PST</time></p></div></blockquote> <script async defer src="//platform.instagram.com/en_US/embeds.js"></script></p>
-
-<p> Delany&rsquo;s smallest size is a 12oz (355mL)&mdash;nearly twice the size of an Australian flat white.
- The huge quantity of milk makes it hard to think of this as being a flat white at all.</p></li>
-<li><p><a href="http://www.bumpngrindcafe.com">Bump N Grind</a></p>
-
-<p> <blockquote class="instagram-media" data-instgrm-version="5" style=" background:#FFF; border:0; border-radius:3px; box-shadow:0 0 1px 0 rgba(0,0,0,0.5),0 1px 10px 0 rgba(0,0,0,0.15); margin: 1px; max-width:658px; padding:0; width:99.375%; width:-webkit-calc(100% - 2px); width:calc(100% - 2px);"><div style="padding:8px;"> <div style=" background:#F8F8F8; line-height:0; margin-top:40px; padding:50.0% 0; text-align:center; width:100%;"> <div style=" background:url(data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAACwAAAAsCAMAAAApWqozAAAAGFBMVEUiIiI9PT0eHh4gIB4hIBkcHBwcHBwcHBydr+JQAAAACHRSTlMABA4YHyQsM5jtaMwAAADfSURBVDjL7ZVBEgMhCAQBAf//42xcNbpAqakcM0ftUmFAAIBE81IqBJdS3lS6zs3bIpB9WED3YYXFPmHRfT8sgyrCP1x8uEUxLMzNWElFOYCV6mHWWwMzdPEKHlhLw7NWJqkHc4uIZphavDzA2JPzUDsBZziNae2S6owH8xPmX8G7zzgKEOPUoYHvGz1TBCxMkd3kwNVbU0gKHkx+iZILf77IofhrY1nYFnB/lQPb79drWOyJVa/DAvg9B/rLB4cC+Nqgdz/TvBbBnr6GBReqn/nRmDgaQEej7WhonozjF+Y2I/fZou/qAAAAAElFTkSuQmCC); display:block; height:44px; margin:0 auto -44px; position:relative; top:-22px; width:44px;"></div></div><p style=" color:#c9c8cd; font-family:Arial,sans-serif; font-size:14px; line-height:17px; margin-bottom:0; margin-top:8px; overflow:hidden; padding:8px 0 7px; text-align:center; text-overflow:ellipsis; white-space:nowrap;"><a href="https://instagram.com/p/-Che_YH68q/" style=" color:#c9c8cd; font-family:Arial,sans-serif; font-size:14px; font-style:normal; font-weight:normal; line-height:17px; text-decoration:none;" target="_blank">A photo posted by @mistydemeo</a> on <time style=" font-family:Arial,sans-serif; font-size:14px; line-height:17px;" datetime="2015-11-13T21:04:32+00:00">Nov 13, 2015 at 1:04pm PST</time></p></div></blockquote> <script async defer src="//platform.instagram.com/en_US/embeds.js"></script></p>
-
-<p> Bump N Grind is one of my favourite shops so I had high hopes, but I was very disappointed in their flat white.</p>
-
-<p> Like Revolver, their flat white runs noticeably smaller than an Australian flat white; Bump N Grind serves theirs in a cappucino cup.
- The coffee is nice, but the milk was steamed poorly and the foam at the surface was far too thick&mdash;not as thick as a cappucino, but this&rsquo;d be on the thick side for a latte, much less a flat white.
- The result was okay, but I wouldn&rsquo;t call it a flat white at all.
- It&rsquo;s basically a cappucino with less foam.</p></li>
-</ol>
-
-</div>
-  
-  
-
-
-    </article>
-  
   <div class="pagination">
     
       <a class="prev" href="/blog/posts/2">&larr; Older</a>
@@ -1070,6 +990,10 @@ I make my own flat whites at home using ristretto shots.</p>
   <ul id="recent_posts">
     
       <li class="post">
+        <a href="/blog/blog/2023/10/25/cargo-dist-system-dependencies-are-hard-so-we-made-them-easier/">Cargo-dist: System Dependencies Are Hard (So We Made Them Easier)</a>
+      </li>
+    
+      <li class="post">
         <a href="/blog/blog/2023/05/29/untangling-another-lingo-parser-edge-case/">Untangling Another Lingo Parser Edge Case</a>
       </li>
     
@@ -1083,10 +1007,6 @@ I make my own flat whites at home using ristretto shots.</p>
     
       <li class="post">
         <a href="/blog/blog/2021/08/14/exploring-jvs/">Exploring JVS</a>
-      </li>
-    
-      <li class="post">
-        <a href="/blog/blog/2020/11/23/bundle-install-with-homebrew-magic-using-brew-bundle-exec/">Bundle Install With Homebrew Magic Using Brew Bundle Exec</a>
       </li>
     
   </ul>

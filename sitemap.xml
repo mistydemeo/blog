@@ -1,6 +1,10 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <urlset xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.sitemaps.org/schemas/sitemap/0.9 http://www.sitemaps.org/schemas/sitemap/0.9/sitemap.xsd" xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
 <url>
+<loc>http://mistys-internet.website/blog/blog/2023/10/25/cargo-dist-system-dependencies-are-hard-so-we-made-them-easier/</loc>
+<lastmod>2023-10-25T14:26:42-07:00</lastmod>
+</url>
+<url>
 <loc>http://mistys-internet.website/blog/blog/2023/05/29/untangling-another-lingo-parser-edge-case/</loc>
 <lastmod>2023-05-29T15:53:18-07:00</lastmod>
 </url>
@@ -120,5 +124,8 @@
 </url>
 <url>
 <loc>http://mistys-internet.website/blog/blog/categories/homebrew/</loc>
+</url>
+<url>
+<loc>http://mistys-internet.website/blog/blog/categories/rust/</loc>
 </url>
 </urlset>

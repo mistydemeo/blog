@@ -5,11 +5,11 @@
 <!--[if (gt IE 8)|(gt IEMobile 7)|!(IEMobile)|!(IE)]><!--><html class="no-js" lang="en"><!--<![endif]-->
 <head>
   <meta charset="utf-8">
-  <title>Mind the Dust - The Future Is Now</title>
+  <title>Cargo-dist: System Dependencies Are Hard (So We Made Them Easier) - The Future Is Now</title>
   <meta name="author" content="Misty De Meo">
 
   
-  <meta name="description" content="Please excuse the sparseness! I&rsquo;m in the process of migrating from Wordpress to Octopress; I haven&rsquo;t had time to change the default team &hellip;">
+  <meta name="description" content="My latest blog post is over at my employer&rsquo;s blog post and talks about the work I&rsquo;ve done to get system dependency management integrated &hellip;">
   
 
   <!-- http://t.co/dKP3o1e -->
@@ -18,7 +18,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1">
 
   
-  <link rel="canonical" href="http://mistys-internet.website/blog/blog/2014/09/10/mind-the-dust">
+  <link rel="canonical" href="http://mistys-internet.website/blog/blog/2023/10/25/cargo-dist-system-dependencies-are-hard-so-we-made-them-easier">
   <link href="/blog/favicon.png" rel="icon">
   <link href="/blog/stylesheets/screen.css" media="screen, projection" rel="stylesheet" type="text/css">
   <link href="/blog/atom.xml" rel="alternate" title="The Future Is Now" type="application/atom+xml">
@@ -66,7 +66,7 @@
   
   <header>
     
-      <h1 class="entry-title">Mind the Dust</h1>
+      <h1 class="entry-title">Cargo-dist: System Dependencies Are Hard (So We Made Them Easier)</h1>
     
     
       <p class="meta">
@@ -75,14 +75,40 @@
 
 
 
-<time class='entry-date' datetime='2014-09-10T08:42:12-07:00'><span class='date'><span class='date-month'>Sep</span> <span class='date-day'>10</span><span class='date-suffix'>th</span>, <span class='date-year'>2014</span></span> <span class='time'>8:42 am</span></time>
+<time class='entry-date' datetime='2023-10-25T14:26:42-07:00'><span class='date'><span class='date-month'>Oct</span> <span class='date-day'>25</span><span class='date-suffix'>th</span>, <span class='date-year'>2023</span></span> <span class='time'>2:26 pm</span></time>
         
       </p>
     
   </header>
 
 
-<div class="entry-content"><p>Please excuse the sparseness! I&rsquo;m in the process of migrating from Wordpress to Octopress; I haven&rsquo;t had time to change the default team or migrate over my older posts.</p>
+<div class="entry-content"><p>My latest blog post is over at my employer&rsquo;s blog post and talks about the work I&rsquo;ve done to get system dependency management integrated into <a href="https://opensource.axo.dev/cargo-dist/"><code>cargo-dist</code></a>, an open source release management tool for Rust. The new release lets users specify non-Rust dependencies in <code>Cargo.toml</code> using a Cargo-like syntax and also provides a detailed report on the resulting binary&rsquo;s dynamic linkage. Here&rsquo;s a sample of the dependency syntax:</p>
+
+<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+<span class='line-number'>11</span>
+</pre></td><td class='code'><pre><code class=''><span class='line'>[workspace.metadata.dist.dependencies.homebrew]
+</span><span class='line'>cmake = { targets = ["x86_64-apple-darwin"] }
+</span><span class='line'>libcue = { version = "2.2.1", targets = ["x86_64-apple-darwin"] }
+</span><span class='line'>
+</span><span class='line'>[workspace.metadata.dist.dependencies.apt]
+</span><span class='line'>cmake = '*'
+</span><span class='line'>libcue-dev = { version = "2.2.1-2" }
+</span><span class='line'>
+</span><span class='line'>[workspace.metadata.dist.dependencies.chocolatey]
+</span><span class='line'>lftp = '*'
+</span><span class='line'>cmake = '3.27.6'</span></code></pre></td></tr></table></div></figure>
+
+
+<p>Go <a href="https://blog.axo.dev/2023/10/dependencies">read the blog post</a> to find out more!</p>
 </div>
 
 
@@ -98,15 +124,21 @@
 
 
 
-<time class='entry-date' datetime='2014-09-10T08:42:12-07:00'><span class='date'><span class='date-month'>Sep</span> <span class='date-day'>10</span><span class='date-suffix'>th</span>, <span class='date-year'>2014</span></span> <span class='time'>8:42 am</span></time>
+<time class='entry-date' datetime='2023-10-25T14:26:42-07:00'><span class='date'><span class='date-month'>Oct</span> <span class='date-day'>25</span><span class='date-suffix'>th</span>, <span class='date-year'>2023</span></span> <span class='time'>2:26 pm</span></time>
       
+
+<span class="categories">
+  
+    <a class='category' href='/blog/blog/categories/rust/'>rust</a>
+  
+</span>
 
 
     </p>
     
       <div class="sharing">
   
-  <a href="//twitter.com/share" class="twitter-share-button" data-url="http://mistys-internet.website/blog/blog/2014/09/10/mind-the-dust/" data-via="" data-counturl="http://mistys-internet.website/blog/blog/2014/09/10/mind-the-dust/" >Tweet</a>
+  <a href="//twitter.com/share" class="twitter-share-button" data-url="http://mistys-internet.website/blog/blog/2023/10/25/cargo-dist-system-dependencies-are-hard-so-we-made-them-easier/" data-via="" data-counturl="http://mistys-internet.website/blog/blog/2023/10/25/cargo-dist-system-dependencies-are-hard-so-we-made-them-easier/" >Tweet</a>
   
   
   
@@ -115,10 +147,8 @@
     
     <p class="meta">
       
-        <a class="basic-alignment left" href="/blog/blog/2013/10/19/no-cpp-precomp-the-compiler-flag-that-time-forgot/" title="Previous Post: -no-cpp-precomp: the compiler flag that time forgot">&laquo; -no-cpp-precomp: the compiler flag that time forgot</a>
+        <a class="basic-alignment left" href="/blog/blog/2023/05/29/untangling-another-lingo-parser-edge-case/" title="Previous Post: Untangling Another Lingo Parser Edge Case">&laquo; Untangling Another Lingo Parser Edge Case</a>
       
-      
-        <a class="basic-alignment right" href="/blog/blog/2014/09/10/thank-you/" title="Next Post: Thank You, Ada">Thank You, Ada &raquo;</a>
       
     </p>
   </footer>
