@@ -4,7 +4,7 @@
   <title><![CDATA[The Future Is Now]]></title>
   <link href="http://mistys-internet.website/blog/atom.xml" rel="self"/>
   <link href="http://mistys-internet.website/blog/"/>
-  <updated>2023-12-30T10:14:50-08:00</updated>
+  <updated>2024-03-01T22:28:22+11:00</updated>
   <id>http://mistys-internet.website/blog/</id>
   <author>
     <name><![CDATA[Misty De Meo]]></name>
@@ -12,6 +12,51 @@
   </author>
   <generator uri="http://octopress.org/">Octopress</generator>
 
+  
+  <entry>
+    <title type="html"><![CDATA[That Time I Accidentally Deleted a Game From MAME]]></title>
+    <link href="http://mistys-internet.website/blog/blog/2024/03/01/that-time-i-accidentally-deleted-a-game-from-mame/"/>
+    <updated>2024-03-01T03:25:45-08:00</updated>
+    <id>http://mistys-internet.website/blog/blog/2024/03/01/that-time-i-accidentally-deleted-a-game-from-mame</id>
+    <content type="html"><![CDATA[<p>Awhile back, I had the chance to <a href="https://www.mistys-internet.website/blog/blog/2022/10/27/how-i-dumped-an-arcade-game-for-mame/">dump a game for MAME</a>. I told myself that if the chance ever came up again, I&rsquo;d contribute again. Luckily, it turns out I didn&rsquo;t have to wait too long&mdash;but the story didn&rsquo;t end like I expected it to.</p>
+
+<p><img src="http://mistys-internet.website/blog/images/martmasttw/0013.big.png" alt="In-game screenshot of Martial Masters" /></p>
+
+<p>When I bought my PGM arcade motherboard, the #1 game I wanted to own was a one-on-one fighting game called <a href="https://wiki.supercombo.gg/w/Martial_Masters">Martial Masters</a>. It&rsquo;s a deeply underrated, gorgeous game&mdash;and judging from the price it goes for these days, I&rsquo;m not the only one after it. It took quite a bit of hunting until I found a copy within my price range but my usual PGM game dealer in China finally tracked down a copy to sell me a few months ago. I was excited to finally play it on the original hardware, but also to see if I had another chance to contribute a game to MAME.</p>
+
+<p>When it arrived, even before I had the chance to check the version number, I was surprised to see it was a Taiwanese region game. All    of IGS&rsquo;s games have simplified Chinese region variants for sale in China; it&rsquo;s unusual to see a traditional Chinese version from Taiwan show up over there. It could just be a sign that the game was so popular they brought over extra cartridges from Taiwan when there weren&rsquo;t enough for local arcades. Once I booted the game and made note of its version numbers, I checked MAME and saw that there was a matching game in its database: <code>martmasttw</code>, or a special Taiwanese version of revision 1.02. That also surprised me&mdash;IGS typically didn&rsquo;t produce entirely separate builds for different regions. Instead, each of their games contains the data for every language and region in its ROMs, and the region code in its copy protection chip determines what region it boots up as.</p>
+
+<p><img src="http://mistys-internet.website/blog/images/martmasttw/0000.big.png" alt="Screenshot of Martial Masters crashing" /></p>
+
+<p>The other thing I noticed about MAME&rsquo;s <code>martmasttw</code> was a comment in the source code noting that it might be a bad dump&mdash;that is, an invalid read that produced corrupted data. This isn&rsquo;t that uncommon when dumping these sorts of games. Whether it&rsquo;s due to dying chips or hardware issues with the reading process, sometimes a read just goes wrong and it gets missed. Once I booted it up in MAME, I confirmed it looked like a bad dump. It instantly crashes with an illegal instruction error, a clear sign of corrupted program code. Now that I owned the game, I had a chance to dump the correct ROMs and fix MAME&rsquo;s database.</p>
+
+<p><img src="http://mistys-internet.website/blog/images/martmasttw/gamechip.jpeg" alt="Photo of a game chip being held" /></p>
+
+<p>As soon as I opened the cartridge, I noticed something interesting: these weren&rsquo;t the chips I was expected. Like with The Gladiator, I only needed to remove and dump two socketed chips, but these were a completely different model. Other PGM games using the same hardware typically use 27C322 (4MB) and 27C160 (2MB) chips, which were common EPROMs in their time period. Here, though, I saw something much more exotic: an OKI 27C3202 soldered into a custom adapter. The game board itself is essentially the same one that&rsquo;s in The Gladiator, so it was clear that the adapter was presenting them as 4MB 27C322 chips.</p>
+
+<p>I haven&rsquo;t been able to figure out why it was designed this way. It can&rsquo;t have been cheap to design and manufacture these custom adapters, and other PGM games that were made both before and after this one all use the more common chips without any adapters. I&rsquo;ve only seen a single other game built this way. Was there a 27C322 shortage at the time this specific game was being made? Were they experimenting with new designs and ended up abandoning this approach? It&rsquo;s hard to tell.</p>
+
+<p><img src="http://mistys-internet.website/blog/images/martmasttw/reader.jpeg" alt="Photo of a game chip being dumped in an EPROM reader" /></p>
+
+<p>I only have an EPROM reader adapter for chips in the 27C322 family, so I hoped it would would be able to handle reading them just fine. On my first attempt, it rejected it; as far as I can tell, it was trying to perform &ldquo;smart&rdquo; verification of the chip, which failed since the underlying chip underneath IGS&rsquo;s adapter isn&rsquo;t actually the chip it&rsquo;s trying to query. I ultimately tricked it by inserting a real 27C322 first and reading that before swapping over to the chip I actually wanted to read. Once the reader&rsquo;s recognized at least one chip, it seems happy to stick in 27C322 mode persistently.</p>
+
+<p>My first read seemed fine, and the dumped data did have a different hash from what MAME recognized. Success! &hellip;or so I thought, until I tried actually booting the game, where it crashed again. I went back to the EPROM reader to make sure the chip was seated correctly before doing a new test read. From the physical design of the adapters, I knew that getting it seated might be a challenge.</p>
+
+<p>The reader uses a <a href="https://en.wikipedia.org/wiki/Zero_insertion_force">ZIF socket</a> which usually makes it easy to insert and remove chips. This time, though, there was an interesting complication. Because of how it&rsquo;s constructed, the socket has a &ldquo;lip&rdquo; at the end past the final set of pins. With a normal 27C322, that&rsquo;s not a problem; the chip ends right at the final set of pins, so nothing hangs over the end of the chip. This adapter has a very different shape from a real 27C322 chip, however&mdash;there&rsquo;s a dangling &ldquo;head&rdquo; that contains the actual chip, as seen in the photo above showing the underside of the adapter. On the real board it hangs harmlessly over the end of the socket, but on a ZIF socket it ends up actually making contact with the end of the socket and keeps the pins from being able to sit as deeply as it would normal sit. I haven&rsquo;t spoken to the person who originally dumped this revision, but I suspect that this is the issue behind the bad dump.</p>
+
+<p>I ended up holding the apdater with one hand to stabilize it and keep all of the pins as even as I could while I locked the ZIF socket&rsquo;s lever a second time; this time, it seemed as though I&rsquo;d been able to get it sitting as even as possible. I then performed several more reads and, before trying to boot it again, compared them against each other. This time, I saw that these new reads were different from the first attempt&mdash;<em>and</em> that they were byte-for-byte identical to each other.</p>
+
+<p><img src="http://mistys-internet.website/blog/images/martmasttw/0003.big.png" alt="Screenshot of Martial Masters's title screen" /></p>
+
+<p>Once I had what seemed like good dump of both chips, I booted them up in MAME to see if it would work. Unlike MAME&rsquo;s ROMs, it booted right away without issues and worked perfectly. After I played a few rounds without a single crash or unexpected behaviour, I was satisfied that my new dumps were fine. As I was getting ready to submit a pull request to MAME to update the hashes in its database, however, I happened to grep the source for them and noticed something funny&mdash;they were already there. In another version of Martial Masters.</p>
+
+<p>I mentioned earlier that I was surprised that MAME had labelled the Taiwanese 1.02 version of Martial Masters as a separate revision from the Chinese 1.02. Well, as it turns out, once the ROMs are dumped correctly it&rsquo;s <em>not</em> a separate revision. The ROMs are actually byte-for-byte identical; it&rsquo;s only the bad dump that had made MAME consider <code>martmasttw</code> a separate revision this whole time.</p>
+
+<p>This is the point where I&rsquo;d intended to open a pull request to MAME just updating a few hashes for the correct dump, but with everything I&rsquo;d learned the <a href="https://github.com/mamedev/mame/pull/11883">final pull request</a> deleted <code>martmasttw</code> entirely. I had set out to fix a revision of the game in MAME, and make one more verison of it playable. Instead, I&rsquo;d proven <em>it didn&rsquo;t exist in the first place</em>. This wasn&rsquo;t where I expected to end up, but it does teach an important lesson: corrupted data can go unnoticed for years if it&rsquo;s not double and triple checked.</p>
+
+<p>And, more than that, it&rsquo;s a reminder that <em>databases are an eternal work in progress</em>. MAME&rsquo;s list of ROMs is also as close as there is to a global catalogue of arcade games and their revisions, but it&rsquo;s still fallible. Databases grow and, sometimes, they shrink; proving a work <em>doesn&rsquo;t</em> exist can be just as important as uncovering new works.</p>
+]]></content>
+  </entry>
   
   <entry>
     <title type="html"><![CDATA[Fixing Classical Cats; or, How I Got Tricked by 28-year-old Defensive Programming]]></title>
@@ -1395,71 +1440,6 @@ In 1999, an unofficial mod titled <a href="http://www5.ocn.ne.jp/~afc/limitover/
     <updated>2014-09-10T08:42:12-07:00</updated>
     <id>http://mistys-internet.website/blog/blog/2014/09/10/mind-the-dust</id>
     <content type="html"><![CDATA[<p>Please excuse the sparseness! I&rsquo;m in the process of migrating from Wordpress to Octopress; I haven&rsquo;t had time to change the default team or migrate over my older posts.</p>
-]]></content>
-  </entry>
-  
-  <entry>
-    <title type="html"><![CDATA[-no-cpp-precomp: The Compiler Flag That Time Forgot]]></title>
-    <link href="http://mistys-internet.website/blog/blog/2013/10/19/no-cpp-precomp-the-compiler-flag-that-time-forgot/"/>
-    <updated>2013-10-19T22:58:00-07:00</updated>
-    <id>http://mistys-internet.website/blog/blog/2013/10/19/no-cpp-precomp-the-compiler-flag-that-time-forgot</id>
-    <content type="html"><![CDATA[<p>I’m often surprised how long software can keep trying to use compatibility features ages after their best-by date.</p>
-
-<p>Now that GCC 4.8 builds on Tiger<sup id="fnref:1"><a href="#fn:1" rel="footnote">1</a></sup>, I’ve been testing as much software with it as I can. When building ncurses using GCC 4.8.1, though, I came across a strange error message:</p>
-
-<blockquote><p>gcc-4.8: error: unrecognized command line option &lsquo;-no-cpp-precomp&rsquo;</p></blockquote>
-
-<p>It built fine with the gcc-4.0 that came with the OS. GCC rarely removes support for flags like this, so I assumed it must be an Apple-only flag. Unfortunately, it wasn’t listed in the manpage at all, and the internet was no help either – the search results were full of users confused about the same build failures, or trying to figure out what it does. All I could find was <a href="http://trac.wxwidgets.org/ticket/14029">confirmation</a> that it’s an obsolete Apple-only flag.</p>
-
-<p>Not finding anything, I decided to find out straight from the horse’s mouth and try source-diving. Luckily Apple publishes the source code for all obsolete versions of their tools at their <a href="http://opensource.apple.com/">Apple Open Source</a> site.</p>
-
-<p>Recent versions of Apple GCC don’t include the flag anywhere in their source. The only place it’s still referenced is in a few configure scripts and changelogs, such as these:</p>
-
-<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-<span class='line-number'>2</span>
-<span class='line-number'>3</span>
-<span class='line-number'>4</span>
-<span class='line-number'>5</span>
-</pre></td><td class='code'><pre><code class='sh'><span class='line'><span class="c"># The spiffy cpp-precomp chokes on some legitimate constructs in GCC</span>
-</span><span class='line'><span class="c"># sources; use -no-cpp-precomp to get to GNU cpp.</span>
-</span><span class='line'><span class="c"># Apple&#39;s GCC has bugs in designated initializer handling, so disable</span>
-</span><span class='line'><span class="c"># that too.</span>
-</span><span class='line'><span class="nv">stage1_cflags</span><span class="o">=</span><span class="s2">&quot;-g -no-cpp-precomp -DHAVE_DESIGNATED_INITIALIZERS=0&quot;</span>
-</span></code></pre></td></tr></table></div></figure>
-
-
-<p>In several releases prior to that, for instance <a href="http://opensource.apple.com/source/gcc/gcc-5493/gcc/gcc.c">gcc-5493</a>, the flag is explicitly mentioned as being retained for compatibility and is a no-op:</p>
-
-<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-<span class='line-number'>2</span>
-</pre></td><td class='code'><pre><code class='sh'><span class='line'>/* APPLE LOCAL cpp-precomp compatibility */
-</span><span class='line'>%<span class="o">{</span>precomp:%ecpp-precomp not supported<span class="o">}</span>%<span class="o">{</span>no-cpp-precomp:<span class="o">}</span>%<span class="o">{</span>Wno-precomp:<span class="o">}</span><span class="se">\</span>
-</span></code></pre></td></tr></table></div></figure>
-
-
-<p>The last time it was actually documented was in <a href="http://opensource.apple.com/source/gcc/gcc-1765/gcc/doc/install.texi">gcc-1765</a>&rsquo;s install.texi, shipped as a part of the WWDC 2004 Developer Preview of Xcode, which also provides a hint as to what the flag actually did:</p>
-
-<blockquote><p>It’s a good idea to use the GNU preprocessor instead of Apple’s @file{cpp-precomp} during the first stage of bootstrapping; this is automatic when doing @samp{make bootstrap}, but to do it from the toplevel objdir you will need to say @samp{make CC=’cc -no-cpp-precomp’ bootstrap}.</p></blockquote>
-
-<p>So this partially answers our question: Apple shipped an alternate preprocessor, and -no-cpp-precomp triggers the use of the GCC cpp instead. I can only assume this was a leftover that had yet to be excised, because the flag itself was still a no-op at that time. To actually find a version where the flag does something, we have to go all the way back to the December 2002 developer tools, whose <a href="http://opensource.apple.com/source/gcc/gcc-937.2/gcc/gcc.c">gcc-937.2</a> actually has code that uses the flag. This particular build of GCC is Apple’s version of gcc-2.95, and it appears to be the very last where it had any effect. Interestingly, the #ifdef that guards this particular block of code is “#ifdef NEXT_CPP_PRECOMP” – suggesting that this dates back to NeXT, rather than Apple.</p>
-
-<p>To actually find out what this means, O’Reilly’s <a href="http://shop.oreilly.com/product/9780596003562.do">Mac OS X for Unix Geeks</a>, from September 2002, has a nice explanation in chapter 5:</p>
-
-<blockquote><p>Precompiled header files are binary files that have been generated from ordinary C header files and that have been preprocessed and parsed using cpp-precomp. When such a precompiled header is created, both macros and declarations present in the corresponding ordinary header file are sorted, resulting in a faster compile time, a reduced symbol table size, and consequently, faster lookup. Precompiled header files are given a .p extension and are produced from ordinary header files that end with a .h extension.</p></blockquote>
-
-<p>Chapter 4 also provides a nice explanation of why -no-cpp-precomp was desirable:</p>
-
-<blockquote><p>cpp-precomp is faster than cpp. However, some code may not compile with cpp-precomp. In that case, you should invoke cpp by instructing cc not to use cpp-precomp.</p></blockquote>
-
-<p>So there we have it – -no-cpp-precomp became somewhat widely used in Unix software as a compatibility measure to prevent Apple’s cpp-precomp feature from breaking their headers, and has stuck around more than a decade since the last time it’s actually done anything.</p>
-<div class="footnotes">
-<hr/>
-<ol>
-<li id="fn:1">
-<p>More on that in a future blog post.<a href="#fnref:1" rev="footnote">&#8617;</a></p></li>
-</ol>
-</div>
-
 ]]></content>
   </entry>
   

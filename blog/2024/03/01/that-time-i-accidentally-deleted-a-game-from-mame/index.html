@@ -1,0 +1,231 @@
+
+<!DOCTYPE html>
+<!--[if IEMobile 7 ]><html class="no-js iem7"><![endif]-->
+<!--[if lt IE 9]><html class="no-js lte-ie8"><![endif]-->
+<!--[if (gt IE 8)|(gt IEMobile 7)|!(IEMobile)|!(IE)]><!--><html class="no-js" lang="en"><!--<![endif]-->
+<head>
+  <meta charset="utf-8">
+  <title>That Time I Accidentally Deleted a Game From MAME - The Future Is Now</title>
+  <meta name="author" content="Misty De Meo">
+
+  
+  <meta name="description" content="Awhile back, I had the chance to dump a game for MAME. I told myself that if the chance ever came up again, I&rsquo;d contribute again. Luckily, it &hellip;">
+  
+
+  <!-- http://t.co/dKP3o1e -->
+  <meta name="HandheldFriendly" content="True">
+  <meta name="MobileOptimized" content="320">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+
+  
+  <link rel="canonical" href="http://mistys-internet.website/blog/blog/2024/03/01/that-time-i-accidentally-deleted-a-game-from-mame">
+  <link href="/blog/favicon.png" rel="icon">
+  <link href="/blog/stylesheets/screen.css" media="screen, projection" rel="stylesheet" type="text/css">
+  <link href="/blog/atom.xml" rel="alternate" title="The Future Is Now" type="application/atom+xml">
+  <script src="/blog/javascripts/modernizr-2.0.js"></script>
+  <script src="//ajax.googleapis.com/ajax/libs/jquery/1.9.1/jquery.min.js"></script>
+  <script>!window.jQuery && document.write(unescape('%3Cscript src="./javascripts/libs/jquery.min.js"%3E%3C/script%3E'))</script>
+  <script src="/blog/javascripts/octopress.js" type="text/javascript"></script>
+  <!--Fonts from Google"s Web font directory at http://google.com/webfonts -->
+<link href="//fonts.googleapis.com/css?family=PT+Serif:regular,italic,bold,bolditalic" rel="stylesheet" type="text/css">
+<link href="//fonts.googleapis.com/css?family=PT+Sans:regular,italic,bold,bolditalic" rel="stylesheet" type="text/css">
+
+  
+
+</head>
+
+<body   >
+  <header role="banner"><hgroup>
+  <h1><a href="/blog/">The Future Is Now</a></h1>
+  
+</hgroup>
+
+</header>
+  <nav role="navigation"><ul class="subscription" data-subscription="rss">
+  <li><a href="/blog/atom.xml" rel="subscribe-rss" title="subscribe via RSS">RSS</a></li>
+  
+</ul>
+  
+<form action="https://www.google.com/search" method="get">
+  <fieldset role="search">
+    <input type="hidden" name="q" value="site:mistys-internet.website/blog" />
+    <input class="search" type="text" name="q" results="0" placeholder="Search"/>
+  </fieldset>
+</form>
+  
+<ul class="main-navigation">
+  <li><a href="/blog/">Blog</a></li>
+  <li><a href="/blog/blog/archives">Archives</a></li>
+</ul>
+
+</nav>
+  <div id="main">
+    <div id="content">
+      <div>
+<article class="hentry" role="article">
+  
+  <header>
+    
+      <h1 class="entry-title">That Time I Accidentally Deleted a Game From MAME</h1>
+    
+    
+      <p class="meta">
+        
+
+
+
+
+<time class='entry-date' datetime='2024-03-01T03:25:45-08:00'><span class='date'><span class='date-month'>Mar</span> <span class='date-day'>1</span><span class='date-suffix'>st</span>, <span class='date-year'>2024</span></span> <span class='time'>3:25 am</span></time>
+        
+      </p>
+    
+  </header>
+
+
+<div class="entry-content"><p>Awhile back, I had the chance to <a href="https://www.mistys-internet.website/blog/blog/2022/10/27/how-i-dumped-an-arcade-game-for-mame/">dump a game for MAME</a>. I told myself that if the chance ever came up again, I&rsquo;d contribute again. Luckily, it turns out I didn&rsquo;t have to wait too long&mdash;but the story didn&rsquo;t end like I expected it to.</p>
+
+<p><img src="/blog/images/martmasttw/0013.big.png" alt="In-game screenshot of Martial Masters" /></p>
+
+<p>When I bought my PGM arcade motherboard, the #1 game I wanted to own was a one-on-one fighting game called <a href="https://wiki.supercombo.gg/w/Martial_Masters">Martial Masters</a>. It&rsquo;s a deeply underrated, gorgeous game&mdash;and judging from the price it goes for these days, I&rsquo;m not the only one after it. It took quite a bit of hunting until I found a copy within my price range but my usual PGM game dealer in China finally tracked down a copy to sell me a few months ago. I was excited to finally play it on the original hardware, but also to see if I had another chance to contribute a game to MAME.</p>
+
+<p>When it arrived, even before I had the chance to check the version number, I was surprised to see it was a Taiwanese region game. All    of IGS&rsquo;s games have simplified Chinese region variants for sale in China; it&rsquo;s unusual to see a traditional Chinese version from Taiwan show up over there. It could just be a sign that the game was so popular they brought over extra cartridges from Taiwan when there weren&rsquo;t enough for local arcades. Once I booted the game and made note of its version numbers, I checked MAME and saw that there was a matching game in its database: <code>martmasttw</code>, or a special Taiwanese version of revision 1.02. That also surprised me&mdash;IGS typically didn&rsquo;t produce entirely separate builds for different regions. Instead, each of their games contains the data for every language and region in its ROMs, and the region code in its copy protection chip determines what region it boots up as.</p>
+
+<p><img src="/blog/images/martmasttw/0000.big.png" alt="Screenshot of Martial Masters crashing" /></p>
+
+<p>The other thing I noticed about MAME&rsquo;s <code>martmasttw</code> was a comment in the source code noting that it might be a bad dump&mdash;that is, an invalid read that produced corrupted data. This isn&rsquo;t that uncommon when dumping these sorts of games. Whether it&rsquo;s due to dying chips or hardware issues with the reading process, sometimes a read just goes wrong and it gets missed. Once I booted it up in MAME, I confirmed it looked like a bad dump. It instantly crashes with an illegal instruction error, a clear sign of corrupted program code. Now that I owned the game, I had a chance to dump the correct ROMs and fix MAME&rsquo;s database.</p>
+
+<p><img src="/blog/images/martmasttw/gamechip.jpeg" alt="Photo of a game chip being held" /></p>
+
+<p>As soon as I opened the cartridge, I noticed something interesting: these weren&rsquo;t the chips I was expected. Like with The Gladiator, I only needed to remove and dump two socketed chips, but these were a completely different model. Other PGM games using the same hardware typically use 27C322 (4MB) and 27C160 (2MB) chips, which were common EPROMs in their time period. Here, though, I saw something much more exotic: an OKI 27C3202 soldered into a custom adapter. The game board itself is essentially the same one that&rsquo;s in The Gladiator, so it was clear that the adapter was presenting them as 4MB 27C322 chips.</p>
+
+<p>I haven&rsquo;t been able to figure out why it was designed this way. It can&rsquo;t have been cheap to design and manufacture these custom adapters, and other PGM games that were made both before and after this one all use the more common chips without any adapters. I&rsquo;ve only seen a single other game built this way. Was there a 27C322 shortage at the time this specific game was being made? Were they experimenting with new designs and ended up abandoning this approach? It&rsquo;s hard to tell.</p>
+
+<p><img src="/blog/images/martmasttw/reader.jpeg" alt="Photo of a game chip being dumped in an EPROM reader" /></p>
+
+<p>I only have an EPROM reader adapter for chips in the 27C322 family, so I hoped it would would be able to handle reading them just fine. On my first attempt, it rejected it; as far as I can tell, it was trying to perform &ldquo;smart&rdquo; verification of the chip, which failed since the underlying chip underneath IGS&rsquo;s adapter isn&rsquo;t actually the chip it&rsquo;s trying to query. I ultimately tricked it by inserting a real 27C322 first and reading that before swapping over to the chip I actually wanted to read. Once the reader&rsquo;s recognized at least one chip, it seems happy to stick in 27C322 mode persistently.</p>
+
+<p>My first read seemed fine, and the dumped data did have a different hash from what MAME recognized. Success! &hellip;or so I thought, until I tried actually booting the game, where it crashed again. I went back to the EPROM reader to make sure the chip was seated correctly before doing a new test read. From the physical design of the adapters, I knew that getting it seated might be a challenge.</p>
+
+<p>The reader uses a <a href="https://en.wikipedia.org/wiki/Zero_insertion_force">ZIF socket</a> which usually makes it easy to insert and remove chips. This time, though, there was an interesting complication. Because of how it&rsquo;s constructed, the socket has a &ldquo;lip&rdquo; at the end past the final set of pins. With a normal 27C322, that&rsquo;s not a problem; the chip ends right at the final set of pins, so nothing hangs over the end of the chip. This adapter has a very different shape from a real 27C322 chip, however&mdash;there&rsquo;s a dangling &ldquo;head&rdquo; that contains the actual chip, as seen in the photo above showing the underside of the adapter. On the real board it hangs harmlessly over the end of the socket, but on a ZIF socket it ends up actually making contact with the end of the socket and keeps the pins from being able to sit as deeply as it would normal sit. I haven&rsquo;t spoken to the person who originally dumped this revision, but I suspect that this is the issue behind the bad dump.</p>
+
+<p>I ended up holding the apdater with one hand to stabilize it and keep all of the pins as even as I could while I locked the ZIF socket&rsquo;s lever a second time; this time, it seemed as though I&rsquo;d been able to get it sitting as even as possible. I then performed several more reads and, before trying to boot it again, compared them against each other. This time, I saw that these new reads were different from the first attempt&mdash;<em>and</em> that they were byte-for-byte identical to each other.</p>
+
+<p><img src="/blog/images/martmasttw/0003.big.png" alt="Screenshot of Martial Masters's title screen" /></p>
+
+<p>Once I had what seemed like good dump of both chips, I booted them up in MAME to see if it would work. Unlike MAME&rsquo;s ROMs, it booted right away without issues and worked perfectly. After I played a few rounds without a single crash or unexpected behaviour, I was satisfied that my new dumps were fine. As I was getting ready to submit a pull request to MAME to update the hashes in its database, however, I happened to grep the source for them and noticed something funny&mdash;they were already there. In another version of Martial Masters.</p>
+
+<p>I mentioned earlier that I was surprised that MAME had labelled the Taiwanese 1.02 version of Martial Masters as a separate revision from the Chinese 1.02. Well, as it turns out, once the ROMs are dumped correctly it&rsquo;s <em>not</em> a separate revision. The ROMs are actually byte-for-byte identical; it&rsquo;s only the bad dump that had made MAME consider <code>martmasttw</code> a separate revision this whole time.</p>
+
+<p>This is the point where I&rsquo;d intended to open a pull request to MAME just updating a few hashes for the correct dump, but with everything I&rsquo;d learned the <a href="https://github.com/mamedev/mame/pull/11883">final pull request</a> deleted <code>martmasttw</code> entirely. I had set out to fix a revision of the game in MAME, and make one more verison of it playable. Instead, I&rsquo;d proven <em>it didn&rsquo;t exist in the first place</em>. This wasn&rsquo;t where I expected to end up, but it does teach an important lesson: corrupted data can go unnoticed for years if it&rsquo;s not double and triple checked.</p>
+
+<p>And, more than that, it&rsquo;s a reminder that <em>databases are an eternal work in progress</em>. MAME&rsquo;s list of ROMs is also as close as there is to a global catalogue of arcade games and their revisions, but it&rsquo;s still fallible. Databases grow and, sometimes, they shrink; proving a work <em>doesn&rsquo;t</em> exist can be just as important as uncovering new works.</p>
+</div>
+
+
+  <footer>
+    <p class="meta">
+      
+  
+
+<span class="byline author vcard">Posted by <span class="fn">Misty De Meo</span></span>
+
+      
+
+
+
+
+<time class='entry-date' datetime='2024-03-01T03:25:45-08:00'><span class='date'><span class='date-month'>Mar</span> <span class='date-day'>1</span><span class='date-suffix'>st</span>, <span class='date-year'>2024</span></span> <span class='time'>3:25 am</span></time>
+      
+
+
+    </p>
+    
+      <div class="sharing">
+  
+  <a href="//twitter.com/share" class="twitter-share-button" data-url="http://mistys-internet.website/blog/blog/2024/03/01/that-time-i-accidentally-deleted-a-game-from-mame/" data-via="" data-counturl="http://mistys-internet.website/blog/blog/2024/03/01/that-time-i-accidentally-deleted-a-game-from-mame/" >Tweet</a>
+  
+  
+  
+</div>
+
+    
+    <p class="meta">
+      
+        <a class="basic-alignment left" href="/blog/blog/2023/12/10/fixing-classical-cats-or/" title="Previous Post: Fixing Classical Cats; or, how I got tricked by 28-year-old defensive programming">&laquo; Fixing Classical Cats; or, how I got tricked by 28-year-old defensive programming</a>
+      
+      
+    </p>
+  </footer>
+</article>
+
+</div>
+
+<aside class="sidebar">
+  
+    <section>
+  <h1>Recent Posts</h1>
+  <ul id="recent_posts">
+    
+      <li class="post">
+        <a href="/blog/blog/2024/03/01/that-time-i-accidentally-deleted-a-game-from-mame/">That Time I Accidentally Deleted a Game From MAME</a>
+      </li>
+    
+      <li class="post">
+        <a href="/blog/blog/2023/12/10/fixing-classical-cats-or/">Fixing Classical Cats; or, How I Got Tricked by 28-year-old Defensive Programming</a>
+      </li>
+    
+      <li class="post">
+        <a href="/blog/blog/2023/10/25/cargo-dist-system-dependencies-are-hard-so-we-made-them-easier/">Cargo-dist: System Dependencies Are Hard (So We Made Them Easier)</a>
+      </li>
+    
+      <li class="post">
+        <a href="/blog/blog/2023/05/29/untangling-another-lingo-parser-edge-case/">Untangling Another Lingo Parser Edge Case</a>
+      </li>
+    
+      <li class="post">
+        <a href="/blog/blog/2022/10/27/how-i-dumped-an-arcade-game-for-mame/">How I Dumped an Arcade Game for MAME</a>
+      </li>
+    
+  </ul>
+</section>
+
+
+
+
+
+  
+</aside>
+
+
+    </div>
+  </div>
+  <footer role="contentinfo"><p>
+  Copyright &copy; 2024 - Misty De Meo -
+  <span class="credit">Powered by <a href="http://octopress.org">Octopress</a></span>
+</p>
+
+</footer>
+  
+
+
+
+
+
+
+
+  <script type="text/javascript">
+    (function(){
+      var twitterWidgets = document.createElement('script');
+      twitterWidgets.type = 'text/javascript';
+      twitterWidgets.async = true;
+      twitterWidgets.src = '//platform.twitter.com/widgets.js';
+      document.getElementsByTagName('head')[0].appendChild(twitterWidgets);
+    })();
+  </script>
+
+
+
+
+
+</body>
+</html>
