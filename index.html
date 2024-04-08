@@ -9,7 +9,7 @@
   <meta name="author" content="Misty De Meo">
 
   
-  <meta name="description" content="Awhile back, I had the chance to dump a game for MAME. I told myself that if the chance ever came up again, I&rsquo;d contribute again. Luckily, it &hellip;">
+  <meta name="description" content="The short, no-clickbait version: to switch the Mac version of Puyo Puyo Fever to English, edit ~/Library/Preferences/PuyoPuyo Fever/PUYOF.BIN and set &hellip;">
   
 
   <!-- http://t.co/dKP3o1e -->
@@ -63,6 +63,79 @@
     <div id="content">
       <div class="blog-index">
   
+  
+  
+    <article>
+      
+  <header>
+    
+      <h1 class="entry-title"><a href="/blog/blog/2024/04/07/unlocking-puyo-puyo-fever-for-macs-english-mode/">Unlocking Puyo Puyo Fever for Mac's English Mode</a></h1>
+    
+    
+      <p class="meta">
+        
+
+
+
+
+<time class='entry-date' datetime='2024-04-07T22:31:23-07:00'><span class='date'><span class='date-month'>Apr</span> <span class='date-day'>7</span><span class='date-suffix'>th</span>, <span class='date-year'>2024</span></span> <span class='time'>10:31 pm</span></time>
+        
+      </p>
+    
+  </header>
+
+
+  <div class="entry-content"><p><em>The short, no-clickbait version: to switch the Mac version of Puyo Puyo Fever to English, edit <code>~/Library/Preferences/PuyoPuyo Fever/PUYOF.BIN</code> and set the byte at <code>0x266</code> to <code>0x01</code>&mdash;or just download <a href="/blog/data/puyofever/PUYOF.BIN">this pre-patched save game</a> and place it in that directory.</em></p>
+
+<p><img src="/blog/images/puyofever/story.png" title="English Puyo Pop Fever in-game story mode screen" ></p>
+
+<p>I&rsquo;ve been a Mac user since 2005, and one of the very first Mac games I bought was the Mac port of Sega&rsquo;s <a href="https://en.wikipedia.org/wiki/Puyo_Pop_Fever">Puyo Puyo Fever</a>. I&rsquo;ve always been a Sega fangirl and I&rsquo;ve always loved puzzle games (even if I&rsquo;m not that good at Puyo Puyo), so when they actually released a Puyo Puyo game for Mac I knew I had to get it. This was back in the days when very, very few companies released games for Mac, so there weren&rsquo;t many options. Even Sega usually ignored Mac users; Puyo Puyo Fever only came out as part of a marketing gimmick that saw Sega release a new port every month for most of a year, leading them to target more niche platforms like Mac, Palm Pilot and Pocket PC.</p>
+
+<p>A few of the console versions came out in English, but the Mac port was exclusive to Japan. I didn&rsquo;t read any Japanese at the time, so I just muddled my way through the menus while wishing I could play it in English. I&rsquo;d thought that maybe I could try to transplant English game data from the console versions, but I didn&rsquo;t own any of them so I just resigned myself to playing the game in Japanese.</p>
+
+<p>Recently, though, I came across some information that made me realize there might be more to it. First, I finally got to try the Japan-exclusive Dreamcast port from 2004&hellip; and discovered that it was fully bilingual, with an option in the menu to switch between Japanese or English text and voices. I might have just thought that Dreamcast players were lucky and I was still out of luck until I ran into the <a href="https://puyonexus.com/wiki/Guide:PPF_PC_Translation">English Puyo Puyo fan community</a>&rsquo;s mod to enable English support in the Windows version. Their technique, which was discovered by community members Yoshi and nmn around 2009, involves modifying not the game itself but a flag in the save game&mdash;the same flag used by the Dreamcast version, which it&rsquo;s still programmed to respect despite the menu option having been removed.</p>
+
+<p>I wasn&rsquo;t able to use the <a href="https://puyonexus.com/forum/viewtopic.php?f=7&amp;t=1097">Windows save modding tool</a> produced by Puyo Puyo fan community member NickW for a couple of reasons:</p>
+
+<ol type="a">
+<li>It&rsquo;s hardcoded to open the save file from the Windows save location, <code>%AppData%\SEGA\PuyoF\PUYOF.BIN</code>, and can&rsquo;t just be given a save file at some other path, and</li>
+<li>The Windows version uses compressed save data, while the Mac version always uses uncompressed saves, and so the editor won&rsquo;t try to open uncompressed saves.</li>
+</ol>
+
+
+<p>I could have updated the editor to work around this but, knowing that that the save was uncompressed and I only had to change a single byte, it seemed like overkill. One byte is easy enough to edit without a specialized tool, so I just pulled out a hex editor. The Windows save editor is source-available, so I didn&rsquo;t have to reverse engineer the locations of the key flags in the save file myself. I guessed that the language flag offset wouldn&rsquo;t be different between the uncompressed Windows saves and the Mac saves, so after reading that it&rsquo;s stored at byte <code>0x288</code>, I tried changing it from <code>0x00</code> to <code>0x01</code> and started up the game.</p>
+
+<p><img src="/blog/images/puyofever/title.png" title="English Puyo Pop Fever title screen" ></p>
+
+<p>&hellip;and it just worked! Without any changes, the entire game swapped over to English&mdash;menus, dialogue, and even the title screen logo. After 20 years, suddenly I was playing Puyo Puyo Fever for Mac in English.</p>
+
+<p>According to the Windows save editor, the next byte (<code>0x289</code>) controls the voice language. Neither the Windows nor the Mac versions actually shipped with English voices on the disc, however, so setting this value just ends up silencing the game instead. The fan community prepared an <a href="https://puyonexus.com/wiki/Guide:PPF_PC_Translation">English voice pack</a> taken from the other versions, but I didn&rsquo;t bother trying it on Mac since proper timing data for the English voices is missing.</p>
+
+<p>At this point I figured I&rsquo;d discovered everything I was going to find until I noticed something at the start of the save data in the hex editor:</p>
+
+<p><img src="/blog/images/puyofever/hexeditor.png" width="300" title="Screenshot of a hex editor showing an image-like pattern" ></p>
+
+<p>I&rsquo;d only been paying attention to data later in the file, so I&rsquo;d overlooked the very beginning until now. But now that I looked at it, it was a <em>very</em> regular pattern. It looks suspiciously like an image; uncompressed bitmaps are usually recognizable to the naked eye in a hex editor, and I wondered if that could be what this was. So I dug out the Dreamcast version again, and lo and behold:</p>
+
+<p><img src="/blog/images/puyofever/PUYOFEVERSYS.png" title="A square pixel art image of a sign with the Japanese hiragana symbol &#34;pu&#34;" alt="A square pixel art image of a sign with the Japanese hiragana symbol &#34;pu&#34;"></p>
+
+<p>It&rsquo;s the Dreamcast version&rsquo;s save icon, displayed in the Dreamcast save menu and on the portable VMU save device. The Mac version doesn&rsquo;t have any reason to need this, and has nowhere to display it, but it&rsquo;s there anyway. Looking at the start of the header made me realize the default save file name from the Dreamcast port is there too&mdash;the very first bytes read 「システムファイル」, or &ldquo;System File&rdquo;. Grabbing an original Dreamcast save file, I was able to confirm that the Mac save is <em>completely identical</em> to the Dreamcast version, except for rendering multi-byte fields in big-endian format<sup id="fnref:1"><a href="#fn:1" rel="footnote">1</a></sup>. I guess by 2004 there was no reason to spend time rewriting the save data format just to save a few hundred bytes, so all the Dreamcast-specific features come along for the ride on Mac and Windows.</p>
+
+<p>Now, you might, ask, why would I spend so much time on a Mac port that doesn&rsquo;t even run on modern computers? Part of it is just that I love digging into older games like this to find out what makes them tick; it&rsquo;s as much a hobby as actually playing them. The other part, of course, is that I&rsquo;ll actually play it. As you might be able to guess from the <a href="https://github.com/mistydemeo/tigerbrew">PowerPC Mac package manager</a> I maintain, I still keep my old Macs around and every now and then I break out the PowerMac G4 for a few rounds of Puyo Puyo Fever. The next time I do, I&rsquo;ll be able to play it in English.</p>
+<div class="footnotes">
+<hr/>
+<ol>
+<li id="fn:1">
+<p>The <a href="https://en.wikipedia.org/wiki/Endianness">byte order</a>, or endianness, of multi-byte data types is different between different kinds of CPUs. The PowerPC processors used by that era of Macs use the big endian format.<a href="#fnref:1" rev="footnote">&#8617;</a></p></li>
+</ol>
+</div>
+
+</div>
+  
+  
+
+
+    </article>
   
   
     <article>
@@ -945,101 +1018,6 @@
 
     </article>
   
-  
-    <article>
-      
-  <header>
-    
-      <h1 class="entry-title"><a href="/blog/blog/2018/10/18/recover-from-filevault-doom/">Recover From FileVault Doom</a></h1>
-    
-    
-      <p class="meta">
-        
-
-
-
-
-<time class='entry-date' datetime='2018-10-18T19:19:04-03:00'><span class='date'><span class='date-month'>Oct</span> <span class='date-day'>18</span><span class='date-suffix'>th</span>, <span class='date-year'>2018</span></span> <span class='time'>7:19 pm</span></time>
-        
-      </p>
-    
-  </header>
-
-
-  <div class="entry-content"><p>Just upgraded to Mojave? Getting the 🚫 of doom when you try to boot your Mac? Worried you&rsquo;ve lost all your data? <strong>Don&rsquo;t panic!</strong> Your Mac is recoverable, and this guide will help you get your drive back in shape.</p>
-
-<p>This bug is caused by a new limitation introduced for FileVault encryption. As mentioned in the <a href="https://developer.apple.com/documentation/macos_release_notes/macos_mojave_10_14_release_notes">release notes</a>, any APFS volume encrypted using Mojave&rsquo;s implementation of FileVault becomes invisible to earlier versions of macOS until the encryption or decryption process completes. By itself, this is mostly harmless. However, this is rendered much worse by a bug<sup id="fnref:1"><a href="#fn:1" rel="footnote">1</a></sup> that causes the Mojave installer to incorrectly trigger reencryption of an already-encrypted FileVault volume during the install process. Because full drive encryption cannot complete in a timely manner, the Mojave installer times out before encryption completes. The result is a macOS 10.13 (or older) install with a macOS 10.14 FileVault volume that hasn&rsquo;t yet finished encrypting. This volume can&rsquo;t be read by the startup manager, and so becomes unbootable.</p>
-
-<p>In order to fix this issue, we&rsquo;ll need to let your drive finish encrypting. This guide will walk you through the process. Before we get started, make sure you have the right supplies on hand. You&rsquo;ll need a USB key with a capacity of at least 8GB and access to a working Mac.</p>
-
-<h3>1. Create a USB Mojave installer</h3>
-
-<p>Download the Mojave installer application on your working Mac using the App Store. Don&rsquo;t worry, you won&rsquo;t be using that to install - just to create a USB installer for your broken Mac. Then follow <a href="https://support.apple.com/en-us/HT201372">these instructions from Apple</a>. This will erase your USB key and turn it into a bootable USB install drive.</p>
-
-<h3>2. Boot into the USB installer</h3>
-
-<p>Turn off the Mac that you&rsquo;re upgrading to Mojave and insert the USB drive you just created. Turn the Mac back on, and immediately hold the option key until the Startup Manager appears. Select the drive you created.</p>
-
-<h3>3. Enter Recovery Mode</h3>
-
-<p>The installer should provide an option to enter Recovery Mode. This is a different version of Recovery Mode than the one that&rsquo;s builtin to your Mac, and it will be able to see your hard drive.</p>
-
-<h3>4. Unlock and mount your hard drive</h3>
-
-<p>From the Utilities menu bar at the top of the screen, select Terminal. From the terminal prompt, type <code>diskutil apfs list</code>. In the output, you should see one volume whose FileVault status is listed as <code>FileVault: in progress</code> (or something similar). If it&rsquo;s already listed as &ldquo;unlocked&rdquo;, then you&rsquo;re good - proceed to step 5.</p>
-
-<p>Unlock this drive by running <code>diskutil apfs unlockVolume DISK</code>, where <code>DISK</code> is the identifier listed after <code>APFS Volume Disk</code> for the volume you identified in the previous paragraph. For example, you might type <code>diskutil apfs unlockVolume disk1s1</code>. This command will ask you for a password; enter either your personal log in password, or a FileVault recovery key.</p>
-
-<p>Once you&rsquo;ve completed this step, exit Terminal. You should be returned to the Recovery Mode main menu.</p>
-
-<h3>5. Create a new APFS volume</h3>
-
-<p>Open Disk Utility from the Recovery Mode main menu. Select your main hard drive, right-click it, and choose &ldquo;Add APFS Volume&rdquo;. Don&rsquo;t worry, this isn&rsquo;t repartitioning your drive - this bootable volume will live on the same volume as your main volume, and you will be able to delete it later. Name it &ldquo;Temporary&rdquo;, then click &ldquo;Add&rdquo;.</p>
-
-<p><img src="/blog/images/mojave/1_volume.png" width="264" title="Creating a volume" ></p>
-
-<p><img src="/blog/images/mojave/2_volume.png" width="442" title="Volume options" ></p>
-
-<p>Once you&rsquo;ve completed this step, exit Disk Utility. You should be returned to the Recovery Mode main menu. Return to the main Mojave installer menu.</p>
-
-<h3>6. Install Mojave on the new volume</h3>
-
-<p>Choose to install Mojave on the volume named &ldquo;Temporary&rdquo; that you created in the previous step. This will be a temporary fresh install, so don&rsquo;t worry too much about it - go ahead and keep all the options at their defaults.</p>
-
-<h3>7. Allow drive encryption to finish</h3>
-
-<p>Once your install has finished and you&rsquo;ve logged in, open Disk Utility. Unlock your normal hard drive by clicking on it and clicking the &ldquo;mount&rdquo; button in the toolbar. You will be asked for a password; like in the previous step in the terminal, you will need to provide either your login password (from your old Mac install), or your recovery key.</p>
-
-<p>At this point, drive encryption will start back up again. You will need to wait for that to finish; this could take a few hours. If you want to check on the progress, you can open a terminal and look at the output of <code>diskutil apfs list</code>; encryption is finished when you run that command and see the status read <code>FileVault: Yes</code>.</p>
-
-<h3>8. Upgrade your main drive to Mojave</h3>
-
-<p>Now you&rsquo;re finally (finally!) ready to let the Mojave install complete. Open up your USB drive in the Finder and run the macOS installer app. This time, instead of picking the temporary volume, pick your original Mac volume. Let the installer complete. This time, your Mac should boot up like normal. You&rsquo;re saved!</p>
-
-<h3>9. Clean up</h3>
-
-<p>Now that your main Mac volume is bootable again, you can get rid of the temporary volume we created in the previous step. To do that, open Disk Utility and right-click the volume named &ldquo;Temporary&rdquo;. Click &ldquo;Delete APFS Volume&rdquo;, then confirm by clicking &ldquo;Delete&rdquo; again.</p>
-
-<p><img src="/blog/images/mojave/3_volume.png" width="205" title="Deleting the temporary volume" ></p>
-
-<h3>You&rsquo;re done!</h3>
-
-<p>With any luck, you should be all set at this point. Feel free to reach out to me if you&rsquo;re still having trouble! Big thanks to <a href="https://twitter.com/mikeymikey">@mikeymikey</a> for the suggestion of using a second APFS volume to install the temporary macOS 10.14. Thanks also to my manager, who allowed me to use my internal blog post as the basis for this post.</p>
-<div class="footnotes">
-<hr/>
-<ol>
-<li id="fn:1">
-<p>I wish I could provide more detail about this bug, but as far as I know no details have been published. I&rsquo;ve filed a radar but haven&rsquo;t received a response. All I know is that this occurs, seemingly at random, to a small percentage of people who try to upgrade from macOS 10.13.6 to macOS 10.14 when FileVault is already enabled.<a href="#fnref:1" rev="footnote">&#8617;</a></p></li>
-</ol>
-</div>
-
-</div>
-  
-  
-
-
-    </article>
-  
   <div class="pagination">
     
       <a class="prev" href="/blog/posts/2">&larr; Older</a>
@@ -1055,6 +1033,10 @@
   <ul id="recent_posts">
     
       <li class="post">
+        <a href="/blog/blog/2024/04/07/unlocking-puyo-puyo-fever-for-macs-english-mode/">Unlocking Puyo Puyo Fever for Mac's English Mode</a>
+      </li>
+    
+      <li class="post">
         <a href="/blog/blog/2024/03/01/that-time-i-accidentally-deleted-a-game-from-mame/">That Time I Accidentally Deleted a Game From MAME</a>
       </li>
     
@@ -1068,10 +1050,6 @@
     
       <li class="post">
         <a href="/blog/blog/2023/05/29/untangling-another-lingo-parser-edge-case/">Untangling Another Lingo Parser Edge Case</a>
-      </li>
-    
-      <li class="post">
-        <a href="/blog/blog/2022/10/27/how-i-dumped-an-arcade-game-for-mame/">How I Dumped an Arcade Game for MAME</a>
       </li>
     
   </ul>
