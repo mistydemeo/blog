@@ -9,7 +9,7 @@
   <meta name="author" content="Misty De Meo">
 
   
-  <meta name="description" content="Just upgraded to Mojave? Getting the 🚫 of doom when you try to boot your Mac? Worried you&rsquo;ve lost all your data? Don&rsquo;t panic! Your Mac is &hellip;">
+  <meta name="description" content="Has this ever happened to you? You&rsquo;re writing a project in Ruby, JavaScript, Go, etc., and you have to build a dependency that uses a system &hellip;">
   
 
   <!-- http://t.co/dKP3o1e -->
@@ -63,6 +63,177 @@
     <div id="content">
       <div class="blog-index">
   
+  
+  
+    <article>
+      
+  <header>
+    
+      <h1 class="entry-title"><a href="/blog/blog/2020/11/23/bundle-install-with-homebrew-magic-using-brew-bundle-exec/">Bundle Install With Homebrew Magic Using Brew Bundle Exec</a></h1>
+    
+    
+      <p class="meta">
+        
+
+
+
+
+<time class='entry-date' datetime='2020-11-23T20:30:00-08:00'><span class='date'><span class='date-month'>Nov</span> <span class='date-day'>23</span><span class='date-suffix'>rd</span>, <span class='date-year'>2020</span></span> <span class='time'>8:30 pm</span></time>
+        
+      </p>
+    
+  </header>
+
+
+  <div class="entry-content"><p>Has this ever happened to you? You&rsquo;re writing a project in Ruby, JavaScript, Go, etc., and you have to build a dependency that uses a system library. So you <code>bundle install</code> and then, a few minutes later, your terminal spits up an ugly set of C compiler errors you don&rsquo;t know how to deal with. After dealing with this enough times I decided to do something about it.</p>
+
+<p><a href="https://brew.sh">Homebrew</a> already has a great tool in its arsenal for dealing with these problems. Homebrew needs to be able to build software reliably and robustly, after all - even if the user&rsquo;s system has weird software installed on it or strange misconfigurations. The <a href="https://docs.brew.sh/Formula-Cookbook#superenv-notes">&ldquo;superenv&rdquo; build environment</a> features intelligent automatic setup of build-related environment variables and <code>PATH</code>s based on just the requested dependencies, which filters out unrequested software and prevents a lot of common build failures that come from interfering software. It also uses shims for many common build tools to enforce just the right arguments passing through to the real tools.</p>
+
+<p>So I thought to myself - we solved that problem for Homebrew builds already, right? Wouldn&rsquo;t it be nice if I could just reuse that work for other things? So that&rsquo;s what I did. Homebrew already provides the <code>Brewfile</code> dependency declaration format and the <code>brew bundle</code> tool to library dependencies with Homebrew, and as a result there&rsquo;s already a great way to get the dependency information we&rsquo;d need to produce a reliable build environment. Since <code>brew bundle</code> is a Homebrew plugin, it has access to Homebrew&rsquo;s core code - including build environment setup. Putting these together, I wrote a feature called <code>brew bundle exec</code>. It takes the software you specify in your Brewfile and builds a dependency tree out of that, then sets up just the right build flags to let anything you want use them.</p>
+
+<p>For example, say I want to <code>gem install mysql2</code>. Often, you get something like this:</p>
+
+<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+</pre></td><td class='code'><pre><code class=''><span class='line'>$ gem install mysql2
+</span><span class='line'>Building native extensions. This could take a while...
+</span><span class='line'># several dozen lines later...
+</span><span class='line'>linking shared-object mysql2/mysql2.bundle
+</span><span class='line'>ld: library not found for -lssl
+</span><span class='line'>clang: error: linker command failed with exit code 1 (use -v to see invocation)
+</span><span class='line'>make: *** [mysql2.bundle] Error 1</span></code></pre></td></tr></table></div></figure>
+
+
+<p>Ew, right? Let&rsquo;s make that better.</p>
+
+<p>By creating a <code>Brewfile</code> with the line <code>brew "mysql"</code>, we can specify that we want to build against a Homebrew-installed MySQL <em>and</em> all of its dependencies. Just by running our command prefixed with <code>brew bundle exec --</code>, for example, <code>brew bundle exec -- gem install mysql2</code>, we can run that command in a build environment that knows exactly how to use its dependencies. Suddenly, everything works&mdash;no messing around with flags, no special options passed to <code>gem install</code>, and no fragile <code>bundle config</code> trickery.</p>
+
+<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+</pre></td><td class='code'><pre><code class=''><span class='line'>$ brew bundle exec -- gem install mysql2
+</span><span class='line'>Building native extensions. This could take a while...
+</span><span class='line'>Successfully installed mysql2-0.5.3
+</span><span class='line'>Parsing documentation for mysql2-0.5.3
+</span><span class='line'>Installing ri documentation for mysql2-0.5.3
+</span><span class='line'>Done installing documentation for mysql2 after 0 seconds
+</span><span class='line'>1 gem installed</span></code></pre></td></tr></table></div></figure>
+
+
+<p>What exactly does <code>brew bundle exec</code> set? There&rsquo;s a variety of flags set which are useful for a variety of different compilers and buildsystems.</p>
+
+<ul>
+<li><code>CC</code> and <code>CXX</code>, the compiler specification flags, point to Homebrew&rsquo;s compiler shims which help ensure that the right flags are passed to the real compiler being used.</li>
+<li><code>CFLAGS</code>, <code>CXXFLAGS</code>, and <code>CPPFLAGS</code> ensure that C and C++ compilers know about the header and library lookup paths for all of the <code>Brewfile</code> dependencies.</li>
+<li><code>PATH</code> ensures that all of the executables installed by <code>Brewfile</code> dependencies will be found first, before any tools of the same name that may be installed elsewhere on your system.</li>
+<li><code>PKG_CONFIG_LIBDIR</code> and <code>PKG_CONFIG_LIBDIR</code> ensure that the <code>pkg-config</code> tool finds <code>Brewfile</code> dependencies.</li>
+<li>Buildsystem-specific flags, such as <code>CMAKE_PREFIX_PATH</code>, ensure that buildsystems can make use of the <code>Brewfile</code> dependencies.</li>
+</ul>
+
+
+<p>So the next time you&rsquo;re bashing your head against build failures in your project, give <code>brew bundle exec</code> a try. It might just solve your problems for you!</p>
+</div>
+  
+  
+
+
+    </article>
+  
+  
+    <article>
+      
+  <header>
+    
+      <h1 class="entry-title"><a href="/blog/blog/2019/02/20/the-hunt-for-the-lost-phoenix-games/">The Hunt for the Lost Phoenix Games</a></h1>
+    
+    
+      <p class="meta">
+        
+
+
+
+
+<time class='entry-date' datetime='2019-02-20T20:22:52-08:00'><span class='date'><span class='date-month'>Feb</span> <span class='date-day'>20</span><span class='date-suffix'>th</span>, <span class='date-year'>2019</span></span> <span class='time'>8:22 pm</span></time>
+        
+      </p>
+    
+  </header>
+
+
+  <div class="entry-content"><p>Among trashgame fans, Phoenix Games are one of the most infamous game publishers of all time. They&rsquo;re famous for making games of the lowest possible quality for the lowest possible price; their most infamous &ldquo;games&rdquo; <a href="https://youtu.be/j4sMwSWoSJY">were just poorly-animated movies on a PS2 disc</a>. They&rsquo;re the kind of fascinating bad you just can&rsquo;t help but love for their own sake.</p>
+
+<p>In their last year of life, Phoenix started publishing Nintendo DS games. They had an aggressive release schedule; in 2008 they announced plans to release 20 games inside of a year, most of which never came out. <em>Which</em> games did or didn&rsquo;t come out is still hard to figure out. Many online release lists take Phoenix Games&rsquo;s estimated release dates at face value, including many games that probably never came out. I&rsquo;ve put together a list of what I&rsquo;ve been able to confirm in the hopes that anyone with more information can help out.</p>
+
+<p>Out of the 20 games Phoenix announced, only five definitely came out under Phoenix themselves. There are confirmed physical copies of these games and ROM dumps on the internet. Three more were licensed to other publishers after Phoenix&rsquo;s bankruptcy. The other twelve are less certain; I&rsquo;ve divided these into three categories with explanations below. Phoenix declared bankruptcy in early 2009, and I haven&rsquo;t been able to confirm that any games were released after the end of 2008. If you have any information, please contact me via email or <a href="https://twitter.com/mistydemeo">on Twitter</a>!</p>
+
+<p>Definitely released:</p>
+
+<ul>
+<li><em>12</em> - NorthPole Studio, 2008</li>
+<li><em>Adventures of Pinocchio</em> - Unknown, 2008</li>
+<li><em>Peter Pan&rsquo;s Playground</em> - Unknown, 2008</li>
+<li><em>Polar Rampage</em> - CyberPlanet, 2008</li>
+<li><em>Valentines Day</em> - NorthPole Studio, 2008</li>
+</ul>
+
+
+<p>Released by other developers:</p>
+
+<ul>
+<li><em>Coral Savior</em> - NorthPole Studio; released as <em>Bermuda Triangle: Saving the Coral</em> by Storm City Games, in North America, 2010; and as <em>Bermuda Triangle</em> by Funbox Media, in Europe, 2011</li>
+<li><em>Hoppie II</em> - CyberPlanet; released as <em>Hoppie</em>, by Maximum Family Games, in North America, 2011</li>
+<li><em>Veggy World</em> - CyberPlanet; released by Maximum Family Games, in North America, 2011</li>
+</ul>
+
+
+<p>Possibly released:</p>
+
+<p>These games had finalized cover art and announced release dates. The games in this category have been found in some online store catalogues, suggesting they may have either been released or at least had already been offered to stores.</p>
+
+<ul>
+<li><em>Jungle Gang: Perfect Plans</em> - Listed in an <a href="https://www.mcvuk.com/business/whats-new-october-17th-08">MCV article</a> as having been released October 17, 2008. Listed in a few online store catalogues as sold out.</li>
+<li><em>Love Heart</em> - Reviewed by Polish site <a href="https://www.gry-online.pl/gry/love-heart/zb24cb">GRYOnline.pl</a>, who gave it a 2008 release date.</li>
+</ul>
+
+
+<p>Probably not released:</p>
+
+<p>Included in release lists, but with no store pages to indicate they were ever actually released. Some of these games were given multiple release dates, probably because they were delayed and solicited multiple times.</p>
+
+<ul>
+<li><em>Dalmatians 4</em> - Listed in a <a href="http://playstationcollecting.com/forum/messageview.cfm?catid=76&amp;threadid=73644&amp;StartRow=26">PlayStation Collecting forums</a> catalogue as having been released on February 13, 2009.</li>
+<li><em>Lion and the King 3</em> - Listed in a <a href="http://playstationcollecting.com/forum/messageview.cfm?catid=76&amp;threadid=73644&amp;StartRow=26">PlayStation Collecting forums</a> catalogue as having been released on both October 24, 2008 and February 13, 2009.</li>
+<li><em>Monster Egg II</em> - Listed in a <a href="http://playstationcollecting.com/forum/messageview.cfm?catid=76&amp;threadid=73644&amp;StartRow=26">PlayStation Collecting forums</a> catalogue as having been released on both November 28, 2008 and March 13, 2009.</li>
+<li><em>Rat-A-Box</em> - Listed in an <a href="https://www.mcvuk.com/business/whats-new-october-17th-08">MCV article</a> as having been released October 17, 2008, but no store catalogue entries.</li>
+</ul>
+
+
+<p>Definitely not released:</p>
+
+<ul>
+<li><em>Cinderella&rsquo;s Fairy Tale</em> - Final cover art, but never included in any release lists.</li>
+<li><em>Greatest Flood</em> - No cover art or homepage.</li>
+<li><em>Iron Chef II</em> - Final cover art, but never included in any release lists.</li>
+<li><em>Monster Dessert</em> - No cover art or homepage.</li>
+<li><em>Princess Snow White</em> - No cover art or homepage.</li>
+<li><em>War in Heaven</em> - Final cover art, but never included in any release lists.</li>
+</ul>
+
+</div>
+  
+  
+
+
+    </article>
   
   
     <article>
@@ -872,118 +1043,6 @@ In 1999, an unofficial mod titled <a href="http://www5.ocn.ne.jp/~afc/limitover/
 
     </article>
   
-  
-    <article>
-      
-  <header>
-    
-      <h1 class="entry-title"><a href="/blog/blog/2014/12/05/homebrew-gcc-changes-coming/">Homebrew GCC Changes Coming</a></h1>
-    
-    
-      <p class="meta">
-        
-
-
-
-
-<time class='entry-date' datetime='2014-12-05T18:57:06-08:00'><span class='date'><span class='date-month'>Dec</span> <span class='date-day'>5</span><span class='date-suffix'>th</span>, <span class='date-year'>2014</span></span> <span class='time'>6:57 pm</span></time>
-        
-      </p>
-    
-  </header>
-
-
-  <div class="entry-content"><p>Big GCC changes are a-coming to <a href="http://brew.sh">Homebrew</a>, which will make building your own software against Homebrew-provided GCCs much more reliable. There&rsquo;s going to be a transition period, though, and any software built against GCC will need to be rebuilt against the new package to work. We&rsquo;ll be pushing the changes on <strong>December 12th, 2014</strong>, and this post is here to help you get ready for it!</p>
-
-<p>(This only affects software built using Homebrew&rsquo;s GCC. Any software built using Clang, which is the compiler that Apple ships, will be unaffected. If you don&rsquo;t know what this means: you&rsquo;re probably fine.)</p>
-
-<h2>The problem</h2>
-
-<p>Since Apple provides many of the same libraries as GCC, Homebrew installs GCC to a nonstandard location in order to avoid shadowing those libraries. Homebrew currently installs GCC using the <code>--enable-version-specific-runtime-libs</code> option to sandbox its libraries and headers, which installs libraries into versioned locations like so:</p>
-
-<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-</pre></td><td class='code'><pre><code class=''><span class='line'>/usr/local/lib/gcc/x86_64-apple-darwin13.4.0/4.9.2/libgfortran.3.dylib</span></code></pre></td></tr></table></div></figure>
-
-
-<p>Since the full version of GCC is embedded&mdash;including the minor version&mdash;along with the OS version, every minor release is installed to a new location; this breaks any software which has dynamically linked against a previous GCC version&rsquo;s copies of these libraries.</p>
-
-<h2>What&rsquo;s changing</h2>
-
-<p>The new GCC package we are shipping will install GCC libraries to a path containing only the series version of GCC. For example, libgfortran will now be installed to:</p>
-
-<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-</pre></td><td class='code'><pre><code class=''><span class='line'>/usr/local/lib/gcc/4.9/libgfortran.3.dylib</span></code></pre></td></tr></table></div></figure>
-
-
-<p>This has several advantages:</p>
-
-<ul>
-<li>New releases of GCC 4.9 will be installed to the same path, so software built using GCC 4.9.2 will work with software built using GCC 4.9.3.</li>
-<li>The same changes will be applied to the <code>gcc49</code> formula in the <a href="https://github.com/Homebrew/homebrew-versions/">homebrew/versions</a> repository, allowing <code>gcc49</code> to provide the 4.9 libraries when <code>gcc</code> is eventually upgraded to 5.0.</li>
-</ul>
-
-
-<h2>What you need to do</h2>
-
-<h3>If you&rsquo;re a user</h3>
-
-<p>If you have built any software using the Homebrew-installed GCC, you will need to reinstall that software once the package is updated on the 12th.</p>
-
-<h3>If you provide binary packages built using the Homebrew-installed GCC</h3>
-
-<p>If you provide binary packages that were built using the Homebrew-installed GCC, you should rebuild them using the <a href="https://github.com/Homebrew/homebrew/pull/34303">new formula</a> and have them ready for your users on the 12th.</p>
-
-<h3>If you maintain Homebrew formulae that use GCC/GFortran</h3>
-
-<p>If you maintain Homebrew formulae that build using GCC or GFortran, you should consider <a href="https://github.com/Homebrew/homebrew/blob/master/share/doc/homebrew/Formula-Cookbook.md#formulae-revisions">bumping their revisions</a> on the 12th to ensure that users rebuild them against the new GCC package.</p>
-
-<h2>The tl;dr version</h2>
-
-<p>On December 12, 2014, we will push a new GCC package that changes the install location of libraries. Any software you&rsquo;ve built using the old package (for instance, C++ or Fortran software) will no longer work and will need to be reinstalled. If you build packages for distribution using Homebrew&rsquo;s GCC package, make sure you&rsquo;ve built new versions using our new package and have them ready to distribute at that date.</p>
-</div>
-  
-  
-
-
-    </article>
-  
-  
-    <article>
-      
-  <header>
-    
-      <h1 class="entry-title"><a href="/blog/blog/2014/09/10/thank-you/">Thank You, Ada</a></h1>
-    
-    
-      <p class="meta">
-        
-
-
-
-
-<time class='entry-date' datetime='2014-09-10T08:46:54-07:00'><span class='date'><span class='date-month'>Sep</span> <span class='date-day'>10</span><span class='date-suffix'>th</span>, <span class='date-year'>2014</span></span> <span class='time'>8:46 am</span></time>
-        
-      </p>
-    
-  </header>
-
-
-  <div class="entry-content"><p><a href="http://www.ibiblio.org/bess/">Bess Sadler</a>, <a href="http://andromedayelton.com/">Andromeda Yelton</a>, <a href="http://chrisbourg.wordpress.com/">Chris Bourg</a> and <a href="http://matienzo.org/">Mark Matienzo</a> have stepped forward to pledge to <a href="https://adainitiative.org/donate/?campaign=libraries">match up to $5120 of donations</a> to the <a href="http://adainitiative.org/">Ada Initiative</a>, a non-profit organization that supports the participation of women in open source and culture. I completely support this very generous act; the Ada Initiative does <a href="http://adainitiative.org/what-we-do/">incredibly important</a> work, and I&rsquo;m extremely proud of my friends and of the library community for supporting them.</p>
-
-<p>I&rsquo;ve <a href="http://modelviewculture.com/pieces/there-and-back-again">written before</a> about how I stopped pursuing a career in tech in my late teens. I saw few female (or trans) role models in the tech industry; at a time when my self-image and self-identity was its most fragile, I pivoted away from something I saw as too masculine, without room for me. The Ada Initiative&rsquo;s conferences and advocacy work have done a lot to help make the open tech world a more welcoming space.</p>
-
-<p>There are a lot of reasons why women don&rsquo;t enter, or don&rsquo;t stay, in the tech industry. The last few weeks, when <a href="http://www.theguardian.com/technology/2014/sep/01/how-to-attack-a-woman-who-works-in-video-games">harassment campaigns</a> have <a href="http://www.themarysue.com/gamergate-harms-women/">targeted women to drive them out of the video game industry</a>, have made me reflect on how important it is to work to make online communities and conferences safe spaces.</p>
-
-<p>The Ada Initiative&rsquo;s <a href="http://adainitiative.org/what-we-do/conference-policies/">conference policy advocacy work</a> and their <a href="http://geekfeminism.wikia.com/wiki/Conference_anti-harassment">example anti-harassment policy</a> have been instrumental in helping many organizations and projects adopt their own policies. Both the <a href="https://github.com/code4lib/antiharassment-policy">Code4lib anti-harassment policy</a> and the <a href="https://github.com/Homebrew/homebrew/blob/master/CODEOFCONDUCT.md">Homebrew code of conduct</a>, for example, were inspired by and partially based on the Ada Initiative&rsquo;s work. Seeing organizations adopt these policies has done a lot to make me feel comfortable, and given me confidence that both preventing and dealing with these forms of harassment is something that they see as important. My hope is that future generations of women will feel comfortable entering and interacting in these spaces in ways that others may not have in the past.</p>
-
-<p>In just a few years, the Ada Initiative has helped make sure that these policies are becoming the norm and not the exception for conferences and online communities. I&rsquo;m so grateful we have their advocacy; please consider <a href="https://supportada.org/?campaign=libraries">donating</a> to help them do even more great things.</p>
-</div>
-  
-  
-
-
-    </article>
-  
   <div class="pagination">
     
       <a class="prev" href="/blog/posts/3">&larr; Older</a>
@@ -1001,6 +1060,14 @@ In 1999, an unofficial mod titled <a href="http://www5.ocn.ne.jp/~afc/limitover/
   <ul id="recent_posts">
     
       <li class="post">
+        <a href="/blog/blog/2024/07/12/github-is-starting-to-feel-like-legacy-software/">"GitHub" Is Starting to Feel Like Legacy Software</a>
+      </li>
+    
+      <li class="post">
+        <a href="/blog/blog/2024/06/25/the-working-archivists-guide-to-enthusiast-cd-rom-archiving-tools/">The Working Archivist's Guide to Enthusiast CD-ROM Archiving Tools</a>
+      </li>
+    
+      <li class="post">
         <a href="/blog/blog/2024/04/07/unlocking-puyo-puyo-fever-for-macs-english-mode/">Unlocking Puyo Puyo Fever for Mac's English Mode</a>
       </li>
     
@@ -1010,14 +1077,6 @@ In 1999, an unofficial mod titled <a href="http://www5.ocn.ne.jp/~afc/limitover/
     
       <li class="post">
         <a href="/blog/blog/2023/12/10/fixing-classical-cats-or/">Fixing Classical Cats; or, How I Got Tricked by 28-year-old Defensive Programming</a>
-      </li>
-    
-      <li class="post">
-        <a href="/blog/blog/2023/10/25/cargo-dist-system-dependencies-are-hard-so-we-made-them-easier/">Cargo-dist: System Dependencies Are Hard (So We Made Them Easier)</a>
-      </li>
-    
-      <li class="post">
-        <a href="/blog/blog/2023/05/29/untangling-another-lingo-parser-edge-case/">Untangling Another Lingo Parser Edge Case</a>
       </li>
     
   </ul>

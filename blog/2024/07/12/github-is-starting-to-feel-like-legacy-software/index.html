@@ -1,0 +1,207 @@
+
+<!DOCTYPE html>
+<!--[if IEMobile 7 ]><html class="no-js iem7"><![endif]-->
+<!--[if lt IE 9]><html class="no-js lte-ie8"><![endif]-->
+<!--[if (gt IE 8)|(gt IEMobile 7)|!(IEMobile)|!(IE)]><!--><html class="no-js" lang="en"><!--<![endif]-->
+<head>
+  <meta charset="utf-8">
+  <title>"GitHub" Is Starting to Feel Like Legacy Software - The Future Is Now</title>
+  <meta name="author" content="Misty De Meo">
+
+  
+  <meta name="description" content="I&rsquo;ve used a lot of tools over the years, which means I&rsquo;ve seen a lot of tools hit a plateau. That&rsquo;s not always a problem; sometimes &hellip;">
+  
+
+  <!-- http://t.co/dKP3o1e -->
+  <meta name="HandheldFriendly" content="True">
+  <meta name="MobileOptimized" content="320">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+
+  
+  <link rel="canonical" href="http://mistys-internet.website/blog/blog/2024/07/12/github-is-starting-to-feel-like-legacy-software">
+  <link href="/blog/favicon.png" rel="icon">
+  <link href="/blog/stylesheets/screen.css" media="screen, projection" rel="stylesheet" type="text/css">
+  <link href="/blog/atom.xml" rel="alternate" title="The Future Is Now" type="application/atom+xml">
+  <script src="/blog/javascripts/modernizr-2.0.js"></script>
+  <script src="//ajax.googleapis.com/ajax/libs/jquery/1.9.1/jquery.min.js"></script>
+  <script>!window.jQuery && document.write(unescape('%3Cscript src="./javascripts/libs/jquery.min.js"%3E%3C/script%3E'))</script>
+  <script src="/blog/javascripts/octopress.js" type="text/javascript"></script>
+  <!--Fonts from Google"s Web font directory at http://google.com/webfonts -->
+<link href="//fonts.googleapis.com/css?family=PT+Serif:regular,italic,bold,bolditalic" rel="stylesheet" type="text/css">
+<link href="//fonts.googleapis.com/css?family=PT+Sans:regular,italic,bold,bolditalic" rel="stylesheet" type="text/css">
+
+  
+
+</head>
+
+<body   >
+  <header role="banner"><hgroup>
+  <h1><a href="/blog/">The Future Is Now</a></h1>
+  
+</hgroup>
+
+</header>
+  <nav role="navigation"><ul class="subscription" data-subscription="rss">
+  <li><a href="/blog/atom.xml" rel="subscribe-rss" title="subscribe via RSS">RSS</a></li>
+  
+</ul>
+  
+<form action="https://www.google.com/search" method="get">
+  <fieldset role="search">
+    <input type="hidden" name="q" value="site:mistys-internet.website/blog" />
+    <input class="search" type="text" name="q" results="0" placeholder="Search"/>
+  </fieldset>
+</form>
+  
+<ul class="main-navigation">
+  <li><a href="/blog/">Blog</a></li>
+  <li><a href="/blog/blog/archives">Archives</a></li>
+</ul>
+
+</nav>
+  <div id="main">
+    <div id="content">
+      <div>
+<article class="hentry" role="article">
+  
+  <header>
+    
+      <h1 class="entry-title">"GitHub" Is Starting to Feel Like Legacy Software</h1>
+    
+    
+      <p class="meta">
+        
+
+
+
+
+<time class='entry-date' datetime='2024-07-12T12:58:54-07:00'><span class='date'><span class='date-month'>Jul</span> <span class='date-day'>12</span><span class='date-suffix'>th</span>, <span class='date-year'>2024</span></span> <span class='time'>12:58 pm</span></time>
+        
+      </p>
+    
+  </header>
+
+
+<div class="entry-content"><p>I&rsquo;ve used a lot of tools over the years, which means I&rsquo;ve seen a lot of tools hit a plateau. That&rsquo;s not always a problem; sometimes something is just &ldquo;done&rdquo; and won&rsquo;t need any changes. Often, though, it&rsquo;s a sign of what&rsquo;s coming. Every now and then, something will pull back out of it and start improving again, but it&rsquo;s often an early sign of long-term decline. I can&rsquo;t always tell if something&rsquo;s just coasting along or if it&rsquo;s actually started to get worse; it&rsquo;s easy to be the boiling frog. That changes for me when something that <em>really</em> matters to me breaks.</p>
+
+<p>To me, one of GitHub&rsquo;s killer power user features is its <code>blame</code> view. <code>git blame</code> on the commandline is useful but hard to read; it&rsquo;s not the interface I reach for every day. GitHub&rsquo;s web UI is not only convenient, but the ease by which I can click through to older versions of the blame view on a line by line basis is uniquely powerful. It&rsquo;s one of those features that anchors me to a product: I stopped using offline graphical git clients because it was just that much nicer.</p>
+
+<p>The other day though, I tried to use the blame view on a large file and ran into an issue I don&rsquo;t remember seeing before: I just <em>couldn&rsquo;t find</em> the line of code I was searching for. I threw various keywords from that line into the browser&rsquo;s command+F search box, and nothing came up. I was stumped until a moment later, while I was idly scrolling the page while doing the search again, and it finally found the line I was looking for. I realized what must have happened.</p>
+
+<p>I&rsquo;d heard rumblings that GitHub&rsquo;s in the middle of shipping a frontend rewrite in React, and I realized this must be it. The problem wasn&rsquo;t that the line I wanted wasn&rsquo;t on the page&mdash;it&rsquo;s that the whole document wasn&rsquo;t being rendered at once, so my browser&rsquo;s builtin search bar just <em>couldn&rsquo;t find it</em>. On a hunch, I tried disabling JavaScript entirely in the browser, and suddenly it started working again. GitHub is <em>able</em> to send a fully server-side rendered version of the page, which actually works like it should, but doesn&rsquo;t do so unless JavaScript is completely unavailable.</p>
+
+<p>I&rsquo;m hardly anti-JavaScript, and I&rsquo;m not anti-React either. Any tool&rsquo;s perfectly fine when used in the right place. The problem: this <em>isn&rsquo;t the right place</em>, and what is to me personally a key feature suddenly doesn&rsquo;t work right all the time anymore. This isn&rsquo;t the only GitHub feature that&rsquo;s felt subtly worse in the past few years&mdash;the once-industry-leading status page no longer reports minor availability issues in an even vaguely timely manner; Actions runs randomly drop network connections to GitHub&rsquo;s own APIs; hitting the merge button sometimes scrolls the page to the wrong position&mdash;but this is the first moment where it really hit me that GitHub&rsquo;s probably not going to get better again from here.</p>
+
+<p>The corporate branding, the new &ldquo;AI-powered developer platform&rdquo; slogan, makes it clear that what I think of as &ldquo;GitHub&rdquo;&mdash;the traditional website, what are to me the core features&mdash;simply isn&rsquo;t Microsoft&rsquo;s priority at this point in time. I know many talented people at GitHub who care, but the company&rsquo;s priorities just don&rsquo;t seem to value what I value about the service. This isn&rsquo;t an anti-AI statement so much as a recognition that the tool I still need to use every day is past its prime. Copilot isn&rsquo;t navigating the website for me, replacing my need to the website as it exists today. I&rsquo;ve had tools hit this phase of decline and turn it around, but I&rsquo;m not optimistic. It&rsquo;s still plenty usable now, and probably will be for some years to come, but I&rsquo;ll want to know what other options I have <em>now</em> rather than when things get worse than this.</p>
+
+<p>And in the meantime, well&hellip; I still need to use GitHub everyday, but maybe it&rsquo;s time to start exploring new platforms&mdash;and find a good local <code>blame</code> tool that works as well as the GitHub web interface used to. (Got a fave? Send it to me at <a href="https://digipres.club/@misty">misty@digipres.club</a> / <a href="https://bsky.app/profile/cdrom.ca">@cdrom.ca</a>. Please!)</p>
+</div>
+
+
+  <footer>
+    <p class="meta">
+      
+  
+
+<span class="byline author vcard">Posted by <span class="fn">Misty De Meo</span></span>
+
+      
+
+
+
+
+<time class='entry-date' datetime='2024-07-12T12:58:54-07:00'><span class='date'><span class='date-month'>Jul</span> <span class='date-day'>12</span><span class='date-suffix'>th</span>, <span class='date-year'>2024</span></span> <span class='time'>12:58 pm</span></time>
+      
+
+
+    </p>
+    
+      <div class="sharing">
+  
+  <a href="//twitter.com/share" class="twitter-share-button" data-url="http://mistys-internet.website/blog/blog/2024/07/12/github-is-starting-to-feel-like-legacy-software/" data-via="" data-counturl="http://mistys-internet.website/blog/blog/2024/07/12/github-is-starting-to-feel-like-legacy-software/" >Tweet</a>
+  
+  
+  
+</div>
+
+    
+    <p class="meta">
+      
+        <a class="basic-alignment left" href="/blog/blog/2024/06/25/the-working-archivists-guide-to-enthusiast-cd-rom-archiving-tools/" title="Previous Post: The Working Archivist's Guide to Enthusiast CD-ROM Archiving Tools">&laquo; The Working Archivist's Guide to Enthusiast CD-ROM Archiving Tools</a>
+      
+      
+    </p>
+  </footer>
+</article>
+
+</div>
+
+<aside class="sidebar">
+  
+    <section>
+  <h1>Recent Posts</h1>
+  <ul id="recent_posts">
+    
+      <li class="post">
+        <a href="/blog/blog/2024/07/12/github-is-starting-to-feel-like-legacy-software/">"GitHub" Is Starting to Feel Like Legacy Software</a>
+      </li>
+    
+      <li class="post">
+        <a href="/blog/blog/2024/06/25/the-working-archivists-guide-to-enthusiast-cd-rom-archiving-tools/">The Working Archivist's Guide to Enthusiast CD-ROM Archiving Tools</a>
+      </li>
+    
+      <li class="post">
+        <a href="/blog/blog/2024/04/07/unlocking-puyo-puyo-fever-for-macs-english-mode/">Unlocking Puyo Puyo Fever for Mac's English Mode</a>
+      </li>
+    
+      <li class="post">
+        <a href="/blog/blog/2024/03/01/that-time-i-accidentally-deleted-a-game-from-mame/">That Time I Accidentally Deleted a Game From MAME</a>
+      </li>
+    
+      <li class="post">
+        <a href="/blog/blog/2023/12/10/fixing-classical-cats-or/">Fixing Classical Cats; or, How I Got Tricked by 28-year-old Defensive Programming</a>
+      </li>
+    
+  </ul>
+</section>
+
+
+
+
+
+  
+</aside>
+
+
+    </div>
+  </div>
+  <footer role="contentinfo"><p>
+  Copyright &copy; 2024 - Misty De Meo -
+  <span class="credit">Powered by <a href="http://octopress.org">Octopress</a></span>
+</p>
+
+</footer>
+  
+
+
+
+
+
+
+
+  <script type="text/javascript">
+    (function(){
+      var twitterWidgets = document.createElement('script');
+      twitterWidgets.type = 'text/javascript';
+      twitterWidgets.async = true;
+      twitterWidgets.src = '//platform.twitter.com/widgets.js';
+      document.getElementsByTagName('head')[0].appendChild(twitterWidgets);
+    })();
+  </script>
+
+
+
+
+
+</body>
+</html>
