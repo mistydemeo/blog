@@ -4,7 +4,7 @@
   <title><![CDATA[The Future Is Now]]></title>
   <link href="http://mistys-internet.website/blog/atom.xml" rel="self"/>
   <link href="http://mistys-internet.website/blog/"/>
-  <updated>2024-07-12T13:15:28-07:00</updated>
+  <updated>2024-07-14T19:58:48-07:00</updated>
   <id>http://mistys-internet.website/blog/</id>
   <author>
     <name><![CDATA[Misty De Meo]]></name>
@@ -31,33 +31,6 @@
 <p>The corporate branding, the new &ldquo;AI-powered developer platform&rdquo; slogan, makes it clear that what I think of as &ldquo;GitHub&rdquo;&mdash;the traditional website, what are to me the core features&mdash;simply isn&rsquo;t Microsoft&rsquo;s priority at this point in time. I know many talented people at GitHub who care, but the company&rsquo;s priorities just don&rsquo;t seem to value what I value about the service. This isn&rsquo;t an anti-AI statement so much as a recognition that the tool I still need to use every day is past its prime. Copilot isn&rsquo;t navigating the website for me, replacing my need to the website as it exists today. I&rsquo;ve had tools hit this phase of decline and turn it around, but I&rsquo;m not optimistic. It&rsquo;s still plenty usable now, and probably will be for some years to come, but I&rsquo;ll want to know what other options I have <em>now</em> rather than when things get worse than this.</p>
 
 <p>And in the meantime, well&hellip; I still need to use GitHub everyday, but maybe it&rsquo;s time to start exploring new platforms&mdash;and find a good local <code>blame</code> tool that works as well as the GitHub web interface used to. (Got a fave? Send it to me at <a href="https://digipres.club/@misty">misty@digipres.club</a> / <a href="https://bsky.app/profile/cdrom.ca">@cdrom.ca</a>. Please!)</p>
-]]></content>
-  </entry>
-  
-  <entry>
-    <title type="html"><![CDATA[The Working Archivist's Guide to Enthusiast CD-ROM Archiving Tools]]></title>
-    <link href="http://mistys-internet.website/blog/blog/2024/06/25/the-working-archivists-guide-to-enthusiast-cd-rom-archiving-tools/"/>
-    <updated>2024-06-25T20:43:54-07:00</updated>
-    <id>http://mistys-internet.website/blog/blog/2024/06/25/the-working-archivists-guide-to-enthusiast-cd-rom-archiving-tools</id>
-    <content type="html"><![CDATA[<h2>Redump</h2>
-
-<p>The Redump project is a metadata database for CD-ROM preservation focused primarily in games.</p>
-
-<h3>The Hardware</h3>
-
-<p>Unlike disk image flux archiving, there&rsquo;s no special enthusiast equipment needed here. Backing up CDs using these techniques uses standard off the shelf drives manufactured by Plextor</p>
-
-<p><a href="http://wiki.redump.org/index.php?title=Optical_Disc_Drive_Compatibility">http://wiki.redump.org/index.php?title=Optical_Disc_Drive_Compatibility</a></p>
-
-<h3>The Software</h3>
-
-<h2>Media Preservation Frontend (Windows only)</h2>
-
-<p><a href="https://github.com/SabreTools/MPF">https://github.com/SabreTools/MPF</a></p>
-
-<h2>Redumper</h2>
-
-<p>Redumper is a</p>
 ]]></content>
   </entry>
   
@@ -1460,6 +1433,61 @@ In 1999, an unofficial mod titled <a href="http://www5.ocn.ne.jp/~afc/limitover/
 </ol>
 </div>
 
+]]></content>
+  </entry>
+  
+  <entry>
+    <title type="html"><![CDATA[Homebrew GCC Changes Coming]]></title>
+    <link href="http://mistys-internet.website/blog/blog/2014/12/05/homebrew-gcc-changes-coming/"/>
+    <updated>2014-12-05T18:57:06-08:00</updated>
+    <id>http://mistys-internet.website/blog/blog/2014/12/05/homebrew-gcc-changes-coming</id>
+    <content type="html"><![CDATA[<p>Big GCC changes are a-coming to <a href="http://brew.sh">Homebrew</a>, which will make building your own software against Homebrew-provided GCCs much more reliable. There&rsquo;s going to be a transition period, though, and any software built against GCC will need to be rebuilt against the new package to work. We&rsquo;ll be pushing the changes on <strong>December 12th, 2014</strong>, and this post is here to help you get ready for it!</p>
+
+<p>(This only affects software built using Homebrew&rsquo;s GCC. Any software built using Clang, which is the compiler that Apple ships, will be unaffected. If you don&rsquo;t know what this means: you&rsquo;re probably fine.)</p>
+
+<h2>The problem</h2>
+
+<p>Since Apple provides many of the same libraries as GCC, Homebrew installs GCC to a nonstandard location in order to avoid shadowing those libraries. Homebrew currently installs GCC using the <code>--enable-version-specific-runtime-libs</code> option to sandbox its libraries and headers, which installs libraries into versioned locations like so:</p>
+
+<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+</pre></td><td class='code'><pre><code class=''><span class='line'>/usr/local/lib/gcc/x86_64-apple-darwin13.4.0/4.9.2/libgfortran.3.dylib</span></code></pre></td></tr></table></div></figure>
+
+
+<p>Since the full version of GCC is embedded&mdash;including the minor version&mdash;along with the OS version, every minor release is installed to a new location; this breaks any software which has dynamically linked against a previous GCC version&rsquo;s copies of these libraries.</p>
+
+<h2>What&rsquo;s changing</h2>
+
+<p>The new GCC package we are shipping will install GCC libraries to a path containing only the series version of GCC. For example, libgfortran will now be installed to:</p>
+
+<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+</pre></td><td class='code'><pre><code class=''><span class='line'>/usr/local/lib/gcc/4.9/libgfortran.3.dylib</span></code></pre></td></tr></table></div></figure>
+
+
+<p>This has several advantages:</p>
+
+<ul>
+<li>New releases of GCC 4.9 will be installed to the same path, so software built using GCC 4.9.2 will work with software built using GCC 4.9.3.</li>
+<li>The same changes will be applied to the <code>gcc49</code> formula in the <a href="https://github.com/Homebrew/homebrew-versions/">homebrew/versions</a> repository, allowing <code>gcc49</code> to provide the 4.9 libraries when <code>gcc</code> is eventually upgraded to 5.0.</li>
+</ul>
+
+
+<h2>What you need to do</h2>
+
+<h3>If you&rsquo;re a user</h3>
+
+<p>If you have built any software using the Homebrew-installed GCC, you will need to reinstall that software once the package is updated on the 12th.</p>
+
+<h3>If you provide binary packages built using the Homebrew-installed GCC</h3>
+
+<p>If you provide binary packages that were built using the Homebrew-installed GCC, you should rebuild them using the <a href="https://github.com/Homebrew/homebrew/pull/34303">new formula</a> and have them ready for your users on the 12th.</p>
+
+<h3>If you maintain Homebrew formulae that use GCC/GFortran</h3>
+
+<p>If you maintain Homebrew formulae that build using GCC or GFortran, you should consider <a href="https://github.com/Homebrew/homebrew/blob/master/share/doc/homebrew/Formula-Cookbook.md#formulae-revisions">bumping their revisions</a> on the 12th to ensure that users rebuild them against the new GCC package.</p>
+
+<h2>The tl;dr version</h2>
+
+<p>On December 12, 2014, we will push a new GCC package that changes the install location of libraries. Any software you&rsquo;ve built using the old package (for instance, C++ or Fortran software) will no longer work and will need to be reinstalled. If you build packages for distribution using Homebrew&rsquo;s GCC package, make sure you&rsquo;ve built new versions using our new package and have them ready to distribute at that date.</p>
 ]]></content>
   </entry>
   
