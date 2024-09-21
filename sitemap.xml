@@ -1,6 +1,10 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <urlset xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.sitemaps.org/schemas/sitemap/0.9 http://www.sitemaps.org/schemas/sitemap/0.9/sitemap.xsd" xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
 <url>
+<loc>http://mistys-internet.website/blog/blog/2024/09/21/what-happened-to-the-japanese-pc-platforms/</loc>
+<lastmod>2024-09-21T14:01:19-07:00</lastmod>
+</url>
+<url>
 <loc>http://mistys-internet.website/blog/blog/2024/09/13/the-working-archivists-guide-to-enthusiast-cd-rom-archiving-tools/</loc>
 <lastmod>2024-09-13T16:32:48-07:00</lastmod>
 </url>
@@ -153,5 +157,20 @@
 </url>
 <url>
 <loc>http://mistys-internet.website/blog/blog/categories/cd-rom/</loc>
+</url>
+<url>
+<loc>http://mistys-internet.website/blog/blog/categories/retrocomputing/</loc>
+</url>
+<url>
+<loc>http://mistys-internet.website/blog/blog/categories/computers/</loc>
+</url>
+<url>
+<loc>http://mistys-internet.website/blog/posts/2/</loc>
+</url>
+<url>
+<loc>http://mistys-internet.website/blog/posts/3/</loc>
+</url>
+<url>
+<loc>http://mistys-internet.website/blog/posts/4/</loc>
 </url>
 </urlset>
