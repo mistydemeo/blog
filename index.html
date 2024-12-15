@@ -9,7 +9,7 @@
   <meta name="author" content="Misty De Meo">
 
   
-  <meta name="description" content="(This was originally posted on a social media site; I&rsquo;ve revised and updated it for my blog.) The other day a friend asked me a pretty &hellip;">
+  <meta name="description" content="I&rsquo;m releasing a tool I wrote for myself: cue2ccd, a commandline tool to convert CD-ROM disc images from the BIN/CUE format to the CloneCD &hellip;">
   
 
   <!-- http://t.co/dKP3o1e -->
@@ -63,6 +63,506 @@
     <div id="content">
       <div class="blog-index">
   
+  
+  
+    <article>
+      
+  <header>
+    
+      <h1 class="entry-title"><a href="/blog/blog/2024/12/15/announcing-cue2ccd-a-tool-to-convert-bin-slash-cue-disc-images-to-clonecd/">Announcing Cue2ccd: A Tool to Convert BIN/CUE Disc Images to CloneCD</a></h1>
+    
+    
+      <p class="meta">
+        
+
+
+
+
+<time class='entry-date' datetime='2024-12-15T14:59:56-08:00'><span class='date'><span class='date-month'>Dec</span> <span class='date-day'>15</span><span class='date-suffix'>th</span>, <span class='date-year'>2024</span></span> <span class='time'>2:59 pm</span></time>
+        
+      </p>
+    
+  </header>
+
+
+  <div class="entry-content"><p>I&rsquo;m releasing a tool I wrote for myself: <a href="https://www.mistys-internet.website/cue2ccd/"><code>cue2ccd</code></a>, a commandline tool to convert CD-ROM disc images from the <a href="https://en.wikipedia.org/wiki/Cue_sheet_(computing)">BIN/CUE</a> format to the <a href="https://en.wikipedia.org/wiki/CloneCD">CloneCD</a> format. For as many disc image conversion tools as there are out there, I hadn&rsquo;t found anything open-source or cross-platform that can handle going between these two specific formats&mdash;so I wrote it myself.</p>
+
+<p>This is a very niche tool, but it solves one specific problem I have. I own a <a href="https://gdemu.wordpress.com/about/">Rhea</a> optical drive emulator for the Sega Saturn, a device which replaces the original CD drive in the console and allows it to load media from disc images on an SD card instead of physical CDs. The Rhea&rsquo;s great in a lot of ways, but it has one specific limitation: it doesn&rsquo;t load games in the BIN/CUE disc image format<sup id="fnref:1"><a href="#fn:1" rel="footnote">1</a></sup>. Since a lot of media online is in that format, I&rsquo;ve really been wanting a convenient way to convert existing BIN/CUE images I have lying around into something I can use. Given how niche this is I don&rsquo;t expect many other people to need it, but I hope it&rsquo;s helpful if there&rsquo;s anyone else in the same situation.</p>
+
+<p>Usage is as simple as possible: just run <code>cue2ccd path_to_cuesheet.cue</code> and it&rsquo;ll produce new <code>.img</code>, <code>.ccd</code> and <code>.sub</code> files in the same directory, ready for use. I&rsquo;ve set up convenient commandline installers for installing it on Mac, Linux, and Windows, which are available from <a href="https://www.mistys-internet.website/cue2ccd/">the website</a>, and it can be installed using Homebrew by running <code>brew install mistydemeo/formulae/cue2ccd</code>.</p>
+
+<p>From here, I&rsquo;d like to take a little dive into the details of what this kind of conversion looks like and what I needed to do. I&rsquo;m not planning to go into my specific implementation, but rather I&rsquo;d like to focus on the details of the formats and the problems I ran into when writing cue2ccd. If you don&rsquo;t care about the technical details, you can skip the rest of the post (but please enjoy the tool, if you use it!). There are three primary things I needed to handle: writing CloneCD control files (<code>.ccd</code>), writing subcode data (<code>.sub</code>), and merging multi-track images.</p>
+
+<h2>Writing CloneCD control files</h2>
+
+<p>Like I mentioned in a <a href="/blog/blog/2024/09/13/the-working-archivists-guide-to-enthusiast-cd-rom-archiving-tools/">previous post</a>, CloneCD&rsquo;s table of contents format is lower-level and much more complex than the cue sheets used by BIN/CUE disc images. Here&rsquo;s a sample cue sheet for a disc image with one data track and two audio tracks:</p>
+
+<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+</pre></td><td class='code'><pre><code class=''><span class='line'>FILE "disc.bin" BINARY
+</span><span class='line'>  TRACK 01 MODE1/2352
+</span><span class='line'>    INDEX 01 00:00:00
+</span><span class='line'>  TRACK 02 AUDIO
+</span><span class='line'>    INDEX 00 00:04:16
+</span><span class='line'>    INDEX 01 00:06:16
+</span><span class='line'>  TRACK 03 AUDIO
+</span><span class='line'>    INDEX 00 00:07:16
+</span><span class='line'>    INDEX 01 00:09:16</span></code></pre></td></tr></table></div></figure>
+
+
+<p>These nine lines capture (most of) the essential parts of a CD, without getting into details: it lists which tracks exist (and which files those tracks are stored in); what type and mode each of those tracks are; and that track&rsquo;s indices, with their locations on the disc.<sup id="fnref:2"><a href="#fn:2" rel="footnote">2</a></sup></p>
+
+<p>The equivalent CloneCD file, meanwhile, is 121 lines long and contains entries that look like this:</p>
+
+<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+<span class='line-number'>11</span>
+<span class='line-number'>12</span>
+<span class='line-number'>13</span>
+<span class='line-number'>14</span>
+<span class='line-number'>15</span>
+<span class='line-number'>16</span>
+<span class='line-number'>17</span>
+<span class='line-number'>18</span>
+<span class='line-number'>19</span>
+<span class='line-number'>20</span>
+<span class='line-number'>21</span>
+<span class='line-number'>22</span>
+<span class='line-number'>23</span>
+<span class='line-number'>24</span>
+<span class='line-number'>25</span>
+<span class='line-number'>26</span>
+<span class='line-number'>27</span>
+<span class='line-number'>28</span>
+<span class='line-number'>29</span>
+<span class='line-number'>30</span>
+</pre></td><td class='code'><pre><code class=''><span class='line'>[CloneCD]
+</span><span class='line'>Version=3
+</span><span class='line'>
+</span><span class='line'>[Disc]
+</span><span class='line'>TocEntries=6
+</span><span class='line'>Sessions=1
+</span><span class='line'>DataTracksScrambled=0
+</span><span class='line'>CDTextLength=0
+</span><span class='line'>
+</span><span class='line'>[Session 1]
+</span><span class='line'>PreGapMode=1
+</span><span class='line'>PreGapSubC=0
+</span><span class='line'>
+</span><span class='line'>[Entry 0]
+</span><span class='line'>Session=1
+</span><span class='line'>Point=0xa0
+</span><span class='line'>ADR=0x01
+</span><span class='line'>Control=0x04
+</span><span class='line'>TrackNo=0
+</span><span class='line'>AMin=0
+</span><span class='line'>ASec=0
+</span><span class='line'>AFrame=0
+</span><span class='line'>ALBA=-150
+</span><span class='line'>Zero=0
+</span><span class='line'>PMin=1
+</span><span class='line'>PSec=0
+</span><span class='line'>PFrame=0
+</span><span class='line'>PLBA=4350
+</span><span class='line'>
+</span><span class='line'># and so on</span></code></pre></td></tr></table></div></figure>
+
+
+<p>And it continues from there&mdash;as you can imagine, it&rsquo;s a much more complex format to generate! At its core, though, they&rsquo;re both representing roughly the same information: the table of contents of a disc, with the tracks and their definitions. All of the information I need to generate the CloneCD files either exists in the cue sheet or can be derived based on information I have access to. This data fits into three categories, one of which is data shared in common between cue sheets and the CloneCD format:</p>
+
+<ul>
+<li>Data about each track, including its list of indices and start/stop timestamps<sup id="fnref:3"><a href="#fn:3" rel="footnote">3</a></sup></li>
+<li>Overall data about the disc and the session (missing from the cue sheet)</li>
+<li>Data about the disc&rsquo;s lead-in and lead-out sections (missing from the cue sheet)</li>
+</ul>
+
+
+<h3>Track-level metadata</h3>
+
+<p>That&rsquo;s a lot to go over, but this turned out not to be as complex as I thought it might be. I&rsquo;ll gloss over the disc-level metadata (which is fairly brief); let&rsquo;s look at what the two formats share in common instead, the track-level metadata. We&rsquo;ll do direct comparison of the same track from both the cue sheet and the CloneCD file, starting with the cue sheet:</p>
+
+<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+</pre></td><td class='code'><pre><code class=''><span class='line'>TRACK 01 MODE1/2352
+</span><span class='line'>  INDEX 01 00:00:00</span></code></pre></td></tr></table></div></figure>
+
+
+<p>Despite being fairly short, it encodes a few different bits of information that we&rsquo;ll be wanting to reproduce.</p>
+
+<ul>
+<li>This is track 1 on the disc;</li>
+<li>It&rsquo;s a data track, specifically a mode 1 data track.<sup id="fnref:4"><a href="#fn:4" rel="footnote">4</a></sup></li>
+<li>That data track is stored in the disc image with &ldquo;raw&rdquo; 2352-byte sectors, meaning error correction is included. This field isn&rsquo;t important for us, since cue2ccd only works with raw disc images.</li>
+<li>This track contains a single index, numbered 1, which begins at the timestamp <code>00:00:00</code>&mdash;that is, at the very beginning of the disc image.</li>
+</ul>
+
+
+<p>It&rsquo;s all, in other words, pretty core structural metadata about the track and how it&rsquo;s formed. Now let&rsquo;s take a look at the CloneCD version:</p>
+
+<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+<span class='line-number'>11</span>
+<span class='line-number'>12</span>
+<span class='line-number'>13</span>
+<span class='line-number'>14</span>
+<span class='line-number'>15</span>
+</pre></td><td class='code'><pre><code class=''><span class='line'>[Entry 3]
+</span><span class='line'>Session=1
+</span><span class='line'>Point=0x01
+</span><span class='line'>ADR=0x01
+</span><span class='line'>Control=0x04
+</span><span class='line'>TrackNo=0
+</span><span class='line'>AMin=0
+</span><span class='line'>ASec=0
+</span><span class='line'>AFrame=0
+</span><span class='line'>ALBA=-150
+</span><span class='line'>Zero=0
+</span><span class='line'>PMin=0
+</span><span class='line'>PSec=2
+</span><span class='line'>PFrame=0
+</span><span class='line'>PLBA=0</span></code></pre></td></tr></table></div></figure>
+
+
+<p>At first glance, it looks pretty overwhelming! It turns out, however, it&rsquo;s not actually as complex as it seems. The field names may seem difficult to understand at first flance, but the good news is that they&rsquo;re based directly on the table of contents from the lead-in on a real CD, and so all of them (with the same or similar names) are documented in the <a href="https://ecma-international.org/publications-and-standards/standards/ecma-130/">CD spec</a>.</p>
+
+<ul>
+<li>The <code>Point</code> (pointer) field is a hex value which means a few different things depending on context. For a standard track, it&rsquo;s the track number. In this case, we know from the cue sheet that this is track 1, so it&rsquo;s set to <code>1</code>.</li>
+<li>The <code>Control</code> field is a hex value which indicates information about the track type, along with some other metadata that isn&rsquo;t relevant to us. This is four bits out of a byte in the CD&rsquo;s binary format, but CloneCD lets us just write a number. There are only two values that matter to us: audio (<code>0</code>) or data (<code>4</code>). We&rsquo;ve got a data track, so this uses <code>4</code>.</li>
+<li>The track starts at <code>00:00:00</code>, so we mark the same values here. They&rsquo;re just in three separate fields, unlike the cue sheet where they&rsquo;re written as a single timestamp. We get <code>PMin=0</code>, <code>PSec=2</code> and <code>PFrame=0</code>. (If that seems like an off-by-two value to you, well-spotted. The explanation comes later.)</li>
+<li>The <code>PLBA</code> field contains essentially the same information as in the Min/Sec/Frame fields, but expressed in terms of the number of sectors since the beginning of the disc&rsquo;s content. In this case, this track begins at the start of the disc, so that&rsquo;s 0.</li>
+<li>The <code>AMin</code>, <code>ASec</code> and <code>AFrame</code> values mean something in other contexts, but here are left at zero.</li>
+<li>The <code>Zero</code> field always contains a <code>0</code>. What a surprise!</li>
+<li>Finally, a few fields aren&rsquo;t relevant to us and get hardcoded, like <code>Adr</code> and <code>TrackNo</code>.</li>
+</ul>
+
+
+<p>Whew! In other words, this is mostly the same data as in the cue sheet, it&rsquo;s just in a more verbose form and using terms that only make sense after reading the CD-ROM spec. Knowing what these fields mean, it wasn&rsquo;t too hard to generate these CloneCD tracks given the equivalent information from the cue sheet.</p>
+
+<h3>Lead-in and lead-out</h3>
+
+<p>I mentioned earlier that the CloneCD format includes information about the lead-in and lead-out. These are sections at the beginning and end of the disc that aren&rsquo;t typically stored, in their raw format, in disc images. The lead-in contains the raw, binary table of contents information for the disc while the lead-out contains information about the disc&rsquo;s duration.</p>
+
+<p>This is missing from the cue sheet format, but we <em>can</em> derive the info we need from what&rsquo;s in the CloneCD data. These are stored as &ldquo;entries&rdquo; in the CloneCD control file alongside the tracks, and actually looks a lot like track data. The fields share names with the ones used for track data, but some of them take on different meanings when used like this.</p>
+
+<p>To give you an idea what this looks like, here&rsquo;s an abbreviated copy of the first/last track information for this disc with only the fields that differ from regular track data.</p>
+
+<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+<span class='line-number'>11</span>
+<span class='line-number'>12</span>
+<span class='line-number'>13</span>
+</pre></td><td class='code'><pre><code class=''><span class='line'>[Entry 0]
+</span><span class='line'>Point=0xa0
+</span><span class='line'>PMin=1
+</span><span class='line'>PSec=0
+</span><span class='line'>PFrame=0
+</span><span class='line'>PLBA=4350
+</span><span class='line'>
+</span><span class='line'>[Entry 1]
+</span><span class='line'>Point=0xa1
+</span><span class='line'>PMin=3
+</span><span class='line'>PSec=0
+</span><span class='line'>PFrame=0
+</span><span class='line'>PLBA=13350</span></code></pre></td></tr></table></div></figure>
+
+
+<p>The <code>Point</code> field is the POINTER field defined in 22.3.4.2 of the CD-ROM spec. Previously, when talking about tracks, we set this to the track number. When set to a value outside the 1-99 track number range, it means something different. Two of those values can be seen above: <code>0xa0</code> means that this entry contains information about the first track on the disc, while <code>0xa1</code> means the last track. When set to these values, it changes the meaning of the remaining fields. Instead of containing timing information, the <code>PMin</code> field is used to specify the <em>track number</em> of the first or last track on the disc, and the other two values are left empty. These two fields tell the player how many tracks to expect when reading the rest of the disc. The PLBA fields are still here, and still calculated based on the Min/Sec/Frame values, but they&rsquo;re essentially meaningless for these entries since the Min/Sec/Frame aren&rsquo;t real timestamps.</p>
+
+<p>Finally, we get to the lead-out, which looks like this (relevant fields only):</p>
+
+<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+</pre></td><td class='code'><pre><code class=''><span class='line'>[Entry 2]
+</span><span class='line'>Point=0xa2
+</span><span class='line'>PMin=0
+</span><span class='line'>PSec=12
+</span><span class='line'>PFrame=16</span></code></pre></td></tr></table></div></figure>
+
+
+<p>A pointer of <code>0xa2</code> indicates that the remaining values are describing the beginning of the disc&rsquo;s lead-out&mdash;or, in other words, describing the end of data. Here, the Min/Sec/Frame values are a timecode again, but instead of describing the <em>start</em> of a section of data, they describe the timestamp marking the <em>end of the disc</em>. (Yes, 12.21 seconds is accurate; this is a small test image containing three seconds-long tracks.) This is actually pretty critical info: it tells the CD player when it should stop seeking at the end of the CD, and makes it possible to tell how long the disc is as a whole.</p>
+
+<h3>Parsing and oddities</h3>
+
+<p>I went for <a href="https://github.com/lipnitsk/libcue">libcue</a> for parsing cue sheets, since it provides a simple and straightforward track-oriented interface which makes it easy to query all of the track definitions. Writing my own parser in Rust felt out of scope. There are a couple of pure-Rust parsers on crates.io, but they&rsquo;re oriented around music files like FLAC and are missing a few features I&rsquo;d need for raw disc images. Instead, I wrote <a href="https://github.com/mistydemeo/libcue.rs">a small crate</a> that acts as a thin binding for libcue while adapting a few bits of its interface to Rust conventions.</p>
+
+<p>One of the more annoying gotchas of the cue sheet format is that it leaves out one important piece of information that&rsquo;s necessary to render the lead-out entry. Let&rsquo;s take another peek at the cue sheet, and see if it jumps out at you.</p>
+
+<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+</pre></td><td class='code'><pre><code class=''><span class='line'>FILE "disc.bin" BINARY
+</span><span class='line'>  TRACK 01 MODE1/2352
+</span><span class='line'>    INDEX 01 00:00:00
+</span><span class='line'>  TRACK 02 AUDIO
+</span><span class='line'>    INDEX 00 00:04:16
+</span><span class='line'>    INDEX 01 00:06:16
+</span><span class='line'>  TRACK 03 AUDIO
+</span><span class='line'>    INDEX 00 00:07:16
+</span><span class='line'>    INDEX 01 00:09:16</span></code></pre></td></tr></table></div></figure>
+
+
+<p>It lists where tracks and indices start&hellip; but it doesn&rsquo;t show where they <em>end</em>. libcue calculates track ends for every track except the last by checking where the next index starts, and returns that with the rest of the information that&rsquo;s in the file, but the duration and endpoint of the final track is left completely ambiguous. The only way to get that information is to check the file size of the actual underlying disc image file and calculate how many sectors long it is. It&rsquo;s not the end of the world, but it <em>is</em> annoying&mdash;and it&rsquo;s the one and only bit of metadata generation I did that required access to the underlying data files. I would have loved if I could have worked just off of the metadata.</p>
+
+<p>Another interesting gotcha is the timestamps, which have an unusual off-by-150 problem. As I mentioned previously, the lead-in and lead-out sections are usually omitted from the binary content of a disc image. Since the lead-in takes up the first 150 sectors on the disc, this means that standard disc images actually start at index 150 into the disc, not index 0. This gives us an conundrum for absolute timestamps. Although the BIN/CUE images appear at first glance to have absolute timestamps that are comparable with the CloneCD file, its definition is slightly different.</p>
+
+<p>With a single BIN file, a cue sheet&rsquo;s indices are absolute indices <em>into the BIN file</em>. Since the first index <em>within the BIN file</em> is actually sector 150 on the disc, it means that the timecodes for that BIN file are offset from the real CD by 150. Let&rsquo;s take another look at some absolute timestamps for the two formats for a practical example:</p>
+
+<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+</pre></td><td class='code'><pre><code class=''><span class='line'>TRACK 02 AUDIO
+</span><span class='line'>  INDEX 01 00:06:16</span></code></pre></td></tr></table></div></figure>
+
+
+
+
+<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+</pre></td><td class='code'><pre><code class=''><span class='line'>PMin=0
+</span><span class='line'>PSec=8
+</span><span class='line'>PFrame=16</span></code></pre></td></tr></table></div></figure>
+
+
+<p>This track on our sample image begins at 00:06:16 into the BIN/CUE&hellip; which means that, for CloneCD, it has an absolute timestamp of exactly two seconds more, 00:08:16. In practice, applying an offset when translating timestamps wasn&rsquo;t actually that hard, but it <em>was</em> a place where where errors seeped in. For a nontrivial part of my tool&rsquo;s life, I had an off-by-one error from sloppy timestamp conversion.</p>
+
+<h2>Generating subcode data</h2>
+
+<p>The second thing I needed to create was <a href="https://en.wikipedia.org/wiki/Compact_Disc_subcode">subcode data</a> (aka subchannel data), a form of builtin metadata used on CD. On physical CDs, each 2352-byte sector is accompanied by 98 bytes of subcode data. The subcode data is necessary when reading a physical CD but not typically needed when mounting or burning a disc image, so a number of disc image formats&mdash;including BIN/CUE and plain ISO files&mdash;don&rsquo;t bother reading or saving it at all. The CloneCD format <em>does</em> back it up, however, and the device I&rsquo;m using requires valid subcode data. I knew I&rsquo;d need to generate it myself.</p>
+
+<p>Subcode data is a binary format encoding very similar information to the entries we just saw in the text-based CloneCD control format above. Each 98-byte subcode sector contains two bytes of synchronization words, followed by 96 bytes of data divided into eight channels with lettered names from P to W. In the original CD and CD-ROM specs, only the P and Q channels are specified; channels R through W were set aside for later expansion, and most discs never use them. They were used for standards such as <a href="https://en.wikipedia.org/wiki/CD-Text">CD-TEXT</a>, which allowed encoding human-readable track names on a CD; <a href="https://en.wikipedia.org/wiki/CD+G">CD+G</a>, which allowed encoding simple graphics, such as on karaoke CDs; and various copy protection systems. For my usecase, none of those were relevant, so I only needed to generate data for the P and Q channels.</p>
+
+<h3>P channel</h3>
+
+<p>The P channel was by far the simplest, and took very little work to do. It&rsquo;s used to indicate the boundaries between tracks for very primitive early players which didn&rsquo;t keep track of table of contents information. If a sector is within the first 150 sectors of the start of a track, it&rsquo;s filled with <code>FF</code> bytes. Otherwise, it contains <code>00</code> bytes. There&rsquo;s no other variation, so it was very easy to implement.</p>
+
+<h3>Q channel</h3>
+
+<p>The Q channel is slightly more complex. Before getting into the details, let&rsquo;s look at a little sample of what a single Q channel sector looks like. Here&rsquo;s the raw bytes in hex format:</p>
+
+<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+</pre></td><td class='code'><pre><code class=''><span class='line'>41010100 00480000 0248F2BB</span></code></pre></td></tr></table></div></figure>
+
+
+<p>There&rsquo;s a chance you may be able to put together some of this based on the description of the entries in a CloneCD control file earlier, but don&rsquo;t worry, we&rsquo;ll come back to this later.</p>
+
+<p>This channel primarily consists of timing information: it encodes the timestamp of the currently-playing sector, a flag indicating whether this sector is data or audio, and some simple forms of metadata<sup id="fnref:5"><a href="#fn:5" rel="footnote">5</a></sup>. It also contains a 16-bit checksum, allowing the data in the rest of the Q channel to be validated. The metadata in question isn&rsquo;t relevant to my usecase, so I only needed to worry the timestamps, the data flag, and the checksum.</p>
+
+<h4>Control and q-Mode fields</h4>
+
+<p>The first byte is separated into two four-bit fields. That is, it contains data which is smaller than one byte&mdash;an idea that isn&rsquo;t always familiar to people who aren&rsquo;t familiar with binary data. Since a byte contains eight bits, it&rsquo;s possible to fit multiple fields into a single byte if they&rsquo;re smaller than one byte. In this case, instead of using the full byte for one field, we can split that one byte in half and use it to store two four-bit fields.</p>
+
+<p>The first of these fields, the control field, consists of a few different flags, but only one is relevant here: the data flag. When unset, it indicates that this sector contains audio; when set, it indicates that it contains data. In our case, that means taking the first four bits of our byte and setting them to <code>0100</code>.</p>
+
+<p>The second field indicates the type of data being encoded in the following bytes. Since I&rsquo;m ignoring the alternate metadata that could be represented here, I always set it to the value indicating that the bytes to follow will contain timing information. In our case, that means taking the last four bits of our byte and setting it to <code>0001</code>. Putting it all together, we get a byte with the bits:</p>
+
+<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+</pre></td><td class='code'><pre><code class=''><span class='line'>01000001</span></code></pre></td></tr></table></div></figure>
+
+
+<p>Or, read as a single byte:</p>
+
+<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+</pre></td><td class='code'><pre><code class=''><span class='line'>41</span></code></pre></td></tr></table></div></figure>
+
+
+<h4>Timestamps</h4>
+
+<p>As with the CloneCD control file, timestamps are stored as separate minute, second and fraction fields. The Q channel contains two different timestamps and some other timekeeping information:</p>
+
+<ul>
+<li>The track number</li>
+<li>The index number</li>
+<li>The timestamp relative to the current track</li>
+<li>The absolute timestamp</li>
+</ul>
+
+
+<p>All of these values are stored in <a href="https://en.wikipedia.org/wiki/Binary-coded_decimal">binary-coded decimal</a> (BCD) format, which has the side bonus that it makes this data easy to read by eye with a hex editor. I made use of that while debugging.</p>
+
+<p>For the most part, these timestamp fields are straightforward to implement so long as I pass the right data in. There was one fun gotcha, however. CD audio contains gaps between tracks called <a href="https://en.wikipedia.org/wiki/Pregap">&ldquo;pregaps&rdquo;</a>; they&rsquo;re defined as index 0 within a track, with the track itself beginning at index 1. They throw an interesting edge case for calculating relative timestamps. What does it mean to track the timestamp relative to the start of the track for a time that <em>isn&rsquo;t part of the track</em>? Since this binary-coded digital format doesn&rsquo;t support negative numbers, the standard uses a slightly strange but appropriate workaround. Within the pregaps, the relative timestamp instead <em>starts</em> at the <em>length</em> of the pregap and then counts down until it hits 0, which marks the beginning of the track, at which point it begins counting up again. Needless to say, this was the source of a few fun off-by-one bugs.</p>
+
+<h4>Checksum</h4>
+
+<p>Finally, it ends with a 16-bit (two-byte) checksum of the remainder of the data. The CRC-16 routine it uses is specified in the CD-ROM spec; I generated a suitable C CRC-16 routine using the Ruby <a href="https://rubygems.org/gems/crc">crc</a> library, then translated it into Rust. I&rsquo;ve published it standalone as the <a href="https://crates.io/crates/cdrom_crc">cdrom_crc</a> crate.</p>
+
+<h4>Putting it all together</h4>
+
+<p>Here&rsquo;s that raw data again, with each byte annotated:</p>
+
+<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+<span class='line-number'>11</span>
+<span class='line-number'>12</span>
+<span class='line-number'>13</span>
+<span class='line-number'>14</span>
+<span class='line-number'>15</span>
+<span class='line-number'>16</span>
+<span class='line-number'>17</span>
+<span class='line-number'>18</span>
+<span class='line-number'>19</span>
+<span class='line-number'>20</span>
+<span class='line-number'>21</span>
+<span class='line-number'>22</span>
+</pre></td><td class='code'><pre><code class=''><span class='line'>41 - This one byte is actually two different fields,
+</span><span class='line'>     each of which takes up four bits.
+</span><span class='line'>     The first four bits are the control field;
+</span><span class='line'>     here, 0100 indicates this is a data track.
+</span><span class='line'>     The next four bits are are the Q-mode field.
+</span><span class='line'>     0001 indicates the remainder of the data is time
+</span><span class='line'>     information.
+</span><span class='line'>01 - This is the track number - track 01.
+</span><span class='line'>01 - This is the current index - index 01.
+</span><span class='line'>00 - These next three bytes make up the relative
+</span><span class='line'>     position of this sector within the track,
+</span><span class='line'>     00:00:48.
+</span><span class='line'>00
+</span><span class='line'>48
+</span><span class='line'>00 - This is the zero field. It's always zero.
+</span><span class='line'>00 - These next three bytes make up the absolute
+</span><span class='line'>     position of this sector on the disc,
+</span><span class='line'>     00:02:48.
+</span><span class='line'>02
+</span><span class='line'>48
+</span><span class='line'>F2 - These last two bytes are the 16-bit checksum.
+</span><span class='line'>BB</span></code></pre></td></tr></table></div></figure>
+
+
+<p>Not actually that <em>much</em> information, and not too hard to make sense of after taking the time to assemble everything, but it certainly took some work to get there.</p>
+
+<p>Luckily for me, the CloneCD representation of subcode data is simplified in a few ways that made things easier. CloneCD ignores the two sync bytes, storing only the 96 data bytes, which saved me the trouble of handling them. It also reorders the data to be easier to reason about. On a physical CD, the subcode for a sector isn&rsquo;t contiguous. Instead, every 32-byte frame of a data sector is followed by a single byte containing one single bit from each of the eight channels. Assembling a complete byte for the channels requires waiting for eight frames and reordering the bits as they come in. CloneCD, meanwhile, reorders the data into the standard byte order. There may be technical reasons why this is the case when streaming from a CD, but I&rsquo;m just grateful to get to write bytes like a normal person.</p>
+
+<h2>Merging disc images</h2>
+
+<p>I actually had a version of cue2ccd ready to release about a year ago, but I had one last feature I really wanted and kept putting off: merging disc images.</p>
+
+<p>More specifically, I wanted to handle disc images containing multiple files. A lot of BIN/CUE disc images use a single BIN file containing all tracks, sort of like how a CD itself is structured, and that&rsquo;s what the initial version of cue2ccd was written for. In recent years, however, split images have become more common. These are still raw images, but they use separate raw disc image files for every track on the disc. In theory, doing this is easy; the data is the same, you just need to concatenate the files. No work at all. Unfortunately, the metadata is a bit harder. Let&rsquo;s take a look at the disc from earlier in its original one-file version:</p>
+
+<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+</pre></td><td class='code'><pre><code class=''><span class='line'>FILE "disc.bin" BINARY
+</span><span class='line'>  TRACK 01 MODE1/2352
+</span><span class='line'>    INDEX 01 00:00:00
+</span><span class='line'>  TRACK 02 AUDIO
+</span><span class='line'>    INDEX 00 00:04:16
+</span><span class='line'>    INDEX 01 00:06:16
+</span><span class='line'>  TRACK 03 AUDIO
+</span><span class='line'>    INDEX 00 00:07:16
+</span><span class='line'>    INDEX 01 00:09:16</span></code></pre></td></tr></table></div></figure>
+
+
+<p>Now let&rsquo;s take a look at the exact same disc, but in a one-file-per-track form:</p>
+
+<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+<span class='line-number'>11</span>
+</pre></td><td class='code'><pre><code class=''><span class='line'>FILE "disc (Track 01).bin" BINARY
+</span><span class='line'>  TRACK 01 MODE1/2352
+</span><span class='line'>    INDEX 01 00:00:00
+</span><span class='line'>FILE "disc (Track 02).bin" BINARY
+</span><span class='line'>  TRACK 02 AUDIO
+</span><span class='line'>    INDEX 00 00:00:00
+</span><span class='line'>    INDEX 01 00:02:00
+</span><span class='line'>FILE "disc (Track 03).bin" BINARY
+</span><span class='line'>  TRACK 03 AUDIO
+</span><span class='line'>    INDEX 00 00:00:00
+</span><span class='line'>    INDEX 01 00:02:00
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>It may strike you that those timestamps aren&rsquo;t useful. And you wouldn&rsquo;t be entirely wrong. They&rsquo;re all the same now! What the heck? What happened?</p>
+
+<p>Well, as I (briefly) mentioned earlier, the timestamps in a cue sheet are timestamps <em>into that file</em>, not absolute timestamps <em>into the disc</em>. For a single-file disc image there&rsquo;s almost no difference between the two, except the off-by-150 issue I mentioned previously. But if a single binary also contains a single track, it suddenly becomes a lot more obvious that the offsets for each track are specific to each file.</p>
+
+<p>So, in practice, implementing this didn&rsquo;t <em>just</em> mean concatenating the files. It also meant, for each track, keeping track of the size of the disc up until that point so that I could convert each of these relative timestamps into an absolute one. It&rsquo;s not necessarily <em>hard</em> work but it&rsquo;s an easy source of off-by-one errors and other similar mistakes, so I had a few revisions with subtly wrong timing. It also runs into a harsher version of the &ldquo;no duration of the last track&rdquo; problem: since every track is its own file, now <em>every</em> track is the last track in its file, so <em>none</em> of them have durations available from the metadata. I was able to apply what I&rsquo;d already written to calculate the duration based on the filesize, with a fix for a bug that only happened when it wasn&rsquo;t the last track in a larger file, but I&rsquo;d certainly have preferred not to have to do it at all.</p>
+
+<h2>In conclusion: CD is weird</h2>
+
+<p>Honestly, it&rsquo;s been fun to get to dig deeper into a format not many people still care about these days. I&rsquo;d also like to thank a couple of people whose help with previous projects was very useful for this one: the creator of the Rhea, Phoebe and GDEmu hardware, who was gracious in providing support debugging my earliest attempts at generating files compatible with his hardware; and CyberWarriorX, with whom I worked on an earlier CloneCD-generating project.</p>
+<div class="footnotes">
+<hr/>
+<ol>
+<li id="fn:1">
+<p>It also supports a few other formats, such as DiscJuggler and Alcohol 120%, but there aren&rsquo;t any open-source tools to convert to those either.<a href="#fnref:1" rev="footnote">&#8617;</a></p></li>
+<li id="fn:2">
+<p>Each track is divided into one or more indices. Index 1 is the actual start of the track, while index 0 defines a gap that comes before the actual track begins, and indices 2 and beyond are rare. The gap between tracks is typically called a &ldquo;pregap&rdquo;. On a real CD player, when picking a track by number, the player will start straight from that track&rsquo;s index 1. When letting the disc play through from a previous track, however, the disc will play the pregap defined in index 0 first before proceeding to index 1.<a href="#fnref:2" rev="footnote">&#8617;</a></p></li>
+<li id="fn:3">
+<p>Since CD was originally designed just for music, all indices to locations on the disc are measured in terms of timestamps instead of a more data-oriented index like an address in bytes. These timestamps are stored in three parts: minutes, seconds, and 1/75 fractions of a second. For example, if a track starts at two seconds into the disc, its timestamp is 00:02:00. libcue translates these into a logical block address, eg a number of sectors, which would mean the previous example is 150. The CloneCD format reproduces the original CD-ROM spec&rsquo;s timestamps, but additionally stores logical block addresses in some places for convenience.<a href="#fnref:3" rev="footnote">&#8617;</a></p></li>
+<li id="fn:4">
+<p>There are a few different modes of data track which have different data layouts. A data sector is always 2352 bytes with a mixture of data and error correction data. The different modes have different ratios of data to error correction. Mode 1, the original and most common mode, uses 2048 bytes out of every sector for data with the remaining 304 bytes serving as error correction.<a href="#fnref:4" rev="footnote">&#8617;</a></p></li>
+<li id="fn:5">
+<p>It&rsquo;s also used in the disc&rsquo;s lead-in and lead-out, but I&rsquo;m not dealing with those sections of the disc.<a href="#fnref:5" rev="footnote">&#8617;</a></p></li>
+</ol>
+</div>
+
+</div>
+  
+  
+
+
+    </article>
   
   
     <article>
@@ -937,155 +1437,6 @@
 
     </article>
   
-  
-    <article>
-      
-  <header>
-    
-      <h1 class="entry-title"><a href="/blog/blog/2022/01/06/do-you-speak-the-lingo/">Do You Speak the Lingo?</a></h1>
-    
-    
-      <p class="meta">
-        
-
-
-
-
-<time class='entry-date' datetime='2022-01-06T14:58:00-08:00'><span class='date'><span class='date-month'>Jan</span> <span class='date-day'>6</span><span class='date-suffix'>th</span>, <span class='date-year'>2022</span></span> <span class='time'>2:58 pm</span></time>
-        
-      </p>
-    
-  </header>
-
-
-  <div class="entry-content"><p>I&rsquo;ve been spending some time lately contributing to <a href="https://www.scummvm.org">ScummVM</a>, an open-source reimplementation of many different game engines that makes it possible to play those games on countless modern platforms. They&rsquo;ve recently added support for Macromedia Director, an engine used by a ton of 90s computer games and multimedia software that I&rsquo;m really passionate about, so I wanted to get involved and help out.</p>
-
-<p><img class="crisp" src="/blog/images/scummvm-henachoco03/scummvm-henachoco03-mac-ja-00003.png"></p>
-
-<p>One of the first games I tried out is <em>Difficult Book Game</em> (<em>Muzukashii Hon wo Yomu to Nemukunaru</em>, or <em>Reading a Difficult Book Makes You Sleepy</em>), a small puzzle game for the Mac by a one-person indie studio called Itachoco Systems that specialized in strange, interesting art games. Players take on the role of a woman named Miss Linli who, after falling asleep reading a complicated book, finds herself in a strange lucid dream where gnomes are crawling all over her table. Players can entice them to climb on her or scoop them up with her hands. If two gnomes walk into each other, they turn into a strange seed that, in turn, grows into other strange things if it comes into contact with another gnome. Players guide her using what feels like an early ancestor to <a href="http://www.foddy.net/Athletics.html">QWOP</a>, with separate keys controlling the joints on each of Linli&rsquo;s arms. It&rsquo;s bizarre, difficult to control, and compelling.</p>
-
-<p>A lot of early Director games play fine in ScummVM without any special work, so I was hoping that would be true here too. Unfortunately, it didn&rsquo;t turn out to be quite that simple. I ended up taking a dive into ScummVM&rsquo;s implementation of Director to fix it.</p>
-
-<p>Director uses its own programming language, Lingo, which is inspired by languages like <a href="https://en.wikipedia.org/wiki/Smalltalk">Smalltalk</a> and <a href="https://en.wikipedia.org/wiki/HyperCard">HyperCard</a>. HyperCard was Apple&rsquo;s hypermedia development environment, released for Macs in 1987, and was known for its simple, English-like, non-programmer friendly programming language. Smalltalk, meanwhile, is a programming language developed in the 70s and 80s known for its simple syntax and powerful object oriented features, very new at the time; it&rsquo;s also influenced other modern languages such as Python and Ruby. Lingo uses a HyperCard-style English-like way of programming and Smalltalk-style object oriented features.</p>
-
-<p>Early versions of Director are unusual for having the engine interpret the game logic straight from source code<sup id="fnref:1"><a href="#fn:1" rel="footnote">1</a></sup>&mdash;which means if you&rsquo;ve got any copy of the game, you&rsquo;ve got the source code too. It&rsquo;s great for debugging and learning how it works, but there&rsquo;s a downside too. If you&rsquo;re writing a new interpreter, like ScummVM, it means you have to deal with writing a parser for arbitrary source code. As it turns out, every issue I&rsquo;d have to deal with to get this game working involved the parser.</p>
-
-<p>I&rsquo;ll get into the details later, but first some background. To give a simplified view, ScummVM processes Lingo source in a few steps. First, it translates the text from its source encoding to Unicode; since Lingo dates to before Unicode was widely used, each script is stored in a language-specific encoding and needs to be translated in order for modern Unicode-native software to interpret it correctly. Next, there&rsquo;s a preprocessing stage in which a few transformations are made in order to make the later stages simpler. The output of this stage is still text which carries the same technical meaning, it&rsquo;s just text that&rsquo;s easier for the next stages to process. This is followed by the two stages of the actual parser itself: the lexer, in which source code text is converted into a series of tokens, and the parser, which has a definition of the grammar for the language and interprets the tokens from the previous stage in the context of that grammar.</p>
-
-<p>This all sounds complicated, but my changes ended up being pretty small. They did, however, end up getting spread across several of these layers.</p>
-
-<h3>1. The fun never ends!</h3>
-
-<p>The very first thing I got after launching the game was this parse error:</p>
-
-<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-</pre></td><td class='code'><pre><code class=''><span class='line'>WARNING: ######################  LINGO: syntax error, unexpected tMETHOD: expected end of file at line 83 col 6 in MovieScript id: 0!</span></code></pre></td></tr></table></div></figure>
-
-
-<p>Taking a look at the code in question, there&rsquo;s nothing that really looks too out of the ordinary:</p>
-
-<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-<span class='line-number'>2</span>
-<span class='line-number'>3</span>
-<span class='line-number'>4</span>
-<span class='line-number'>5</span>
-<span class='line-number'>6</span>
-</pre></td><td class='code'><pre><code class=''><span class='line'>factory lady
-</span><span class='line'>method mNew
-</span><span class='line'>    instance rspri,rx,ry,rhenka,rkihoncala,rflag,rhoko,rkasoku
-</span><span class='line'>end method
-</span><span class='line'>method mInit1 spri
-</span><span class='line'># etc</span></code></pre></td></tr></table></div></figure>
-
-
-<p>This is the start of the definition of the game&rsquo;s first factory. Lingo supports object-oriented features, something that was still pretty new when it was introduced, and allows for user-defined classes called &ldquo;factories&rdquo;<sup id="fnref:2"><a href="#fn:2" rel="footnote">2</a></sup>. Following the <code>factory lady</code> definition are a number of methods, defined in a block-like format: <code>method NAME</code>, an indented set of one or more lines of method definitions, and an <code>end method</code> line.</p>
-
-<p>That last line, it turns out, was the problem. To my surprise, it turns out those <code>end method</code> blocks are totally optional even though it&rsquo;s the documented syntax in the official Director manual. Not only can it have any text there instead of <code>method</code>, but it turns out you don&rsquo;t need any form of <code>end</code> statement at all. If ScummVM didn&rsquo;t recognize it, it seems that many games must have just skipped it.</p>
-
-<p>Luckily, this was a very easy fix: I <a href="https://github.com/scummvm/scummvm/pull/3547">added a single line</a> to ScummVM&rsquo;s <a href="https://en.wikipedia.org/wiki/GNU_Bison">Bison</a>-based parser and it was able to handle <code>end</code> statements without breaking support for methods defined without them. I hoped that was all it was going to take for Difficult Book Game to run, but I wasn&rsquo;t quite so lucky.</p>
-
-<h3>2. Language-dependent syntax</h3>
-
-<p>Unlike most modern languages, Lingo doesn&rsquo;t have a general-purpose escape character like <code>\</code> that can be use to extend a line of code across multiple lines. Instead, it uses a special character called the &ldquo;continuation marker&rdquo;, <code>¬</code><sup id="fnref:3"><a href="#fn:3" rel="footnote">3</a></sup>, which serves that purpose and is used for nothing else in the language<sup id="fnref:4"><a href="#fn:4" rel="footnote">4</a></sup>. (Hope you like holding down keys to type special characters!) Here&rsquo;s an example of how that looks with a couple lines of code from a real application:</p>
-
-<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-<span class='line-number'>2</span>
-</pre></td><td class='code'><pre><code class=''><span class='line'>global theObjects,retdata1,retdata2,ladytime,selif,daiido,Xzahyo,Yzahyo,StageNum, ¬
-</span><span class='line'>           daihoko</span></code></pre></td></tr></table></div></figure>
-
-
-<p>Since Lingo was originally written for the Mac, whose default MacRoman character set supported a number of &ldquo;special&rdquo; characters and accents outside the normal ASCII range, they were able to get away with characters that might not be safe in other programming languages. But there&rsquo;s a problem there, and not just that it was annoying to type: what happens if you&rsquo;re programming in a language that doesn&rsquo;t use MacRoman? This is before Unicode, so each language was using a different encoding, and there&rsquo;s no guarantee that a given language would have <code>¬</code> in its character set.</p>
-
-<p>Which takes me back to Difficult Book Game. I tried running it again after the fix above, only to run into a new parse error. After checking the lines of code it was talking about, I ran into something that looks almost like the code above&hellip; <em>almost</em>.</p>
-
-<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-<span class='line-number'>2</span>
-</pre></td><td class='code'><pre><code class=''><span class='line'>global theObjects,retdata1,retdata2,ladytime,selif,daiido,Xzahyo,Yzahyo,StageNum, ﾂ
-</span><span class='line'>           daihoko</span></code></pre></td></tr></table></div></figure>
-
-
-<p>Spot the difference? In the place where the continuation marker should be, there&rsquo;s something else: <code>ﾂ</code>, or the halfwidth katakana character &ldquo;tsu&rdquo;. As it turns out, that&rsquo;s not random. In MacRoman, <code>¬</code> takes up the character position <code>0xC2</code>, and <code>ﾂ</code> is at the same location in MacJapanese. That, it turns out, seems to be the answer of how the continuation marker is handled in different languages. It&rsquo;s not really <code>¬</code>, it&rsquo;s whatever character happens to be at <code>0xC2</code> in a given text encoding.</p>
-
-<p>Complicating things a bit, ScummVM handles lexing Lingo <em>after</em> translating the code from its source encoding to UTF-8. If it lexed the raw bytes, it would be one thing: whatever the character is at <code>0xC2</code> is the continuation marker, regardless of what character it &ldquo;means&rdquo;. Handling it after it&rsquo;s been turned into Unicode is a lot harder. Since ScummVM already has a Lingo preprocessor, though, it could get fixed up there: just look for instances of <code>ﾂ</code> followed by a newline, and treat that as though it&rsquo;s a &ldquo;real&rdquo; continuation marker<sup id="fnref:5"><a href="#fn:5" rel="footnote">5</a></sup>. A little crude, but it works, and suddenly ScummVM could parse Difficult Book Game&rsquo;s code<sup id="fnref:6"><a href="#fn:6" rel="footnote">6</a></sup>. Or, almost&hellip;</p>
-
-<h3>3. What&rsquo;s in a space?</h3>
-
-<p>Now that I could finally get in-game, I could start messing around with the controls and see how it ran. Characters were moving, controls were responding&mdash;it was looking good! At least until I pressed a certain key&hellip;</p>
-
-<p><img class="crisp" src="/blog/images/scummvm-henachoco03/scummvm-henachoco03-mac-ja-00000.png"></p>
-
-<p>Her arms detached&mdash;that doesn&rsquo;t look comfortable. In the console, ScummVM flagged an error that looked relevant:</p>
-
-<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-</pre></td><td class='code'><pre><code class=''><span class='line'>Incorrect number of arguments for handler mLHizikaraHand (1, expected 3 to 3). Adding extra 2 voids!</span></code></pre></td></tr></table></div></figure>
-
-
-<p>This sounded relevant, since &ldquo;hiji&rdquo; means elbow. I figured it was probably the handler called when rotating her arm around her elbow, which is exactly what visually broke. I took a look at where <code>mLHizikaraHand</code> and the similar handlers were being called, and noticed something weird. In some places, it looks like this:</p>
-
-<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-</pre></td><td class='code'><pre><code class=''><span class='line'>locaobject(mLHizikaraHand,(rhenka + 1),dotti)</span></code></pre></td></tr></table></div></figure>
-
-
-<p>And in other places, it looked slightly different:</p>
-
-<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-</pre></td><td class='code'><pre><code class=''><span class='line'>locaobject(mLHizikaraHand (rhenka + 1),dotti)</span></code></pre></td></tr></table></div></figure>
-
-
-<p>Can you find the difference? It&rsquo;s the character immediately after the handler name: instead of a comma, it&rsquo;s followed by a space. Now that I looked at it, the ScummVM error actually sounded right. It <em>does</em> look like it&rsquo;s calling <code>mLHizikaraHand</code> with a single argument (<code>rhenka + 1</code>). After talking it over with ScummVM dev djsrv, it sounds like this is just a Lingo parsing oddity. Lingo was designed to be a user-friendly language, and there are plenty of cases where its permissive parser accepts things that most languages would reject. This seems to be one of them.</p>
-
-<p>Unfortunately, this parse case also seems to be different between Lingo versions. Fixing how it interprets it might have knock-on effects for parsing things created for later Director releases. Time to get hacky instead. The good news is that ScummVM has a mechanism for exactly this: it bundles patches for various games, making it possible to fix up weird and ambiguous syntax that its parser can&rsquo;t handle yet. I added patches to change the ambiguous cases to the syntax used elsewhere, and suddenly Miss Linli&rsquo;s posture is looking a lot healthier.</p>
-
-<p><img class="crisp" src="/blog/images/scummvm-henachoco03/scummvm-henachoco03-mac-ja-00001.png"></p>
-
-<p>This whole thing ended up being much more of a journey than I expected. So much for having it just run! In the end, though, I learned quite a bit&mdash;and I was able to get a cool game to run on modern OSs. I&rsquo;m continuing to work on ScummVM&rsquo;s Director support and should have more to write about later.</p>
-
-<p>Thanks to ScummVM developers djsrv and sev for their help working on this.</p>
-<div class="footnotes">
-<hr/>
-<ol>
-<li id="fn:1">
-<p>Later versions switched to using a bytecode format, similar to Java or C#. This makes processing a lot easier, since bytecode produced by Director&rsquo;s own compiler is far more standardized than human-written source code.<a href="#fnref:1" rev="footnote">&#8617;</a></p></li>
-<li id="fn:2">
-<p>Despite the name, it isn&rsquo;t really implementing the <a href="https://en.wikipedia.org/wiki/Factory_method_pattern">factory pattern</a>.<a href="#fnref:2" rev="footnote">&#8617;</a></p></li>
-<li id="fn:3">
-<p>The mathematical <a href="https://en.wikipedia.org/wiki/Negation">negation operator</a>.<a href="#fnref:3" rev="footnote">&#8617;</a></p></li>
-<li id="fn:4">
-<p>It&rsquo;s a bit of a weird choice, but Lingo didn&rsquo;t do it first. It showed up first in Apple&rsquo;s HyperCard and AppleScript languages.<a href="#fnref:4" rev="footnote">&#8617;</a></p></li>
-<li id="fn:5">
-<p>Tempting as it is to refactor the lexer, I had other things to do, and I really wasn&rsquo;t familiar enough with its innards to take that on.<a href="#fnref:5" rev="footnote">&#8617;</a></p></li>
-<li id="fn:6">
-<p>As it turns out, this wasn&rsquo;t the only game with the same issue. Fixing this also fixed several other Japanese games, including <em>The Seven Colors: Legend of Psy・S City</em> and <em>Eriko Tamura&rsquo;s Oz</em>.<a href="#fnref:6" rev="footnote">&#8617;</a></p></li>
-</ol>
-</div>
-
-</div>
-  
-  
-
-
-    </article>
-  
   <div class="pagination">
     
       <a class="prev" href="/blog/posts/2">&larr; Older</a>
@@ -1101,6 +1452,10 @@
   <ul id="recent_posts">
     
       <li class="post">
+        <a href="/blog/blog/2024/12/15/announcing-cue2ccd-a-tool-to-convert-bin-slash-cue-disc-images-to-clonecd/">Announcing Cue2ccd: A Tool to Convert BIN/CUE Disc Images to CloneCD</a>
+      </li>
+    
+      <li class="post">
         <a href="/blog/blog/2024/09/21/what-happened-to-the-japanese-pc-platforms/">What Happened to the Japanese PC Platforms?</a>
       </li>
     
@@ -1114,10 +1469,6 @@
     
       <li class="post">
         <a href="/blog/blog/2024/04/07/unlocking-puyo-puyo-fever-for-macs-english-mode/">Unlocking Puyo Puyo Fever for Mac's English Mode</a>
-      </li>
-    
-      <li class="post">
-        <a href="/blog/blog/2024/03/01/that-time-i-accidentally-deleted-a-game-from-mame/">That Time I Accidentally Deleted a Game From MAME</a>
       </li>
     
   </ul>
