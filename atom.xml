@@ -4,7 +4,7 @@
   <title><![CDATA[The Future Is Now]]></title>
   <link href="http://mistys-internet.website/blog/atom.xml" rel="self"/>
   <link href="http://mistys-internet.website/blog/"/>
-  <updated>2024-12-15T17:37:00-08:00</updated>
+  <updated>2025-01-23T16:45:56-08:00</updated>
   <id>http://mistys-internet.website/blog/</id>
   <author>
     <name><![CDATA[Misty De Meo]]></name>
@@ -12,6 +12,63 @@
   </author>
   <generator uri="http://octopress.org/">Octopress</generator>
 
+  
+  <entry>
+    <title type="html"><![CDATA[What You Might Miss When Backing Up CDs]]></title>
+    <link href="http://mistys-internet.website/blog/blog/2025/01/23/what-you-might-miss-when-backing-up-cds/"/>
+    <updated>2025-01-23T16:39:24-08:00</updated>
+    <id>http://mistys-internet.website/blog/blog/2025/01/23/what-you-might-miss-when-backing-up-cds</id>
+    <content type="html"><![CDATA[<p>I&rsquo;ve written a bit recently about CD-ROM preservation and some of the more niche, easily-missed parts of the format. I&rsquo;ve covered the formats themselves, but I felt it might help to provide some concrete examples of the kind of data that can easily be missed and that might not get backed up.</p>
+
+<p>As I mentioned in a <a href="http://mistys-internet.website/blog/blog/2024/09/13/the-working-archivists-guide-to-enthusiast-cd-rom-archiving-tools/">previous post</a>, many CD disc image formats don&rsquo;t include the disc&rsquo;s subcode data<sup id="fnref:1"><a href="#fn:1" rel="footnote">1</a></sup>. Most discs don&rsquo;t use it for any non-structural data, and in the cases where it&rsquo;s used for copy protection it&rsquo;s immediately obvious that it&rsquo;s needed since the backed up software won&rsquo;t work. There are cases that are subtler, however, and where actually significant data in the subcode can be missed.</p>
+
+<center><iframe width="560" height="315" src="https://www.youtube.com/embed/videoseries?list=PL8RnW3nRCF9lYNarjMnxlUmWSa8pXGcb1" title="YouTube video player" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" referrerpolicy="strict-origin-when-cross-origin" allowfullscreen></iframe></center>
+
+
+<p><a href="https://en.wikipedia.org/wiki/CD+G">CD+G</a> is an extension to the Compact Disc format that allows displaying simple graphics alongside the audio content of a CD. It comes well before CD-ROM, so it&rsquo;s designed for CD players that are hooked up to a TV rather than computers. CD+G stores its graphics in the disc&rsquo;s subcode data, which means that only backups that include that data actually capture the full content of the disc. Back up a CD+G disc in a format that doesn&rsquo;t include subcode data, like BIN/CUE, and it just turns into a normal audio CD. These graphics can be used for anything; the first CD+G release, Firesign Theatre&rsquo;s 1985 comedy album (shown above) features illustrations to accompany the audio. It was never widely-used, but it did develop a significant niche in karaoke discs as a way to display lyrics on-screen.</p>
+
+<p>I want to talk a little more about how easy it can be to miss that a disc has significant CD+G data, so let&rsquo;s take a look at a few practical examples. A simple example is the Firesign Theatre album mentioned above. The packaging, <a href="https://www.discogs.com/release/843915-The-Firesign-Theatre-Eat-Or-Be-Eaten">as seen on Discogs</a>, doesn&rsquo;t mention the CD+G content at all, aside from a brief reference in the album credits&mdash;most owners of this disc would have no idea the CD+G content existed, and would never have owned a player. It&rsquo;s very likely that most people backing up their disc wouldn&rsquo;t even know they had skipped some of its content.</p>
+
+<p>That&rsquo;s a little too simple, though. A little too neat and tidy. Let&rsquo;s take a look at something more fun.</p>
+
+<p>In the 16-bit era, the first CD-based game consoles all had support for playing music CDs as a bonus feature. Many of these consoles also supported CD+G, and for many families these would have been their only CD+G player. The Victor Wondermega, a high-end all-in-one Sega Mega Drive/Mega CD console released in Japan, leaned into CD+G&rsquo;s popularity as a karaoke format by making karaoke one of its major features&mdash;including two microphone ports built right into the console. The system was bundled with a pack-in CD called <a href="https://segaretro.org/Wondermega_Collection"><em>Wondermega Collection</em></a> that showed off all aspects of its features: it includes several minigames that can be played in Mega CD mode, and two karaoke audio tracks that can be played if the player boots into the system&rsquo;s CD player instead of the game.</p>
+
+<center style="image-rendering: pixelated;">
+<p><img src="http://mistys-internet.website/blog/images/subcode/cdg-missing.png" alt="Screenshot of a track from Wondermega Collection with CD+G imagery missing.">
+<img src="http://mistys-internet.website/blog/images/subcode/cdg-present.png" alt="Screenshot of a track from Wondermega Collection with CD+G imagery present. The UI in the CD player indicates that this is the same track on the disc, with the exact same spot in the track being shown."></center>
+
+
+<p></p></p>
+
+<p style="text-align: center; font-style: italic;">Screenshots of two disc images of Wondermega Collection running in the same CD player. The screenshot on the left is played without the subcode information, so it's recognized as audio-only. The screenshot on the right is played with the subcode information, so the CD+G content is correctly identified and rendered during playback.</p>
+
+
+<p>Those karaoke tracks are coded using CD+G<sup id="fnref:2"><a href="#fn:2" rel="footnote">2</a></sup>, which means that they&rsquo;re only properly backed up if the disc is ripped in a format which supports subcode data. And, because of the complexity of the disc, there are many reasons that it&rsquo;s easy to fail to notice that this data was missed:</p>
+
+<ul>
+<li>Since the disc contains both Mega CD and audio CD content, the audio CD portion could easily be missed when testing the backup. In this case, it&rsquo;s easy to miss that the audio CD tracks actually had unique content beyond the audio itself.</li>
+<li>Not all Mega CD emulators support subcode data, so it may not be clear how to even test that the disc is complete or incomplete.</li>
+<li>The Redump standard doesn&rsquo;t include subcode data in the set of data it validates<sup id="fnref:3"><a href="#fn:3" rel="footnote">3</a></sup>, so those backing up their discs to match Redump&rsquo;s database may discard the subcode data without realizing that it&rsquo;s significant.</li>
+</ul>
+
+
+<p>So what&rsquo;s the lesson here? Well, first of all, it&rsquo;s simply that it&rsquo;s difficult to fully audit all of the content on a disc to confirm that a backup is fully functional. The more kinds of distinct content on a disc, as in our <em>Wondermega Collection</em> example, the harder. (This is similar to the example of Mac/Windows hybrid discs I gave in my previous post, where by only testing a backup on one operating system an archivist might miss that they had discarded data for the other.) The second lesson is that it&rsquo;s not always obvious what content even <em>exists</em> on a disc, and it&rsquo;s easy to throw something away simply by not knowing it existed in the first place.</p>
+
+<p>My personal recommendation, for those creating raw disc backups of physical CDs, is simply to always store the subcode data&mdash;at only 4% the size of the disc&rsquo;s primary data, it adds very little extra storage burden in exchange for being sure that nothing is being lost. For the truly storage space-starved, it&rsquo;s worth at least doing a full audit to make sure that no CD+G, CD-TEXT or similar data is present before discarding subcode data.</p>
+<div class="footnotes">
+<hr/>
+<ol>
+<li id="fn:1">
+<p>Also known as subchannel data.<a href="#fnref:1" rev="footnote">&#8617;</a></p></li>
+<li id="fn:2">
+<p>Which, yes, means they do work on any CD player that supports CD+G, including regular karaoke CD players.<a href="#fnref:2" rev="footnote">&#8617;</a></p></li>
+<li id="fn:3">
+<p>This isn&rsquo;t out of ignorance&mdash;there are technical limitations that make it difficult to validate the fixity of subcode data. Redump&rsquo;s database only includes data that can be reliably reproduced; omitting subcode data doesn&rsquo;t mean that it&rsquo;s not significant or that it shouldn&rsquo;t be backed up along with the rest of the disc&rsquo;s content, just that it can&rsquo;t be validated in the same way that the disc&rsquo;s main contents can be.<a href="#fnref:3" rev="footnote">&#8617;</a></p></li>
+</ol>
+</div>
+
+]]></content>
+  </entry>
   
   <entry>
     <title type="html"><![CDATA[Announcing Cue2ccd: A Tool to Convert BIN/CUE Disc Images to CloneCD]]></title>
@@ -1956,91 +2013,6 @@ In 1999, an unofficial mod titled <a href="http://www5.ocn.ne.jp/~afc/limitover/
 <p>Except the tile for Genichirou, which is so long it&rsquo;s allocated two tiles.<a href="#fnref:4" rev="footnote">&#8617;</a></p></li>
 <li id="fn:5">
 <p>Cathy&rsquo;s name is rendered in Hiragana despite being a foreign name; it would more normally be rendered as &ldquo;キャシー&rdquo;.<a href="#fnref:5" rev="footnote">&#8617;</a></p></li>
-</ol>
-</div>
-
-]]></content>
-  </entry>
-  
-  <entry>
-    <title type="html"><![CDATA[Attack the Vector]]></title>
-    <link href="http://mistys-internet.website/blog/blog/2015/05/16/attack-the-vector/"/>
-    <updated>2015-05-16T21:12:00-07:00</updated>
-    <id>http://mistys-internet.website/blog/blog/2015/05/16/attack-the-vector</id>
-    <content type="html"><![CDATA[<p>One downside of working with ancient OSs is coming across bugs that will never be fixed.</p>
-
-<p>In the early days of Tigerbrew, I had just started experimenting with GCC 4.2 as a replacement for Xcode 2.5&rsquo;s GCC 4.0. Everything was going great until I built something that uses Cocoa, which blew up with this message:</p>
-
-<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-<span class='line-number'>2</span>
-<span class='line-number'>3</span>
-<span class='line-number'>4</span>
-<span class='line-number'>5</span>
-</pre></td><td class='code'><pre><code class=''><span class='line'>In file included from /System/Library/Frameworks/CoreServices.framework/Frameworks/CarbonCore.framework/Headers/DriverServices.h:32,
-</span><span class='line'>                 from /System/Library/Frameworks/CoreServices.framework/Frameworks/CarbonCore.framework/Headers/CarbonCore.h:125,
-</span><span class='line'>                 from /System/Library/Frameworks/CoreServices.framework/Headers/CoreServices.h:21,
-</span><span class='line'>                 from test.c:2:
-</span><span class='line'>/System/Library/Frameworks/CoreServices.framework/Frameworks/CarbonCore.framework/Headers/MachineExceptions.h:115: error: expected specifier-qualifier-list before ‘vector’</span></code></pre></td></tr></table></div></figure>
-
-
-<p>A syntax error coming not from within the package I was building, but from within&hellip; Carbon?</p>
-
-<p>The error actually comes from the Vector128 union within MachineExceptions.h, located in CoreServices&rsquo;s CarbonCore framework. The very first section of this union had the offending code. Let&rsquo;s play spot the bug:</p>
-
-<p>Here&rsquo;s what it looks like as of OS X 10.4.11:</p>
-
-<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-<span class='line-number'>2</span>
-<span class='line-number'>3</span>
-<span class='line-number'>4</span>
-<span class='line-number'>5</span>
-<span class='line-number'>6</span>
-<span class='line-number'>7</span>
-<span class='line-number'>8</span>
-<span class='line-number'>9</span>
-</pre></td><td class='code'><pre><code class='c'><span class='line'><span class="k">typedef</span> <span class="k">struct</span> <span class="n">FPUInformationPowerPC</span>    <span class="n">FPUInformationPowerPC</span><span class="p">;</span>
-</span><span class='line'><span class="k">union</span> <span class="n">Vector128</span> <span class="p">{</span>
-</span><span class='line'><span class="cp">#ifdef __VEC__</span>
-</span><span class='line'> <span class="n">vector</span> <span class="kt">unsigned</span> <span class="kt">int</span>         <span class="n">v</span><span class="p">;</span>
-</span><span class='line'><span class="cp">#endif</span>
-</span><span class='line'>  <span class="kt">unsigned</span> <span class="kt">long</span>       <span class="n">l</span><span class="p">[</span><span class="mi">4</span><span class="p">];</span>
-</span><span class='line'>  <span class="kt">unsigned</span> <span class="kt">short</span>      <span class="n">s</span><span class="p">[</span><span class="mi">8</span><span class="p">];</span>
-</span><span class='line'>  <span class="kt">unsigned</span> <span class="kt">char</span>       <span class="n">c</span><span class="p">[</span><span class="mi">16</span><span class="p">];</span>
-</span><span class='line'><span class="p">};</span>
-</span></code></pre></td></tr></table></div></figure>
-
-
-<p>And here it is in OS X 10.7.5<sup id="fnref:1"><a href="#fn:1" rel="footnote">1</a></sup>:</p>
-
-<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-<span class='line-number'>2</span>
-<span class='line-number'>3</span>
-<span class='line-number'>4</span>
-<span class='line-number'>5</span>
-<span class='line-number'>6</span>
-<span class='line-number'>7</span>
-<span class='line-number'>8</span>
-<span class='line-number'>9</span>
-</pre></td><td class='code'><pre><code class='c'><span class='line'><span class="k">typedef</span> <span class="k">struct</span> <span class="n">FPUInformationPowerPC</span>    <span class="n">FPUInformationPowerPC</span><span class="p">;</span>
-</span><span class='line'><span class="k">union</span> <span class="n">Vector128</span> <span class="p">{</span>
-</span><span class='line'><span class="cp">#ifdef __APPLE_ALTIVEC__</span>
-</span><span class='line'>   <span class="n">vector</span> <span class="kt">unsigned</span> <span class="kt">int</span>         <span class="n">v</span><span class="p">;</span>
-</span><span class='line'><span class="cp">#endif</span>
-</span><span class='line'>  <span class="kt">unsigned</span> <span class="kt">long</span>       <span class="n">l</span><span class="p">[</span><span class="mi">4</span><span class="p">];</span>
-</span><span class='line'>  <span class="kt">unsigned</span> <span class="kt">short</span>      <span class="n">s</span><span class="p">[</span><span class="mi">8</span><span class="p">];</span>
-</span><span class='line'>  <span class="kt">unsigned</span> <span class="kt">char</span>       <span class="n">c</span><span class="p">[</span><span class="mi">16</span><span class="p">];</span>
-</span><span class='line'><span class="p">};</span>
-</span></code></pre></td></tr></table></div></figure>
-
-
-<p>The bug comes from the use of the <code>vector</code> keyword. As pointed out in this <a href="https://trac.macports.org/ticket/34213#comment:7">MacPorts ticket</a>, the issue is with the <code>#ifdef</code> that checks for <code>__VEC__</code>. <code>__VEC__</code> is defined if AltiVec is on, <em>without necessarily</em> meaning that AltiVec syntactic extensions are enabled. The <code>vector</code> keyword is only available if either <code>altivec.h</code> is included, or the <code>-mpim-altivec</code> or <code>-faltivec</code> flags are passed. Since Tigerbrew always optimizes for the host CPU, G4 and G5 users were getting AltiVec enabled without forcing syntactic extensions. I fixed this in Tigerbrew this by always passing <code>-faltivec</code> on PowerPC systems when building any package, regardless of whether AltiVec is being used.</p>
-
-<p>As to why Apple never caught this, GCC 4.0&rsquo;s behaviour seems to be different; it seems to enable AltiVec syntactic extensions whenever <code>-maltivec</code> is on. Apple did eventually fix the bug, as seen in the Lion header above. According to the MacPorts ticket linked previously, it was fixed in the CarbonCore header in 10.5 and in the 10.4u SDK packaged in Xcode 3 for Leopard. Since the 10.4u SDK fix was never backported to Tiger itself, Tiger users have to make do with the workaround.</p>
-<div class="footnotes">
-<hr/>
-<ol>
-<li id="fn:1">
-<p>10.7 may be Intel-only, but the relevant code&rsquo;s still there. In fact, the same PowerPC unions and structs are still there as of 10.9.4.<a href="#fnref:1" rev="footnote">&#8617;</a></p></li>
 </ol>
 </div>
 

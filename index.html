@@ -9,7 +9,7 @@
   <meta name="author" content="Misty De Meo">
 
   
-  <meta name="description" content="I&rsquo;m releasing a tool I wrote for myself: cue2ccd, a commandline tool to convert CD-ROM disc images from the BIN/CUE format to the CloneCD &hellip;">
+  <meta name="description" content="I&rsquo;ve written a bit recently about CD-ROM preservation and some of the more niche, easily-missed parts of the format. I&rsquo;ve covered the &hellip;">
   
 
   <!-- http://t.co/dKP3o1e -->
@@ -63,6 +63,83 @@
     <div id="content">
       <div class="blog-index">
   
+  
+  
+    <article>
+      
+  <header>
+    
+      <h1 class="entry-title"><a href="/blog/blog/2025/01/23/what-you-might-miss-when-backing-up-cds/">What You Might Miss When Backing Up CDs</a></h1>
+    
+    
+      <p class="meta">
+        
+
+
+
+
+<time class='entry-date' datetime='2025-01-23T16:39:24-08:00'><span class='date'><span class='date-month'>Jan</span> <span class='date-day'>23</span><span class='date-suffix'>rd</span>, <span class='date-year'>2025</span></span> <span class='time'>4:39 pm</span></time>
+        
+      </p>
+    
+  </header>
+
+
+  <div class="entry-content"><p>I&rsquo;ve written a bit recently about CD-ROM preservation and some of the more niche, easily-missed parts of the format. I&rsquo;ve covered the formats themselves, but I felt it might help to provide some concrete examples of the kind of data that can easily be missed and that might not get backed up.</p>
+
+<p>As I mentioned in a <a href="/blog/blog/2024/09/13/the-working-archivists-guide-to-enthusiast-cd-rom-archiving-tools/">previous post</a>, many CD disc image formats don&rsquo;t include the disc&rsquo;s subcode data<sup id="fnref:1"><a href="#fn:1" rel="footnote">1</a></sup>. Most discs don&rsquo;t use it for any non-structural data, and in the cases where it&rsquo;s used for copy protection it&rsquo;s immediately obvious that it&rsquo;s needed since the backed up software won&rsquo;t work. There are cases that are subtler, however, and where actually significant data in the subcode can be missed.</p>
+
+<center><iframe width="560" height="315" src="https://www.youtube.com/embed/videoseries?list=PL8RnW3nRCF9lYNarjMnxlUmWSa8pXGcb1" title="YouTube video player" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" referrerpolicy="strict-origin-when-cross-origin" allowfullscreen></iframe></center>
+
+
+<p><a href="https://en.wikipedia.org/wiki/CD+G">CD+G</a> is an extension to the Compact Disc format that allows displaying simple graphics alongside the audio content of a CD. It comes well before CD-ROM, so it&rsquo;s designed for CD players that are hooked up to a TV rather than computers. CD+G stores its graphics in the disc&rsquo;s subcode data, which means that only backups that include that data actually capture the full content of the disc. Back up a CD+G disc in a format that doesn&rsquo;t include subcode data, like BIN/CUE, and it just turns into a normal audio CD. These graphics can be used for anything; the first CD+G release, Firesign Theatre&rsquo;s 1985 comedy album (shown above) features illustrations to accompany the audio. It was never widely-used, but it did develop a significant niche in karaoke discs as a way to display lyrics on-screen.</p>
+
+<p>I want to talk a little more about how easy it can be to miss that a disc has significant CD+G data, so let&rsquo;s take a look at a few practical examples. A simple example is the Firesign Theatre album mentioned above. The packaging, <a href="https://www.discogs.com/release/843915-The-Firesign-Theatre-Eat-Or-Be-Eaten">as seen on Discogs</a>, doesn&rsquo;t mention the CD+G content at all, aside from a brief reference in the album credits&mdash;most owners of this disc would have no idea the CD+G content existed, and would never have owned a player. It&rsquo;s very likely that most people backing up their disc wouldn&rsquo;t even know they had skipped some of its content.</p>
+
+<p>That&rsquo;s a little too simple, though. A little too neat and tidy. Let&rsquo;s take a look at something more fun.</p>
+
+<p>In the 16-bit era, the first CD-based game consoles all had support for playing music CDs as a bonus feature. Many of these consoles also supported CD+G, and for many families these would have been their only CD+G player. The Victor Wondermega, a high-end all-in-one Sega Mega Drive/Mega CD console released in Japan, leaned into CD+G&rsquo;s popularity as a karaoke format by making karaoke one of its major features&mdash;including two microphone ports built right into the console. The system was bundled with a pack-in CD called <a href="https://segaretro.org/Wondermega_Collection"><em>Wondermega Collection</em></a> that showed off all aspects of its features: it includes several minigames that can be played in Mega CD mode, and two karaoke audio tracks that can be played if the player boots into the system&rsquo;s CD player instead of the game.</p>
+
+<center style="image-rendering: pixelated;">
+<p><img src="/blog/images/subcode/cdg-missing.png" alt="Screenshot of a track from Wondermega Collection with CD+G imagery missing.">
+<img src="/blog/images/subcode/cdg-present.png" alt="Screenshot of a track from Wondermega Collection with CD+G imagery present. The UI in the CD player indicates that this is the same track on the disc, with the exact same spot in the track being shown."></center>
+
+
+<p></p></p>
+
+<p style="text-align: center; font-style: italic;">Screenshots of two disc images of Wondermega Collection running in the same CD player. The screenshot on the left is played without the subcode information, so it's recognized as audio-only. The screenshot on the right is played with the subcode information, so the CD+G content is correctly identified and rendered during playback.</p>
+
+
+<p>Those karaoke tracks are coded using CD+G<sup id="fnref:2"><a href="#fn:2" rel="footnote">2</a></sup>, which means that they&rsquo;re only properly backed up if the disc is ripped in a format which supports subcode data. And, because of the complexity of the disc, there are many reasons that it&rsquo;s easy to fail to notice that this data was missed:</p>
+
+<ul>
+<li>Since the disc contains both Mega CD and audio CD content, the audio CD portion could easily be missed when testing the backup. In this case, it&rsquo;s easy to miss that the audio CD tracks actually had unique content beyond the audio itself.</li>
+<li>Not all Mega CD emulators support subcode data, so it may not be clear how to even test that the disc is complete or incomplete.</li>
+<li>The Redump standard doesn&rsquo;t include subcode data in the set of data it validates<sup id="fnref:3"><a href="#fn:3" rel="footnote">3</a></sup>, so those backing up their discs to match Redump&rsquo;s database may discard the subcode data without realizing that it&rsquo;s significant.</li>
+</ul>
+
+
+<p>So what&rsquo;s the lesson here? Well, first of all, it&rsquo;s simply that it&rsquo;s difficult to fully audit all of the content on a disc to confirm that a backup is fully functional. The more kinds of distinct content on a disc, as in our <em>Wondermega Collection</em> example, the harder. (This is similar to the example of Mac/Windows hybrid discs I gave in my previous post, where by only testing a backup on one operating system an archivist might miss that they had discarded data for the other.) The second lesson is that it&rsquo;s not always obvious what content even <em>exists</em> on a disc, and it&rsquo;s easy to throw something away simply by not knowing it existed in the first place.</p>
+
+<p>My personal recommendation, for those creating raw disc backups of physical CDs, is simply to always store the subcode data&mdash;at only 4% the size of the disc&rsquo;s primary data, it adds very little extra storage burden in exchange for being sure that nothing is being lost. For the truly storage space-starved, it&rsquo;s worth at least doing a full audit to make sure that no CD+G, CD-TEXT or similar data is present before discarding subcode data.</p>
+<div class="footnotes">
+<hr/>
+<ol>
+<li id="fn:1">
+<p>Also known as subchannel data.<a href="#fnref:1" rev="footnote">&#8617;</a></p></li>
+<li id="fn:2">
+<p>Which, yes, means they do work on any CD player that supports CD+G, including regular karaoke CD players.<a href="#fnref:2" rev="footnote">&#8617;</a></p></li>
+<li id="fn:3">
+<p>This isn&rsquo;t out of ignorance&mdash;there are technical limitations that make it difficult to validate the fixity of subcode data. Redump&rsquo;s database only includes data that can be reliably reproduced; omitting subcode data doesn&rsquo;t mean that it&rsquo;s not significant or that it shouldn&rsquo;t be backed up along with the rest of the disc&rsquo;s content, just that it can&rsquo;t be validated in the same way that the disc&rsquo;s main contents can be.<a href="#fnref:3" rev="footnote">&#8617;</a></p></li>
+</ol>
+</div>
+
+</div>
+  
+  
+
+
+    </article>
   
   
     <article>
@@ -1376,67 +1453,6 @@
 
     </article>
   
-  
-    <article>
-      
-  <header>
-    
-      <h1 class="entry-title"><a href="/blog/blog/2022/10/27/how-i-dumped-an-arcade-game-for-mame/">How I Dumped an Arcade Game for MAME</a></h1>
-    
-    
-      <p class="meta">
-        
-
-
-
-
-<time class='entry-date' datetime='2022-10-27T21:06:52-07:00'><span class='date'><span class='date-month'>Oct</span> <span class='date-day'>27</span><span class='date-suffix'>th</span>, <span class='date-year'>2022</span></span> <span class='time'>9:06 pm</span></time>
-        
-      </p>
-    
-  </header>
-
-
-  <div class="entry-content"><p>I recently had the chance to do something that I&rsquo;ve wanted to do for years: dump an arcade game to add it to MAME.</p>
-
-<p><img src="/blog/images/theglad104/0005.big.png" alt="Screenshot of The Gladiator's title screen" /></p>
-
-<p>MAME is a massive emulator that covers thousands of arcade games across the history of gaming. It&rsquo;s one of those projects I&rsquo;ve used and loved for decades. I&rsquo;ve always wanted to give back, but it never felt like I had something to contribute&mdash;until recently.</p>
-
-<p>You might remember from <a href="https://www.mistys-internet.website/blog/blog/2021/08/14/exploring-jvs/">one of my other posts</a> that I recently got into collecting arcade games. This year I&rsquo;ve been collecting games for a Taiwanese system called the PolyGame Master (PGM), a cartridge-based system with interchangeable games sold by International Games System (IGS) between 1997 and 2005. It has a lot of great games that aren&rsquo;t very well-known, in particular some incredibly well-designed beat-em-ups.</p>
-
-<p>A couple months ago, I bought a copy of <em>The Gladiator</em>, a wuxia-themed beat em up set in the Song dynasty. My specific copy turns out to be an otherwise-undumped game revison. Many arcade games were released in many different versions, including regional variations and bugfix updates, and it can take collectors and MAME developers years to track them all down. In the case of <em>The Gladiator</em>, MAME has the final release, 1.07, and the first few revisions, but it&rsquo;s missing most of the versions in between. When my copy came here, I booted it up and found out it was one of those versions MAME was missing: 1.04.</p>
-
-<p>Luckily, I already had the hardware on hand to dump it. I own an EPROM burner that I&rsquo;d bought to <em>write</em> chips so that I could mod games I&rsquo;d bought, but EPROM burners can read chips as well. I own an adapter that supports several common chips that, luckily, can handle exactly the chips I needed for this game.</p>
-
-<div style="text-align: center; width: 33%; margin: 1em auto;"><img alt="Photo of an EPROM burner with a 27C160 chip in it" src="/blog/images/theglad104/IMG_5291.jpeg"></div>
-
-
-<p>It&rsquo;s easy to think of game cartridges as just being a single thing, but arcade game boards typically have a large number of chips. Why&rsquo;s that? It&rsquo;s partly technical; specific chips can be connected directly to particular regions of the system&rsquo;s hardware, like graphics or sound, which means that even though it&rsquo;s less flexible than an all-in-one ROM, it has some performance advantages too. The two chips I dumped here are program code for two different CPUs: one for the 68000 CPU in the system itself, and one for the ARM7 CPU in the game cartridge.</p>
-
-<p>The other advantage is that using a large number of chips can make it easier to update a game down the line. Making an overseas release? It would be much cheaper to update just a couple of your chips instead of producing new revisions of everything on your board. Releasing a bugfix update? It&rsquo;s much more quick and painless to update existing games if all your program code is on a single chip.</p>
-
-<p>From looking at MAME, I could tell that every other revision of <em>The Gladiator</em> used a single set of chips for almost everything. Only the two program ROM chips are different between versions, which made my life a lot easier. I was also lucky that these chips were easy to get to. Depending on the kind of game, chips might be attached straight to the board, or they might be in sockets where they can be easily removed and reattached. <em>The Gladiator</em> has two game boards, one of which uses two socketed chips. And, thankfully, those were the only two chips I had to remove and dump.</p>
-
-<p>To remove the chips, I used an EPROM removal tool&mdash;basically just a little set of pliers on a spring, with pair of needle noses that get in under the edge of the chip in the socket so you can pull it out. The two chips were both common types that my EPROM burner supports, so once I got them out they weren&rsquo;t difficult to read. The most important chip, which has the game&rsquo;s program code, is an EPROM chip known as the 27C160&mdash;a 2MB chip in a specific form factor. I already own a reader that supports that and the 4MB version of the same chip, which you can see in the above photo. The second chip is a 27C4096DC which has a much smaller 512KB capacity.</p>
-
-<div style="text-align: center; width: 33%; margin: 1em auto;"><img alt="Photo of an open game cartridge showing the boards and ROM chips" src="/blog/images/theglad104/IMG_5293.jpeg"></div>
-
-
-<p>Why are there two program ROMs? Many games for the PGM use a fascinating and pretty intense form of copy protection. As I mentioned earlier, the PGM motherboard has a 20MHz 68000 processor, a 16-bit CPU that was very widely used in the 90s. The game cartridge, meanwhile, has a 20MHz ARM7 coprocessor. For early games, that ARM7 was there just for copy protection. Game cartridges would feature an unencrypted 68000 ROM and an encrypted ARM7 ROM; the ARM7 must successfully decrypt and execute code from the encrypted ROM for the main program code to be allowed to boot and run. By the end of the PGM&rsquo;s life, they&rsquo;d clearly realized it was silly to be devoting the ARM7 just to copy protection when it was faster than the CPU on the motherboard, so they put it to use for actual game logic. On games like <em>The Gladiator</em>, the unencrypted 68000 ROM and the main CPU are only doing very basic bootstrapping work and then hand off the rest of the work to the ARM7, which runs the game using code on the encrypted ARM7 chip.</p>
-
-<p>I spent awhile fumbling around trying to get the dumped ARM7 ROM to work, but it turns out that&rsquo;s because I read it as the wrong kind. Oops. My reader has a switch that switches between the 2MB and 4MB versions of the chip&hellip; and I had it set to 4MB, even though the chip helpfully told me right on the package it&rsquo;s a 2MB chip. So, after I spent a half hour fumbling, I realize what I&rsquo;d done and went back to redump it&mdash;and <em>that</em> version worked first try. Phew.</p>
-
-<p><img src="/blog/images/theglad104/0004.big.png" alt="Screenshot of The Gladiator's boot screen with the program ROM versions" /></p>
-
-<p>Once I dumped it, I was able to figure out that one of the two program ROMs is identical to one that&rsquo;s already in MAME; only the ARM ROM is unique. That meant adding it to MAME was very easy; I could mostly copy and paste existing code defining the game cartridge, changing just one line with the new ROM and a few lines with some different metadata, and I was good to go. I submitted a <a href="https://github.com/mamedev/mame/pull/10306">pull request</a> and, after some discussion, it was merged. For something I&rsquo;ve wanted to be able to contribute to for <em>years</em>, feels good and, honestly pretty painless. And now, as of <a href="https://www.mamedev.org/?p=518">MAME 0.249</a>, <em>The Gladiator</em> 1.04 can finally be emulated!</p>
-</div>
-  
-  
-
-
-    </article>
-  
   <div class="pagination">
     
       <a class="prev" href="/blog/posts/2">&larr; Older</a>
@@ -1450,6 +1466,10 @@
     <section>
   <h1>Recent Posts</h1>
   <ul id="recent_posts">
+    
+      <li class="post">
+        <a href="/blog/blog/2025/01/23/what-you-might-miss-when-backing-up-cds/">What You Might Miss When Backing Up CDs</a>
+      </li>
     
       <li class="post">
         <a href="/blog/blog/2024/12/15/announcing-cue2ccd-a-tool-to-convert-bin-slash-cue-disc-images-to-clonecd/">Announcing Cue2ccd: A Tool to Convert BIN/CUE Disc Images to CloneCD</a>
@@ -1467,10 +1487,6 @@
         <a href="/blog/blog/2024/07/12/github-is-starting-to-feel-like-legacy-software/">"GitHub" Is Starting to Feel Like Legacy Software</a>
       </li>
     
-      <li class="post">
-        <a href="/blog/blog/2024/04/07/unlocking-puyo-puyo-fever-for-macs-english-mode/">Unlocking Puyo Puyo Fever for Mac's English Mode</a>
-      </li>
-    
   </ul>
 </section>
 
@@ -1484,7 +1500,7 @@
     </div>
   </div>
   <footer role="contentinfo"><p>
-  Copyright &copy; 2024 - Misty De Meo -
+  Copyright &copy; 2025 - Misty De Meo -
   <span class="credit">Powered by <a href="http://octopress.org">Octopress</a></span>
 </p>
 
