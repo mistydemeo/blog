@@ -9,7 +9,7 @@
   <meta name="author" content="Misty De Meo">
 
   
-  <meta name="description" content="I&rsquo;ve written a bit recently about CD-ROM preservation and some of the more niche, easily-missed parts of the format. I&rsquo;ve covered the &hellip;">
+  <meta name="description" content="Every now and then, I run into a bug so mystifying on its face I know it&rsquo;s going to be a journey just from the error message. This is one of &hellip;">
   
 
   <!-- http://t.co/dKP3o1e -->
@@ -63,6 +63,71 @@
     <div id="content">
       <div class="blog-index">
   
+  
+  
+    <article>
+      
+  <header>
+    
+      <h1 class="entry-title"><a href="/blog/blog/2025/05/13/the-database-row-that-did-and-didnt-exist/">The Database Row That Did and Didn't Exist</a></h1>
+    
+    
+      <p class="meta">
+        
+
+
+
+
+<time class='entry-date' datetime='2025-05-13T15:16:48-07:00'><span class='date'><span class='date-month'>May</span> <span class='date-day'>13</span><span class='date-suffix'>th</span>, <span class='date-year'>2025</span></span> <span class='time'>3:16 pm</span></time>
+        
+      </p>
+    
+  </header>
+
+
+  <div class="entry-content"><p>Every now and then, I run into a bug so mystifying on its face I know it&rsquo;s going to be a journey just from the error message. This is one of those stories.</p>
+
+<p>I work at a Python shop right now, and we were upgrading an app to Django 5. There are a few breaking changes, but nothing too unexpected or out of the ordinary. Everything was working great in our development environment, but once we deployed to our QA environment we noticed something <em>very</em> strange&mdash;an <code>IntegrityError</code> exception telling us that an object couldn&rsquo;t be saved because the primary key already existed in the database.</p>
+
+<p>My immediate reaction was that, well, <em>that</em> was unusual. I didn&rsquo;t think we were ever manually assigning an <code>id</code> and we were always relying on the database&rsquo;s autoincrement. I double checked the code in the traceback, and indeed, all I saw was something harmless. An anonymized version looks something like this:</p>
+
+<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+</pre></td><td class='code'><pre><code class=''><span class='line'>object = models.Model.filter(property1=value).get()
+</span><span class='line'>object.property2 = method_result()
+</span><span class='line'>object.save()</span></code></pre></td></tr></table></div></figure>
+
+
+<p>Not only were we not assigning it a clashing <code>id</code>, we weren&rsquo;t even creating a new row from scratch. This was an existing database record we&rsquo;d just queried for, then updated a single property on and then saved. We shouldn&rsquo;t have been trying to insert a new row into the database at all&mdash;Django should have been able to know to <code>UPDATE</code> the existing row it itself had fetched in the first place. I wracked my head trying to figure out what was going on, and started trying everything I could think of to narrow it down:</p>
+
+<ul>
+<li>Did it always happen? (Yes.)</li>
+<li>Did it happen with every record, not just that one? (Yes&mdash;or so we thought.)</li>
+<li>Did it happen if I simplified the code to the most basic possible version, to isolate out anything else that could be messing with it? (Yes; just fetching the record and immediately saving it without changes triggered the bug.)</li>
+<li>Did it happen if I forced Django to perform an <code>UPDATE</code> instead of an <code>INSERT</code>? (Yes, but with new symptoms; calling <code>object.save(force_update=True)</code> failed with a message about how it couldn&rsquo;t do an <code>UPDATE</code> because the row <em>didn&rsquo;t</em> exist.)</li>
+<li>Did it happen from a <code>django-admin</code> shell on the QA server? (Yes.)</li>
+<li>Could I manually query for and update the row from a <code>psql</code> console? (Yes, so Postgres itself was fine.)</li>
+</ul>
+
+
+<p>By this point several of us were poking at the problem from different angles trying to figure out exactly what was going on. We had a little breakthrough when a coworker idly tried fetching not one of our recent records but the record with <code>id</code> 1&mdash;and Django was perfectly happy to save it back. It was only <em>some</em> of our records that seemed to be cursed, and again only in Django&mdash;Postgres itself would happily write to them.</p>
+
+<p>By this point there were three of us poking at the problem, and each of us made a discovery building on the experiments we&rsquo;d done so far that ended up cracking the problem. First, one person took a look at the queryset that Django used to determine if the primary key existed in the database and discovered that it was completely empty. This determines whether Django thinks the record is newly-created or not, and so&mdash;even though the record was fetched from the database&mdash;it determined the record was new and should be inserted into the database with an <code>INSERT</code> instead of using <code>UPDATE</code> on an existing row.</p>
+
+<p>Well, that was the proximate cause, but that didn&rsquo;t yet explain <em>why</em> that was happening. The next clue came in the discovery that the Django model definitions and the schema of the actual database had drifted for historical reasons. Specifically, several tables&mdash;including this one&mdash;were specified as using an <code>int</code> for their primary key in Django, but used <code>bigint</code> in the real database. This was true for both our QA server and production, so it wasn&rsquo;t just a QA-specific drift. We also, at this point, noticed that the records we were having trouble with <em>all had <code>id</code>s outside the <code>int</code> range</em>. Until this point, the only small primary key we&rsquo;d tried was <code>id=1</code>, but we tried a selection of other small <code>id</code>s and found that Django would read and write those just fine. It was only once we entered <code>bigint</code>&rsquo;s range that the Django problem reared its head.</p>
+
+<p>Which, finally, led me to look back at something I&rsquo;d previously noticed but not paid much attention to in the Django 5.0 release notes. In the <a href="https://docs.djangoproject.com/en/5.2/releases/5.0/#miscellaneous">Miscellaneous section</a>, it mentions that</p>
+
+<blockquote><p>Filtering querysets against overflowing integer values now always returns an empty queryset. As a consequence, you may need to use ExpressionWrapper() to explicitly wrap arithmetic against integer fields in such cases.</p></blockquote>
+
+<p>This took on new meaning with the knowledge we now had about the mismatch of primary key types. We <em>were</em> in fact filtering querysets against overflowing integer values, or rather <em>Django itself</em> was because Django had been given a wrong understanding of what the integer type was. In prior versions, Django had let the &ldquo;impossible&rdquo; comparison carry out and it worked by chance; in Django 5, it enforced internal correctness by rejecting a comparison the underlying database would be able to carry out. I certainly can&rsquo;t call it the wrong decision from a correctness standpoint, but it was a hell of an issue to debug!</p>
+</div>
+  
+  
+
+
+    </article>
   
   
     <article>
@@ -1376,83 +1441,6 @@
 
     </article>
   
-  
-    <article>
-      
-  <header>
-    
-      <h1 class="entry-title"><a href="/blog/blog/2023/05/29/untangling-another-lingo-parser-edge-case/">Untangling Another Lingo Parser Edge Case</a></h1>
-    
-    
-      <p class="meta">
-        
-
-
-
-
-<time class='entry-date' datetime='2023-05-29T15:53:18-07:00'><span class='date'><span class='date-month'>May</span> <span class='date-day'>29</span><span class='date-suffix'>th</span>, <span class='date-year'>2023</span></span> <span class='time'>3:53 pm</span></time>
-        
-      </p>
-    
-  </header>
-
-
-  <div class="entry-content"><p>I was testing out a new Macromedia Director CD in ScummVM, and I noticed a non-fatal error at startup:</p>
-
-<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-<span class='line-number'>2</span>
-<span class='line-number'>3</span>
-</pre></td><td class='code'><pre><code class=''><span class='line'>WARNING: ######################  LINGO: syntax error, unexpected tSTRING: expected ')' at line 2 col 70 in ScoreScript id: 2!
-</span><span class='line'>WARNING: #   2: set DiskChk = FileIO(mnew,"read"¬"The Source:Put Contents on Hard Drive:Journey to the Source:YZ.DATA")!
-</span><span class='line'>WARNING: #                                                                            ^ about here!</span></code></pre></td></tr></table></div></figure>
-
-
-<p>It may have been non-fatal, but seeing an error like that makes me uneasy anyway&mdash;I&rsquo;m never sure when it&rsquo;ll turn out to have ramifications down the line. This comes from the parser for Director&rsquo;s custom programming language, Lingo, so I opened up the code in question<sup id="fnref:1"><a href="#fn:1" rel="footnote">1</a></sup> to take a look. The whole script turned out to be only three straightforward lines. The part ScummVM complained about came right at the start of the file, and at first glance it looked pretty innocuous.</p>
-
-<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-<span class='line-number'>2</span>
-<span class='line-number'>3</span>
-</pre></td><td class='code'><pre><code class=''><span class='line'>set DiskChk = FileIO(mnew,"read"¬
-</span><span class='line'>"The Source:Put Contents on Hard Drive:Journey to the Source:YZ.DATA")
-</span><span class='line'>IF DiskChk = -35 THEN GO TO "No CD"</span></code></pre></td></tr></table></div></figure>
-
-
-<p>The symbol at the end of that first line is a continuation marker, which you might remember from a <a href="https://www.mistys-internet.website/blog/blog/2022/01/06/do-you-speak-the-lingo/">previous blog post</a> where I debugged a different issue with them. The continuation marker is a special kind of escape character with one specific purpose: it escapes newlines to allow statements to extend across more than one line of code, and nothing else.</p>
-
-<p>At first I thought maybe the issue was with the continuation marker itself being misparsed, like in the error I documented in that older blog post; maybe it was failing to be recognized and wasn&rsquo;t being replaced with whitespace? To figure that out, I started digging around in ScummVM&rsquo;s Lingo preprocessor. Spoiler: it turned out <em>not</em> to be an issue with the continuation marker, but it pointed me in the right direction anyway.</p>
-
-<p>ScummVM handles the continuation marker in two phases. In a preprocessor phase, it <a href="https://github.com/scummvm/scummvm/blob/6823514318a29fe9ec34956a97085117514a60dc/engines/director/lingo/lingo-preprocessor.cpp#L69-L73">removes the newline after the marker</a> in order to simplify parsing later. Afterwards, in the lexer, it <a href="https://github.com/scummvm/scummvm/blob/6823514318a29fe9ec34956a97085117514a60dc/engines/director/lingo/lingo-lex.l#L92">replaces the marker with a space</a> to produce a single normal line of code. The error message above contains a version of the line between those two steps: the preprocessor has combined the two lines of code into one, but the continuation marker hasn&rsquo;t been replaced with a space yet.</p>
-
-<p>If we do the work of the preprocessor/lexer ourselves, we get this copy of the line:</p>
-
-<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-</pre></td><td class='code'><pre><code class=''><span class='line'>set DiskChk = FileIO(mnew,"read" "The Source:Put Contents on Hard Drive:Journey to the Source:YZ.DATA")</span></code></pre></td></tr></table></div></figure>
-
-
-<p>In this form, the error is a bit more obvious than when it was spread across multiple lines. The problem is with how the arguments are passed to <code>FileIO</code>: the first two arguments are separated by a comma, but the second and third aren&rsquo;t. The newline between the second and third arguments makes it easy to miss, but as soon as we put it all together it becomes obvious.</p>
-
-<p>In the last case I looked at, described in the previous blog post, this was an ambiguous parse case: the same line of code was valid if you added the missing comma or not, but it was interpreted two totally different ways. This time is different. If you add the missing comma, this is a normal, valid line of code; if you don&rsquo;t, it&rsquo;s invalid syntax and you get the error we&rsquo;re seeing at the top.</p>
-
-<p>As far as I can tell, the original Director runtime actually accepts this without throwing an error even though this isn&rsquo;t documented as correct syntax. The official Director programming manual tells the user to use commas to separate arguments, but it&rsquo;s tolerant enough to support when they&rsquo;re forgotten like they are here<sup id="fnref:2"><a href="#fn:2" rel="footnote">2</a></sup>. ScummVM doesn&rsquo;t get that same luxury. As I mentioned in the previous blog post, later Director versions tightened up these ambiguous parse cases, and supporting the weird case in Director 3 would significantly complicate the parser. Since this is only the second case of this issue, though, it&rsquo;s not really <em>necessary</em> to support it either. ScummVM has builtin support for patching a specific disc&rsquo;s Lingo source code, so I was able to simply fix this by patching the code to the properly-formatted version.</p>
-
-<p>The disc in question still doesn&rsquo;t fully work, but I&rsquo;m putting some time into it. I&rsquo;m planning on writing a followup on the other fixes necessary to get it running as expected. And for today&rsquo;s lesson? Old software is weird. Just like new software.</p>
-<div class="footnotes">
-<hr/>
-<ol>
-<li id="fn:1">
-<p>Before version 4, Director software was interpreted from source code at runtime&mdash;so, conveniently, that means that you can peek at the source code to any early Director software.<a href="#fnref:1" rev="footnote">&#8617;</a></p></li>
-<li id="fn:2">
-<p><em>MacroMind Director Version 3.0: Interactivity Manual</em>. (1991). MacroMind, Inc. Page 64.<a href="#fnref:2" rev="footnote">&#8617;</a></p></li>
-</ol>
-</div>
-
-</div>
-  
-  
-
-
-    </article>
-  
   <div class="pagination">
     
       <a class="prev" href="/blog/posts/2">&larr; Older</a>
@@ -1468,6 +1456,10 @@
   <ul id="recent_posts">
     
       <li class="post">
+        <a href="/blog/blog/2025/05/13/the-database-row-that-did-and-didnt-exist/">The Database Row That Did and Didn't Exist</a>
+      </li>
+    
+      <li class="post">
         <a href="/blog/blog/2025/01/23/what-you-might-miss-when-backing-up-cds/">What You Might Miss When Backing Up CDs</a>
       </li>
     
@@ -1481,10 +1473,6 @@
     
       <li class="post">
         <a href="/blog/blog/2024/09/13/the-working-archivists-guide-to-enthusiast-cd-rom-archiving-tools/">The Working Archivist's Guide to Enthusiast CD-ROM Archiving Tools</a>
-      </li>
-    
-      <li class="post">
-        <a href="/blog/blog/2024/07/12/github-is-starting-to-feel-like-legacy-software/">"GitHub" Is Starting to Feel Like Legacy Software</a>
       </li>
     
   </ul>
@@ -1512,16 +1500,6 @@
 
 
 
-
-  <script type="text/javascript">
-    (function(){
-      var twitterWidgets = document.createElement('script');
-      twitterWidgets.type = 'text/javascript';
-      twitterWidgets.async = true;
-      twitterWidgets.src = '//platform.twitter.com/widgets.js';
-      document.getElementsByTagName('head')[0].appendChild(twitterWidgets);
-    })();
-  </script>
 
 
 
