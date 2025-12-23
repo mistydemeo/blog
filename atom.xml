@@ -4,7 +4,7 @@
   <title><![CDATA[The Future Is Now]]></title>
   <link href="http://mistys-internet.website/blog/atom.xml" rel="self"/>
   <link href="http://mistys-internet.website/blog/"/>
-  <updated>2025-07-20T14:55:06-07:00</updated>
+  <updated>2025-12-22T20:32:44-08:00</updated>
   <id>http://mistys-internet.website/blog/</id>
   <author>
     <name><![CDATA[Misty De Meo]]></name>
@@ -12,6 +12,51 @@
   </author>
   <generator uri="http://octopress.org/">Octopress</generator>
 
+  
+  <entry>
+    <title type="html"><![CDATA[It's Not Called Watchy; or, Solving a Minor Video Game Mystery]]></title>
+    <link href="http://mistys-internet.website/blog/blog/2025/12/22/watchy/"/>
+    <updated>2025-12-22T20:31:43-07:00</updated>
+    <id>http://mistys-internet.website/blog/blog/2025/12/22/watchy</id>
+    <content type="html"><![CDATA[<p>Flexing the brevity muscle today with a short post to set the record straight on a weird video game history quirk I spotted online.</p>
+
+<p>For reasons that aren&rsquo;t important<sup id="fnref:1"><a href="#fn:1" rel="footnote">1</a></sup>, I was looking up an extremely obscure 90s PC game called <em>Team 47 GoMan</em>. Absolutely no one has heard of this game before, which doesn&rsquo;t seem to be fondly (or at all) remembered, which explains why there wasn&rsquo;t all that much about it online. (&ldquo;From the creators of <a href="https://obscuritory.com/fighting/creep-clash/">Creep Clash</a>&rdquo; didn&rsquo;t sell too many copies.) But I <em>did</em> see something strange. A lot of the search results online had a different title than the one I&rsquo;d seen. Several of the top results called it <em>Watchy</em>&mdash;which I thought was <em>weird</em>, since it didn&rsquo;t seem to have anything to do with the game at all. Even weirder, though, several of these sites had screenshots and videos of the game, but <em>none</em> of them used that &ldquo;Watchy&rdquo; title. So where did it come from?</p>
+
+<p>The Mobygames page gave me a bit of a hint. It used &ldquo;Watchy&rdquo; as the primary title, while specifying that &ldquo;Team 47 GoMan&rdquo; was the title in other territories. Vaguely plausible, but at the same time not terribly satisfying. Is this US-developed game really so obscure in the US that the only screenshots and footage are of the alleged European/Japanese release?</p>
+
+<!-- ![Box for "Watchy: A Team 17 GoMan Adventure" featuring robot characters.](/images/watchy/61Z109fKk8L._AC_-2.jpg) -->
+
+
+<p><img src="http://mistys-internet.website/blog/images/watchy/61Z109fKk8L._AC_-2.jpg" style="width: 50%; float: left; padding-right: 0.5em;" alt="Watchy: A Team 17 GoMan Adventure"></p>
+
+<p>I did some searching under the &ldquo;Watchy&rdquo; name to see if I could find any copies for sale, and did run into two copies. One is from a Canadian budget publisher, and one <a href="https://aukro.cz/watchy-a-team-47-goman-mini-adventure-cd-pc-6988977528?tab=course-description">seems to be from Europe</a>. Both of them have the Watchy title and what looks like similar characters, but what really caught my eye is the subtitle. The Canadian one calls itself &ldquo;A Team 47 GoMan Adventure&rdquo; - which feels like a weird title if this is meant to <em>be</em> &ldquo;Team 47 GoMan&rdquo;, isn&rsquo;t it? The other box is even more telling though. It reads &ldquo;A Team 47 GoMan Mini Adventure!&rdquo;, which makes it read a lot less like an alternate title and more like a spinoff.</p>
+
+<!-- ![Box for "Watchy: A Team 17 GoMan Mini Adventure!" featuring robot characters.](/images/watchy/YB13.jpg) -->
+
+
+<p><img src="http://mistys-internet.website/blog/images/watchy/YB13.jpg" style="width: 50%; float: right; padding-bottom: 0.5em" alt="Watchy: A Team 17 GoMan Mini Adventure!"></p>
+
+<p>At this point I did what I should have done in the first place and checked the publisher&rsquo;s archived webpage. Right there, on the <a href="https://web.archive.org/web/19981206050102/http://www.47-tek.com/3pack.htm">homepage from 1998</a>, I had the evidence I needed&mdash;a page for their &ldquo;GoMan&trade; 3 Pack&rdquo;, which included <em>Team 47 GoMan</em> itself along with a screensaver and, of course, <a href="https://web.archive.org/web/19980129025158/http://www.47-tek.com/watchy.htm"><em>Watchy</em></a>. This, it turns out, is a spinoff like I thought it must have been from the title. It&rsquo;s described as a 2D arcade action game, and from looking at <a href="https://www.youtube.com/watch?v=1450HriICCM&amp;t=870s">footage</a> that was linked to me when I was <a href="https://bsky.app/profile/maxmantic.bsky.social/post/3m6s3llkvjl2f">talking about it on Bluesky</a> it&rsquo;s a much simpler game than the actual <em>GoMan</em>.</p>
+
+<p>But <em>why</em> was part of the internet convinced these were the same game? I think this may have accidentally come from Mobygames or another database like it, since many of the pages with the wrong title have text that seems to be copied and pasted from one place. The <a href="https://www.mobygames.com/game/42081/team-47-goman/">Mobygames page was created in 2009</a>, and luckily the Wayback Machine <a href="https://web.archive.org/web/20100503033618/http://www.mobygames.com/game/windows/team-47-goman">has copies going back to 2009-2010</a> that show it using the <em>Team 47 GoMan</em> title. <a href="https://web.archive.org/web/20130430070454/http://www.mobygames.com/game/windows/watchy">By 2013</a> the title had become <em>Watchy</em>, so someone clearly changed the main title somewhere in between.<sup id="fnref:2"><a href="#fn:2" rel="footnote">2</a></sup> Why? I suspect it&rsquo;s that Canadian box I showed earlier, which <a href="https://www.amazon.com/Watchy-Team-47-GOMAN-Adventure-Canada/dp/B002OCD0V8">comes from the only Amazon.com product listing with &ldquo;Team 47 GoMan&rdquo; in it</a>. It sure feels like someone was looking the game up, found the box on Amazon with a different title, and assumed that was the primary game title in the US and so it should be the main game title on Mobygames as well<sup id="fnref:3"><a href="#fn:3" rel="footnote">3</a></sup>.</p>
+
+<p>Even though this is <a href="https://www.mobygames.com/game/42081/team-47-goman/">correct on Mobygames now</a>, I expect the long tail of this particular mixup to take awhile. The other online references to &ldquo;Watchy&rdquo; all seem to be copied from Mobygames, which is a common pattern online; a lot of game history is more or less rumour, copied from site to site without actually going back to check with sources. But these pages also don&rsquo;t tend to update very often once they&rsquo;ve been created, which means that even if Mobygames has been corrected I expect it to take a long time for the web to correct itself.</p>
+
+<p>Which is why I&rsquo;m writing this. If someone online finds one of these abandonware sites and wonders why the page is calling the game they just downloaded &ldquo;Watchy&rdquo;, at least they might find this post in a search engine telling them that it&rsquo;s wrong&mdash;and why.</p>
+<div class="footnotes">
+<hr/>
+<ol>
+<li id="fn:1">
+<p>But that may eventually bear fruit on <a href="https://cdrom.ca">CD-ROM Journal</a>.<a href="#fnref:1" rev="footnote">&#8617;</a></p></li>
+<li id="fn:2">
+<p>The observant will notice that the <em>description</em> still reads &ldquo;Team 47 GoMan&rdquo;, which should have been a sign that I should have questioned the primary game title sooner.<a href="#fnref:2" rev="footnote">&#8617;</a></p></li>
+<li id="fn:3">
+<p>I&rsquo;m not really a fan of Mobygames&rsquo;s policy that the US title for a game is always the default title no matter where it&rsquo;s from or when it came out, but that&rsquo;s another story&hellip;<a href="#fnref:3" rev="footnote">&#8617;</a></p></li>
+</ol>
+</div>
+
+]]></content>
+  </entry>
   
   <entry>
     <title type="html"><![CDATA[Dist 0.28.1 Is Out]]></title>
@@ -1829,55 +1874,6 @@ Unfortunately, my copy shipped with large scratches on sides A and B. (See the p
 <p>Aside from the main album, preorders came with a special dogsong single. This one-sided 7" single has an extended version of dogsong, and is pressed on transparent vinyl with an image of the annoying dog on the other side. It&rsquo;s very cute, and for what it is it&rsquo;s well-produced and pretty-looking.</p>
 
 <p><img src="http://mistys-internet.website/blog/images/undertale/dogsong_disc.jpg" title="Dogsong disc" ></p>
-]]></content>
-  </entry>
-  
-  <entry>
-    <title type="html"><![CDATA[Elegance]]></title>
-    <link href="http://mistys-internet.website/blog/blog/2016/01/26/elegance/"/>
-    <updated>2016-01-26T20:37:58-08:00</updated>
-    <id>http://mistys-internet.website/blog/blog/2016/01/26/elegance</id>
-    <content type="html"><![CDATA[<p>A few months ago, I wrote <a href="https://github.com/mistydemeo/lucia">decoders</a> for the PCM formats used by the Sega CD and Sega Saturn versions of the game Lunar: Eternal Blue<sup id="fnref:1"><a href="#fn:1" rel="footnote">1</a></sup>.
-I wanted to write up a few notes on the format of the Sega CD version&rsquo;s uncompressed PCM format, and some interesting lessons I learned from it.</p>
-
-<p>All files in this format run at a sample rate of 16282Hz. This unusual number is based on the base clock of the PCM chip. Similarly, the reason that samples are 8-bit signed instead of 16-bit is because this is the Sega CD PCM chip&rsquo;s <a href="http://www.retrodev.com/RF5C68A.pdf">native format</a>.</p>
-
-<p>Each file is divided into a set of fixed-size frames; the header constitutes the first frame, and every group of samples constitutes the subsequent frames.
-These frames are set to a size of 2048 bytes&mdash;chosen because this is the exact size of a Mode 1 CD-ROM sector, and hence the most convenient chunk of data which can be read from a disc when streaming.
-This is also why the header takes up 2048 bytes, when the actual data stored within it uses fewer than 16 bytes.</p>
-
-<p>Each frame of content contains 1024 samples.
-Because each sample takes up one byte in the original format, this means only half of a frame is used for content.
-The actual content is interleaved with 0 bytes.
-Despite seeming a pointless, inefficient use of space, this does serve a purpose by <a href="https://gist.github.com/pbarfuss/cde669526ffc21dbd759">allowing for oversampling</a>. The PCM chip&rsquo;s <a href="http://www.retrodev.com/RF5C68A.pdf">datasheet</a> lists a maximum frequency of 19800Hz, but this trick allows for pseudo-32564Hz playback.</p>
-
-<p>The format used in Lunar: Eternal Blue supports stereo playback, though only two songs are actually encoded in stereo<sup id="fnref:2"><a href="#fn:2" rel="footnote">2</a></sup>.
-Songs encoded in stereo interleave their content not every sample, as in most PCM formats, but every frame; one 2048-byte frame will contain 1024 left samples, the next frame will contain the matching 1024 right samples, and so forth.
-This was likely chosen because the PCM chip expects samples for only one output channel at a time, and doesn&rsquo;t itself implement stereo support.</p>
-
-<p>The loop format used is highly idiosyncratic.
-Loop starts are measured in bytes from the beginning of the header; that is, a position to seek to from the start of actual content.
-The loop end time, however, uses a different unit; loop end is measured in terms of the <em>sample</em> at which the loop ends, not the byte.
-Because one sample is stored for every two bytes, and because left/right samples in a stereo pair are counted numerically as the same sample, this means that this count differs from the byte position at the end of the song by a factor of either 2 or 4.
-This is a quirk of how the PCM playback routine works; it&rsquo;s more efficient to keep track of the number of samples played instead of the bytes played, and therefore storing the data in that format means that no extra math has to be performed to determine if the end of a loop has been reached.
-Similarly, the treatment of left/right samples as being the same sample is likely an artifact of what was the simplest way for the PCM playback code to handle this condition.</p>
-
-<p>Looking at these PCM files gave me a new appreciation for design, and helped me appreciate more how important it is to understand the reason behind design decisions.
-In a lot of ways this format feels like it should be &ldquo;bad&rdquo; design: it&rsquo;s strange, it&rsquo;s idiosyncratic, it&rsquo;s internally inconsistent.
-But every single detail is carefully chosen; everything serves a purpose.
-Each of these idiosyncrasies was carefully chosen to solve a particular problem, or to ensure peak performance in a particular bottleneck.
-Given the restrictions of a 16-bit game console, all of these choices were necessary to be able to support constantly streaming audio like this in the first place.
-Aligning every single detail of a format or API with the job which needs to be done is its own kind of elegance&mdash;a kind of elegance I understand a little better now.</p>
-<div class="footnotes">
-<hr/>
-<ol>
-<li id="fn:1">
-<p>I referenced a couple of open-source decoders for the Sega CD version&rsquo;s format when writing my own (<a href="https://bitbucket.org/kode54/foo_lunar2">foo_lunar2</a> by kode54, and <a href="http://hcs64.com/vgmstream.html">vgmstream</a>), along with some notes given to me by <a href="https://kode54.net">kode54</a>.<a href="#fnref:1" rev="footnote">&#8617;</a></p></li>
-<li id="fn:2">
-<p>The Pentagulia theme, and the sunken tower.<a href="#fnref:2" rev="footnote">&#8617;</a></p></li>
-</ol>
-</div>
-
 ]]></content>
   </entry>
   
