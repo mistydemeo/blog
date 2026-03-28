@@ -1,6 +1,10 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <urlset xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.sitemaps.org/schemas/sitemap/0.9 http://www.sitemaps.org/schemas/sitemap/0.9/sitemap.xsd" xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
 <url>
+<loc>http://mistys-internet.website/blog/blog/2026/03/27/forget-spreadsheets/</loc>
+<lastmod>2026-03-27T17:52:46-07:00</lastmod>
+</url>
+<url>
 <loc>http://mistys-internet.website/blog/blog/2025/12/22/watchy/</loc>
 <lastmod>2025-12-22T20:31:43-07:00</lastmod>
 </url>
@@ -183,5 +187,14 @@
 </url>
 <url>
 <loc>http://mistys-internet.website/blog/blog/categories/computers/</loc>
+</url>
+<url>
+<loc>http://mistys-internet.website/blog/posts/2/</loc>
+</url>
+<url>
+<loc>http://mistys-internet.website/blog/posts/3/</loc>
+</url>
+<url>
+<loc>http://mistys-internet.website/blog/posts/4/</loc>
 </url>
 </urlset>

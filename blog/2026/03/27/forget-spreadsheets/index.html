@@ -1,0 +1,226 @@
+
+<!DOCTYPE html>
+<!--[if IEMobile 7 ]><html class="no-js iem7"><![endif]-->
+<!--[if lt IE 9]><html class="no-js lte-ie8"><![endif]-->
+<!--[if (gt IE 8)|(gt IEMobile 7)|!(IEMobile)|!(IE)]><!--><html class="no-js" lang="en"><!--<![endif]-->
+<head>
+  <meta charset="utf-8">
+  <title>Forget Spreadsheets, I Wrote My Own Visual Game Script Editor - The Future Is Now</title>
+  <meta name="author" content="Misty De Meo">
+
+  <meta name="fediverse:creator" content="@misty@digipres.club">
+
+  
+  <meta name="description" content="People who have been following me on social media may know that, for the past few years, I&rsquo;ve been working on a fan translation project for a &hellip;">
+  
+
+  <!-- http://t.co/dKP3o1e -->
+  <meta name="HandheldFriendly" content="True">
+  <meta name="MobileOptimized" content="320">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+
+  
+  <link rel="canonical" href="http://mistys-internet.website/blog/blog/2026/03/27/forget-spreadsheets">
+  <link href="/blog/favicon.png" rel="icon">
+  <link href="/blog/stylesheets/screen.css" media="screen, projection" rel="stylesheet" type="text/css">
+  <link href="/blog/atom.xml" rel="alternate" title="The Future Is Now" type="application/atom+xml">
+  <script src="/blog/javascripts/modernizr-2.0.js"></script>
+  <script src="//ajax.googleapis.com/ajax/libs/jquery/1.9.1/jquery.min.js"></script>
+  <script>!window.jQuery && document.write(unescape('%3Cscript src="./javascripts/libs/jquery.min.js"%3E%3C/script%3E'))</script>
+  <script src="/blog/javascripts/octopress.js" type="text/javascript"></script>
+  <!--Fonts from Google"s Web font directory at http://google.com/webfonts -->
+<link href="//fonts.googleapis.com/css?family=PT+Serif:regular,italic,bold,bolditalic" rel="stylesheet" type="text/css">
+<link href="//fonts.googleapis.com/css?family=PT+Sans:regular,italic,bold,bolditalic" rel="stylesheet" type="text/css">
+
+  
+
+</head>
+
+<body   >
+  <header role="banner"><hgroup>
+  <h1><a href="/blog/">The Future Is Now</a></h1>
+  
+</hgroup>
+
+</header>
+  <nav role="navigation"><ul class="subscription" data-subscription="rss">
+  <li><a href="/blog/atom.xml" rel="subscribe-rss" title="subscribe via RSS">RSS</a></li>
+  
+</ul>
+  
+<form action="https://www.google.com/search" method="get">
+  <fieldset role="search">
+    <input type="hidden" name="q" value="site:mistys-internet.website/blog" />
+    <input class="search" type="text" name="q" results="0" placeholder="Search"/>
+  </fieldset>
+</form>
+  
+<ul class="main-navigation">
+  <li><a href="/blog/">Blog</a></li>
+  <li><a href="/blog/blog/archives">Archives</a></li>
+</ul>
+
+</nav>
+  <div id="main">
+    <div id="content">
+      <div>
+<article class="hentry" role="article">
+  
+  <header>
+    
+      <h1 class="entry-title">Forget Spreadsheets, I Wrote My Own Visual Game Script Editor</h1>
+    
+    
+      <p class="meta">
+        
+
+
+
+
+<time class='entry-date' datetime='2026-03-27T17:52:46-07:00'><span class='date'><span class='date-month'>Mar</span> <span class='date-day'>27</span><span class='date-suffix'>th</span>, <span class='date-year'>2026</span></span> <span class='time'>5:52 pm</span></time>
+        
+      </p>
+    
+  </header>
+
+
+<div class="entry-content"><p>People who have been following me on social media may know that, for the past few years, I&rsquo;ve been working on a fan translation project for a Sega Saturn RPG called <a href="https://en.wikipedia.org/wiki/Lunar:_Sanposuru_Gakuen"><em>Magic School Lunar</em></a>. With technical and initial playtesting work wrapping up, that project is finally entering the late phases and I&rsquo;m now reaching a point where I&rsquo;m going to be doing a lot of rewriting of the English text. The traditional approach, in both professional localizations and fan translations, involves working in a spreadsheet with access to the original language and translation side by side. (In fan translations, it&rsquo;s not even rare to work by editing raw text files.) It&rsquo;s not the most convenient or <em>fun</em> to be writing entirely within a spreadsheet though, especially when there are technical constaints to be thinking about. This game has a strict character limit per line and a maximum of three lines per text box, and I found myself wishing for a nice way to visualize how text will look in-game so I can ensure what I&rsquo;m writing will actually look good in-game. A spreadsheet just wasn&rsquo;t going to cut it. But then, of course, I realized&hellip; I <em>am</em> a programmer. Why don&rsquo;t I just write my own? So I did.</p>
+
+<p><img src="/blog/images/msl/editor.png" alt="Screenshot of the script editor, showing a screenshot at the top and a spreadsheet-like view on bottom. The screenshot at the top features the text that's being typed into the actively-selected text box." /></p>
+
+<p>My work is based around CSV files that contain the script and metadata for every line of text in the game, and between the script itself and metadata such as what character is speaking, I had in principle enough data to mock up what any given line should look like in-game. My basic goal was to reproduce a spreadsheet-like workflow but with added screenshot visualization that updates in realtime as I work. Now that I&rsquo;ve had the chance to try it out, I can say it definitely works just as well as I&rsquo;d hoped. It&rsquo;s much easier to catch mistakes should I find myself overflowing lines, and it&rsquo;s very useful for making aesthetic decisions about text formatting too.</p>
+
+<p>I decided to write a GUI app rather than a web app, for no particular reason other than because I happen to like desktop apps, and ended up using <a href="https://www.tcl-lang.org">Tk</a> as the windowing toolkit so it would be easy to run it on other platforms if someone needs to run it on something other than macOS. Although I briefly considered using a compiled language<sup id="fnref:1"><a href="#fn:1" rel="footnote">1</a></sup> I ended up deciding on Python. This was partly because Python happens to have very good bindings for Tk, and partly because I&rsquo;ve passed my CSVs through Python-based tooling already so I knew that the CSVs I&rsquo;d output would result in minimal formatting/git repo churn. I&rsquo;ve looked at Tk apps a few times but I&rsquo;ve never written one of my own, so I was pleasantly surprised how easy it was to work with. I spent a few hours on this project over the course of a few days, and quite honestly most of that time was just spent picking up the basics of Tk.</p>
+
+<p>I didn&rsquo;t start out with the GUI though. This was all about the screenshot preview, so I figured I&rsquo;d handle that first. I&rsquo;ve done a little work with Python&rsquo;s <a href="https://pillow.readthedocs.io/en/stable/">Pillow library</a> before, which felt like it&rsquo;d be right tool for the job, and thankfully it was quite easy to work with. All I needed was basic image compositing, and Pillow handles that very well. There were only really three elements I needed to simulate a proper screenshot:</p>
+
+<ul>
+<li>A scene from the game with no text or character portrait</li>
+<li>The game&rsquo;s font and positioning data for where text goes</li>
+<li>The portraits used when named characters speak and their positioning data</li>
+</ul>
+
+
+<p>I had the raw images for the font and portraits already from the translation process, and the positioning data wasn&rsquo;t too hard to find either. <em>Magic School Lunar</em> uses a fixed-width font<sup id="fnref:2"><a href="#fn:2" rel="footnote">2</a></sup>, so there&rsquo;s no fancy inter-character spacing to reverse-engineer; a given index on a line is always going to go in exactly the right place. I simply grabbed real screenshots of the game and worked out exactly where where the letters belonged, then I rendered new text on top of the existing text to make sure everything was aligned exactly where it belongs. It was easy to handle the portraits as well, which always go in the same place<sup id="fnref:3"><a href="#fn:3" rel="footnote">3</a></sup>, so it didn&rsquo;t take me long to add that either. After I was confident I had the positioning completely right, I ran off a build of the game with all the text blanked out so I could grab myself an in-game screenshot of an empty text box with no character speaking.</p>
+
+<p><img src="/blog/images/msl/basicui.png" alt="Screenshot of the UI with a single text input box and a screenshot rendered using the text that's been typed there." /></p>
+
+<p>Once I had the actual screenshot generation taken care of, I got to work building out the real UI. I&rsquo;d been prototyping with a simple MVP that just rendered the screenshot out from a single text input box and which was missing the actual script editor, and I was slightly dreading the work of laying out the real thing. I shouldn&rsquo;t have worried though, since it turned out to be quite easy. I used Tk&rsquo;s <a href="https://tkdocs.com/tutorial/grid.html">grid manager</a><sup id="fnref:4"><a href="#fn:4" rel="footnote">4</a></sup> to handle the layout. It divides the screen into rows and columns, with each element laid out on a specific column and row. It&rsquo;s easy to think about, but it also just happens to be a perfect match for laying out a bunch of UI elements in a table&mdash;exactly my usecase, in other words.</p>
+
+<p>I was also pleasantly surprised just how easy it was to integrate the generated screenshot into the UI. Tk itself assumes images you&rsquo;re displaying are coming from some kind of bitmap file, but Tk+Pillow seems to be a popular combination because Pillow has built-in Tk integration and can wrap a Pillow-generated image in a Tk-compatible image class that allows you to put a generated image anywhere that Tk accepts an image.</p>
+
+<p>My only big UI issue came when I started loading larger script files. My original plan had been to populate the full UI with the entirety of a script file and implement a scrolling viewport, much like in a traditional spreadsheet app. Unfortunately, it turns out Tk has big issues rendering huge numbers of elements within a frame and it would spin its wheels for an extended period loading any input file with more than a few hundred rows. If this were an app I was making for other people, I might have chosen to try to optimize this by having it dynamically load and unload elements as you scroll, but I didn&rsquo;t really need something that fancy for myself; I chose to instead just paginate the data with a limited number of rows onscreen at once along with back/forward buttons to switch pages. It works well enough for my own needs.</p>
+
+<p>All in all, I was very happy how fast this all came together. I&rsquo;ve already been using this to do little changes, and I know it&rsquo;s going to come in handy as I get deeper into script editing. If you want to check the source code for yourself, I&rsquo;ve put it <a href="https://codeberg.org/mistydemeo/msl-script-editor">up on Codeberg</a>.</p>
+<div class="footnotes">
+<hr/>
+<ol>
+<li id="fn:1">
+<p>I actually considered Swift at one point, but I really didn&rsquo;t want to limit this to only working on Mac.<a href="#fnref:1" rev="footnote">&#8617;</a></p></li>
+<li id="fn:2">
+<p>Fun fact: this game uses the exact same font as the two Sega CD <em>Lunar</em> games in Japanese, so the English version is reusing the font from the English versions of those games for that extra nod to series history.<a href="#fnref:2" rev="footnote">&#8617;</a></p></li>
+<li id="fn:3">
+<p>The real game sometimes puts these on the right instead of the left, but I didn&rsquo;t bother simulating this since it won&rsquo;t affect how I&rsquo;ll be writing.<a href="#fnref:3" rev="footnote">&#8617;</a></p></li>
+<li id="fn:4">
+<p>Tk-knowers will probably recognize that despite the grid manager being around since 1996, it&rsquo;s still the &ldquo;new&rdquo; system to a lot of people and most code examples online are still using the older, fiddlier <code>pack</code> system. I decided to deal with the annoyance of having fewer examples to follow in exchange for getting to use something easier.<a href="#fnref:4" rev="footnote">&#8617;</a></p></li>
+</ol>
+</div>
+
+</div>
+
+
+  <footer>
+    <p class="meta">
+      
+  
+
+<span class="byline author vcard">Posted by <span class="fn">Misty De Meo</span></span>
+
+      
+
+
+
+
+<time class='entry-date' datetime='2026-03-27T17:52:46-07:00'><span class='date'><span class='date-month'>Mar</span> <span class='date-day'>27</span><span class='date-suffix'>th</span>, <span class='date-year'>2026</span></span> <span class='time'>5:52 pm</span></time>
+      
+
+
+    </p>
+    
+      <div class="sharing">
+  
+  
+  
+</div>
+
+    
+    <p class="meta">
+      
+        <a class="basic-alignment left" href="/blog/blog/2025/12/22/watchy/" title="Previous Post: It's Not Called Watchy; or, Solving a Minor Video Game Mystery">&laquo; It's Not Called Watchy; or, Solving a Minor Video Game Mystery</a>
+      
+      
+    </p>
+  </footer>
+</article>
+
+</div>
+
+<aside class="sidebar">
+  
+    <section>
+  <h1>Recent Posts</h1>
+  <ul id="recent_posts">
+    
+      <li class="post">
+        <a href="/blog/blog/2026/03/27/forget-spreadsheets/">Forget Spreadsheets, I Wrote My Own Visual Game Script Editor</a>
+      </li>
+    
+      <li class="post">
+        <a href="/blog/blog/2025/12/22/watchy/">It's Not Called Watchy; or, Solving a Minor Video Game Mystery</a>
+      </li>
+    
+      <li class="post">
+        <a href="/blog/blog/2025/07/20/dist-0-dot-28-dot-1-is-out/">Dist 0.28.1 Is Out</a>
+      </li>
+    
+      <li class="post">
+        <a href="/blog/blog/2025/05/13/the-database-row-that-did-and-didnt-exist/">The Database Row That Did and Didn't Exist</a>
+      </li>
+    
+      <li class="post">
+        <a href="/blog/blog/2025/01/23/what-you-might-miss-when-backing-up-cds/">What You Might Miss When Backing Up CDs</a>
+      </li>
+    
+  </ul>
+</section>
+
+
+
+
+
+  
+</aside>
+
+
+    </div>
+  </div>
+  <footer role="contentinfo"><p>
+  Copyright &copy; 2026 - Misty De Meo -
+  <span class="credit">Powered by <a href="http://octopress.org">Octopress</a></span>
+</p>
+
+</footer>
+  
+
+
+
+
+
+
+
+
+
+
+
+</body>
+</html>

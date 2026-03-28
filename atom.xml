@@ -4,7 +4,7 @@
   <title><![CDATA[The Future Is Now]]></title>
   <link href="http://mistys-internet.website/blog/atom.xml" rel="self"/>
   <link href="http://mistys-internet.website/blog/"/>
-  <updated>2026-03-25T13:59:03-07:00</updated>
+  <updated>2026-03-27T17:53:36-07:00</updated>
   <id>http://mistys-internet.website/blog/</id>
   <author>
     <name><![CDATA[Misty De Meo]]></name>
@@ -12,6 +12,56 @@
   </author>
   <generator uri="http://octopress.org/">Octopress</generator>
 
+  
+  <entry>
+    <title type="html"><![CDATA[Forget Spreadsheets, I Wrote My Own Visual Game Script Editor]]></title>
+    <link href="http://mistys-internet.website/blog/blog/2026/03/27/forget-spreadsheets/"/>
+    <updated>2026-03-27T17:52:46-07:00</updated>
+    <id>http://mistys-internet.website/blog/blog/2026/03/27/forget-spreadsheets</id>
+    <content type="html"><![CDATA[<p>People who have been following me on social media may know that, for the past few years, I&rsquo;ve been working on a fan translation project for a Sega Saturn RPG called <a href="https://en.wikipedia.org/wiki/Lunar:_Sanposuru_Gakuen"><em>Magic School Lunar</em></a>. With technical and initial playtesting work wrapping up, that project is finally entering the late phases and I&rsquo;m now reaching a point where I&rsquo;m going to be doing a lot of rewriting of the English text. The traditional approach, in both professional localizations and fan translations, involves working in a spreadsheet with access to the original language and translation side by side. (In fan translations, it&rsquo;s not even rare to work by editing raw text files.) It&rsquo;s not the most convenient or <em>fun</em> to be writing entirely within a spreadsheet though, especially when there are technical constaints to be thinking about. This game has a strict character limit per line and a maximum of three lines per text box, and I found myself wishing for a nice way to visualize how text will look in-game so I can ensure what I&rsquo;m writing will actually look good in-game. A spreadsheet just wasn&rsquo;t going to cut it. But then, of course, I realized&hellip; I <em>am</em> a programmer. Why don&rsquo;t I just write my own? So I did.</p>
+
+<p><img src="http://mistys-internet.website/blog/images/msl/editor.png" alt="Screenshot of the script editor, showing a screenshot at the top and a spreadsheet-like view on bottom. The screenshot at the top features the text that's being typed into the actively-selected text box." /></p>
+
+<p>My work is based around CSV files that contain the script and metadata for every line of text in the game, and between the script itself and metadata such as what character is speaking, I had in principle enough data to mock up what any given line should look like in-game. My basic goal was to reproduce a spreadsheet-like workflow but with added screenshot visualization that updates in realtime as I work. Now that I&rsquo;ve had the chance to try it out, I can say it definitely works just as well as I&rsquo;d hoped. It&rsquo;s much easier to catch mistakes should I find myself overflowing lines, and it&rsquo;s very useful for making aesthetic decisions about text formatting too.</p>
+
+<p>I decided to write a GUI app rather than a web app, for no particular reason other than because I happen to like desktop apps, and ended up using <a href="https://www.tcl-lang.org">Tk</a> as the windowing toolkit so it would be easy to run it on other platforms if someone needs to run it on something other than macOS. Although I briefly considered using a compiled language<sup id="fnref:1"><a href="#fn:1" rel="footnote">1</a></sup> I ended up deciding on Python. This was partly because Python happens to have very good bindings for Tk, and partly because I&rsquo;ve passed my CSVs through Python-based tooling already so I knew that the CSVs I&rsquo;d output would result in minimal formatting/git repo churn. I&rsquo;ve looked at Tk apps a few times but I&rsquo;ve never written one of my own, so I was pleasantly surprised how easy it was to work with. I spent a few hours on this project over the course of a few days, and quite honestly most of that time was just spent picking up the basics of Tk.</p>
+
+<p>I didn&rsquo;t start out with the GUI though. This was all about the screenshot preview, so I figured I&rsquo;d handle that first. I&rsquo;ve done a little work with Python&rsquo;s <a href="https://pillow.readthedocs.io/en/stable/">Pillow library</a> before, which felt like it&rsquo;d be right tool for the job, and thankfully it was quite easy to work with. All I needed was basic image compositing, and Pillow handles that very well. There were only really three elements I needed to simulate a proper screenshot:</p>
+
+<ul>
+<li>A scene from the game with no text or character portrait</li>
+<li>The game&rsquo;s font and positioning data for where text goes</li>
+<li>The portraits used when named characters speak and their positioning data</li>
+</ul>
+
+
+<p>I had the raw images for the font and portraits already from the translation process, and the positioning data wasn&rsquo;t too hard to find either. <em>Magic School Lunar</em> uses a fixed-width font<sup id="fnref:2"><a href="#fn:2" rel="footnote">2</a></sup>, so there&rsquo;s no fancy inter-character spacing to reverse-engineer; a given index on a line is always going to go in exactly the right place. I simply grabbed real screenshots of the game and worked out exactly where where the letters belonged, then I rendered new text on top of the existing text to make sure everything was aligned exactly where it belongs. It was easy to handle the portraits as well, which always go in the same place<sup id="fnref:3"><a href="#fn:3" rel="footnote">3</a></sup>, so it didn&rsquo;t take me long to add that either. After I was confident I had the positioning completely right, I ran off a build of the game with all the text blanked out so I could grab myself an in-game screenshot of an empty text box with no character speaking.</p>
+
+<p><img src="http://mistys-internet.website/blog/images/msl/basicui.png" alt="Screenshot of the UI with a single text input box and a screenshot rendered using the text that's been typed there." /></p>
+
+<p>Once I had the actual screenshot generation taken care of, I got to work building out the real UI. I&rsquo;d been prototyping with a simple MVP that just rendered the screenshot out from a single text input box and which was missing the actual script editor, and I was slightly dreading the work of laying out the real thing. I shouldn&rsquo;t have worried though, since it turned out to be quite easy. I used Tk&rsquo;s <a href="https://tkdocs.com/tutorial/grid.html">grid manager</a><sup id="fnref:4"><a href="#fn:4" rel="footnote">4</a></sup> to handle the layout. It divides the screen into rows and columns, with each element laid out on a specific column and row. It&rsquo;s easy to think about, but it also just happens to be a perfect match for laying out a bunch of UI elements in a table&mdash;exactly my usecase, in other words.</p>
+
+<p>I was also pleasantly surprised just how easy it was to integrate the generated screenshot into the UI. Tk itself assumes images you&rsquo;re displaying are coming from some kind of bitmap file, but Tk+Pillow seems to be a popular combination because Pillow has built-in Tk integration and can wrap a Pillow-generated image in a Tk-compatible image class that allows you to put a generated image anywhere that Tk accepts an image.</p>
+
+<p>My only big UI issue came when I started loading larger script files. My original plan had been to populate the full UI with the entirety of a script file and implement a scrolling viewport, much like in a traditional spreadsheet app. Unfortunately, it turns out Tk has big issues rendering huge numbers of elements within a frame and it would spin its wheels for an extended period loading any input file with more than a few hundred rows. If this were an app I was making for other people, I might have chosen to try to optimize this by having it dynamically load and unload elements as you scroll, but I didn&rsquo;t really need something that fancy for myself; I chose to instead just paginate the data with a limited number of rows onscreen at once along with back/forward buttons to switch pages. It works well enough for my own needs.</p>
+
+<p>All in all, I was very happy how fast this all came together. I&rsquo;ve already been using this to do little changes, and I know it&rsquo;s going to come in handy as I get deeper into script editing. If you want to check the source code for yourself, I&rsquo;ve put it <a href="https://codeberg.org/mistydemeo/msl-script-editor">up on Codeberg</a>.</p>
+<div class="footnotes">
+<hr/>
+<ol>
+<li id="fn:1">
+<p>I actually considered Swift at one point, but I really didn&rsquo;t want to limit this to only working on Mac.<a href="#fnref:1" rev="footnote">&#8617;</a></p></li>
+<li id="fn:2">
+<p>Fun fact: this game uses the exact same font as the two Sega CD <em>Lunar</em> games in Japanese, so the English version is reusing the font from the English versions of those games for that extra nod to series history.<a href="#fnref:2" rev="footnote">&#8617;</a></p></li>
+<li id="fn:3">
+<p>The real game sometimes puts these on the right instead of the left, but I didn&rsquo;t bother simulating this since it won&rsquo;t affect how I&rsquo;ll be writing.<a href="#fnref:3" rev="footnote">&#8617;</a></p></li>
+<li id="fn:4">
+<p>Tk-knowers will probably recognize that despite the grid manager being around since 1996, it&rsquo;s still the &ldquo;new&rdquo; system to a lot of people and most code examples online are still using the older, fiddlier <code>pack</code> system. I decided to deal with the annoyance of having fewer examples to follow in exchange for getting to use something easier.<a href="#fnref:4" rev="footnote">&#8617;</a></p></li>
+</ol>
+</div>
+
+]]></content>
+  </entry>
   
   <entry>
     <title type="html"><![CDATA[It's Not Called Watchy; or, Solving a Minor Video Game Mystery]]></title>
@@ -1842,38 +1892,6 @@
 </ol>
 </div>
 
-]]></content>
-  </entry>
-  
-  <entry>
-    <title type="html"><![CDATA[Review: Undertale Vinyl Soundtrack]]></title>
-    <link href="http://mistys-internet.website/blog/blog/2017/02/19/review-undertale-vinyl-soundtrack/"/>
-    <updated>2017-02-19T13:05:40+11:00</updated>
-    <id>http://mistys-internet.website/blog/blog/2017/02/19/review-undertale-vinyl-soundtrack</id>
-    <content type="html"><![CDATA[<p>I got my copy of the Undertale vinyl soundtrack in the mail the other day. While I&rsquo;ve seen a lot of excitement for it, I haven&rsquo;t seen many people talk about what it&rsquo;s like, so I decided to write up my impressions.</p>
-
-<p><img src="http://mistys-internet.website/blog/images/undertale/front.jpg" title="Front cover" >
-First, to start with the good <a href="news:">news:</a> the art design is beautiful, and gorgeously printed. The red-on-black front cover is stylish, and the mostly-new pixel artwork is very well-done. The gatefold opens to a house party scene with a ton of the game&rsquo;s NPCs, which is adorable and fits the mood of the game really well too. Most of the printing is matte, with a few details in glossy ink that really stands out&mdash;the Undertale logo on the cover, and the coloured lights in the party scene.</p>
-
-<p><img class="right" src="http://mistys-internet.website/blog/images/undertale/poke.jpg" width="150" title="Sleeve pokes out awkwardly" >
-Unfortunately the quality of the sleeve itself is subpar. The cardboard feels thin and flimsy compared to other double-albums I own; it lacks weight. The gatefold hinge is also poorly-folded, and doesn&rsquo;t stay closed on its own when the records are in; it flops open awkwardly. The records also don&rsquo;t slide comfortably into the sleeve when the gatefold is closed, which makes putting records back after a play more awkward than it has to be. (See right: the record is inserted as far as it gets when the gatefold is closed. The black thing poking out is the inner record sleeve.) If you open the sleeve to insert the records all the way, then they can&rsquo;t be removed while the gatefold is closed, which is even more awkward. The overall feeling is surprisingly cheap for a $35 album.</p>
-
-<p>The records themselves are also mixed quality. The transparent red and blue coloured vinyl is classy, and the simple label design is attractive as well. It&rsquo;s a minor detail, but the inner record sleeves are very attractive and easy to get the discs in and out of.</p>
-
-<p><img class="left" src="http://mistys-internet.website/blog/images/undertale/scratch.jpg" width="150" title="Close up of scratched record" >
-Unfortunately, my copy shipped with large scratches on sides A and B. (See the photo on the left&mdash;the scratches are very visible at full size.) Both discs were also covered in dust fresh out of the package. Everything I&rsquo;ve seen suggests this isn&rsquo;t an isolated issue&mdash;I know other people whose iam8bit records shipped with scratches before the first play, and from scanning their twitter feed, it looks like this is a common complaint with other customers. Needless to say, this is a huge issue, and I&rsquo;m shocked it&rsquo;s as common a problem as it is with them.</p>
-
-<p>Given those defects, I was surprised when the discs sounded great. The mastering quality is very good, and leaves very little to complain about if you&rsquo;re lucky enough to get undamaged discs. I did notice a mastering error that clips off the first note of Snowy on side one, but that was the only discernible error.</p>
-
-<p>Given just how huge the Undertale soundtrack is, the entire thing was not going to fit on two discs. The vinyl release curates a selection of tracks to fit the available running time. They generally made a good set of calls, hitting all the major notes and popular moments, though by necessity your favourite deep cut is probably missing. Given the time constraints, I don&rsquo;t see much to complain about in the selection. Pushing the soundtrack to three discs would probably have been a good call, even if that would have pushed up the price.</p>
-
-<p>Despite the good sound quality, it doesn&rsquo;t feel like iam8bit actually has the experience it takes to release a premium package like Undertale was meant to be. It&rsquo;s pretty clear they have big ambitions, and I hope they learn from their mistakes so they get to the point that their quality lives up, but they&rsquo;re not there yet. The stuff they&rsquo;re good at&mdash;art and graphic design&mdash;is offset by poor physical design and unreliable QC. I can&rsquo;t really recommend this as-is, especially with the high chance of getting a dud.</p>
-
-<p><img src="http://mistys-internet.website/blog/images/undertale/dogsong.jpg" title="Dogsong sleeve" ></p>
-
-<p>Aside from the main album, preorders came with a special dogsong single. This one-sided 7" single has an extended version of dogsong, and is pressed on transparent vinyl with an image of the annoying dog on the other side. It&rsquo;s very cute, and for what it is it&rsquo;s well-produced and pretty-looking.</p>
-
-<p><img src="http://mistys-internet.website/blog/images/undertale/dogsong_disc.jpg" title="Dogsong disc" ></p>
 ]]></content>
   </entry>
   
