@@ -4,7 +4,7 @@
   <title><![CDATA[Category: Archives | The Future Is Now]]></title>
   <link href="http://mistys-internet.website/blog/blog/categories/archives/atom.xml" rel="self"/>
   <link href="http://mistys-internet.website/blog/"/>
-  <updated>2026-03-27T17:53:36-07:00</updated>
+  <updated>2026-06-24T09:13:03-07:00</updated>
   <id>http://mistys-internet.website/blog/</id>
   <author>
     <name><![CDATA[Misty De Meo]]></name>
@@ -93,13 +93,13 @@
 
 <h2>The Hardware</h2>
 
-<p>Unlike floppy disk image flux archiving, there&rsquo;s no special enthusiast equipment needed here. Backing up CDs using these techniques uses certain models of standard off the shelf drives manufactured by Plextor. While these drives are no longer manufactured, they&rsquo;re readily available secondhand from eBay or computer recycling stores. They can be frequently purchased in good working condition for $40 or less. A full list of compatible drives can be found on the Redump wiki: <a href="http://wiki.redump.org/index.php?title=Optical_Disc_Drive_Compatibility">http://wiki.redump.org/index.php?title=Optical_Disc_Drive_Compatibility</a></p>
+<p>Unlike floppy disk image flux archiving, there&rsquo;s no special enthusiast equipment needed here. Backing up CDs using these techniques uses certain models of standard off the shelf drives manufactured by Plextor. While these drives are no longer manufactured, they&rsquo;re readily available secondhand from eBay or computer recycling stores. They can be frequently purchased in good working condition for $40 or less. A full list of compatible drives can be found on the Redump wiki: <a href="https://wiki.redump.info/index.php?title=Optical_Disc_Drive_Compatibility">https://wiki.redump.info/index.php?title=Optical_Disc_Drive_Compatibility</a></p>
 
 <p>This list contains a mixture of internal drives and USB-based external drives. Interal drives can also be converted into external drives using a cheap USB adapter.</p>
 
 <h2>The Software</h2>
 
-<p>There are a number of different tools available; this post will focus on the most popular ones and the ones with which I have personal experience. <a href="http://wiki.redump.org/index.php?title=Dumping_Guides">Redump&rsquo;s wiki</a> provides step-by-step usage guides for all of the tools I recommend.</p>
+<p>There are a number of different tools available; this post will focus on the most popular ones and the ones with which I have personal experience. <a href="https://wiki.redump.info/index.php?title=Dumping_Guides">Redump&rsquo;s wiki</a> provides step-by-step usage guides for all of the tools I recommend.</p>
 
 <h3>Media Preservation Frontend (Windows only)</h3>
 
@@ -181,7 +181,7 @@ c1589aa3e8f55b86d0be614e835127d254eabb54 /README.TXT
 
 <h3>redumper</h3>
 
-<p>A list of files can also be found on the <a href="http://wiki.redump.org/index.php?title=redumper#Output_Files">Redump wiki</a>.</p>
+<p>A list of files can also be found on the <a href="http://wiki.redump.info/index.php?title=redumper#Output_Files">Redump wiki</a>.</p>
 
 <ul>
 <li>All <code>.bin</code> files - The disc&rsquo;s data and audio tracks, one file per track.</li>
