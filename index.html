@@ -11,7 +11,7 @@
   <meta name="fediverse:creator" content="@misty@digipres.club">
 
   
-  <meta name="description" content="People who have been following me on social media may know that, for the past few years, I&rsquo;ve been working on a fan translation project for a &hellip;">
+  <meta name="description" content="This is a story from the old days before we had YouTube or the bandwidth to stream audio. Back then, if you wanted to listen to music from a video &hellip;">
   
 
   <!-- http://t.co/dKP3o1e -->
@@ -65,6 +65,85 @@
     <div id="content">
       <div class="blog-index">
   
+  
+  
+    <article>
+      
+  <header>
+    
+      <h1 class="entry-title"><a href="/blog/blog/2026/08/01/searching-for-the-broken-down-chiptune-player-of-my-dreams/">Searching for the Broken-down Chiptune Player of My Dreams</a></h1>
+    
+    
+      <p class="meta">
+        
+
+
+
+
+<time class='entry-date' datetime='2026-08-01T11:04:17-07:00'><span class='date'><span class='date-month'>Aug</span> <span class='date-day'>1</span><span class='date-suffix'>st</span>, <span class='date-year'>2026</span></span> <span class='time'>11:04 am</span></time>
+        
+      </p>
+    
+  </header>
+
+
+  <div class="entry-content"><p>This is a story from the old days before we had YouTube or the bandwidth to stream audio.</p>
+
+<p>Back then, if you wanted to listen to music from a video game, <em>maybe</em> you could track down an official soundtrack CD&mdash;or, if you were a mega nerd like me, you&rsquo;d download ripped chiptunes and their special players. These files are basically cut-down versions of the original game data, containing the game&rsquo;s music data and its original player; it&rsquo;s intended to be paired with a special audio player which is essentially a cut-down emulator for the console which emulates the CPU and sound chip but not the rest of the hardware. Since they stripped out anything the game didn&rsquo;t need to play the music, they were usually tiny. Entire soundtracks for 8-bit and 16-bit games could easily fit in under 50KB<sup id="fnref:1"><a href="#fn:1" rel="footnote">1</a></sup>, which made it easy for me to sample stuff on a whim even with a dialup internet connection.</p>
+
+<p>For me, these were a great way to try out the music to games I&rsquo;d read about but never actually played. It was <em>especially</em> great for those legendary games I&rsquo;d heard about that used weird hardware and that I&rsquo;d never have gotten to try on their original systems. There&rsquo;s one game in particular that fascinated me: Konami&rsquo;s <a href="https://en.wikipedia.org/wiki/Lagrange_Point_(video_game)"><em>Lagrange Point</em></a>. It was one of a set of NES games that were famous in the early emulation scene for using the &ldquo;expansion audio&rdquo; feature of the Famicom, the Japanese version of the system. This allowed game cartridges to include extra audio hardware which games could use simultaneously with the builtin chip for richer and much more complex music. This feature was missing from international versions of the NES, and until emulation most people outside Japan had only heard rumours about what games like <em>Castlevania III</em> had actually sounded like in their original versions.</p>
+
+<p><em>Lagrange Point</em> had an especially mystical reputation for being the only NES game using Konami&rsquo;s <a href="https://en.wikipedia.org/wiki/Memory_management_controller#VRC7">VRC7 sound chip</a><sup id="fnref:2"><a href="#fn:2" rel="footnote">2</a></sup>, which was much more advanced than anything else on the system. It used a sound chip using entirely different technology from every other NES game; its <a href="https://en.wikipedia.org/wiki/Yamaha_YM2413">Yamaha YM2413</a> is an FM synthesis chip closer to the 16-bit Sega Genesis than anything that anything else used on the NES<sup id="fnref:3"><a href="#fn:3" rel="footnote">3</a></sup>, and I just had to hear what that sounded like for myself. Here, click play and take a listen to the first track for yourself:</p>
+
+<p><audio controls src="/blog/audio/lagrange_point/ao.mp3"></audio></p>
+
+<p>It&rsquo;s a nice sound, isn&rsquo;t it? It&rsquo;s surreal to me hearing sound like this coming out of an NES game that feels like it should have much more primitive instruments.</p>
+
+<p>That said, when I grabbed an <a href="https://www.nesdev.org/wiki/NSF">.NSF</a> rip of the game and popped it in the first player I could find that did VRC7 audio, that&rsquo;s not what I heard. What I heard was this:</p>
+
+<p><audio controls src="/blog/audio/lagrange_point/meridian.mp3"></audio></p>
+
+<p>That&rsquo;s not really the same at all, is it? Those sound like different instruments entirely, something closer to a &ldquo;normal&rdquo; NES instrument sound than the warm smooth instruments the game is meant to use. That scratchiness in particular has always stuck with me; it gives the game a very distinctive broken-down sound with a texture completely unlike the original game&rsquo;s sound at all. Maybe this is the nostalgia talking, but I liked the sound at the time and I like it now. No one meant for it to sound this way, but I enjoy it all the same.</p>
+
+<p>Fast forward about 25 years. I still use these custom players and ripped game audio today and happened to dig out the <em>Lagrange Point</em> NSF. It didn&rsquo;t sound anything like the incorrect version I&rsquo;d imprinted on, so I thought I&rsquo;d hunt down that old player and take a listen again just to see if it was like I remembered. There was just one problem:</p>
+
+<p><em>I&rsquo;d forgotten what player it was.</em></p>
+
+<p>I wasn&rsquo;t going to be able to listen to the broken-down chiptunes of my dreams if I didn&rsquo;t have the right player! Thus started my desperate hunt to see if I could figure out what player it was.</p>
+
+<p>I had the vague memory that it was a player called <a href="https://web.archive.org/web/20031207130331/http://meridian.overclocked.org/oldadvanceweb/">Meridian Advance</a>, which was released back in 2001, but it definitely wasn&rsquo;t that. It doesn&rsquo;t have VRC7 support at all, so trying to play it back just got me silence and the very occasional sound it was playing from the regular NES sound chip.</p>
+
+<p>If my one memory was out, what <em>was</em> it? I started digging through every NSF player I could find from the late 90s through the early 00s, hoping <em>one</em> of them would be the right one. <a href="https://web.archive.org/web/20040414050747/http://rocknes.kinox.org/">BNSF</a>? No VRC7 support at all. <a href="http://nezplug.sourceforge.net/">NEZplug</a>? Plays normally. <a href="https://tnse.zophar.net/NSFten.htm">NSFten for Winamp</a>? No VRC7. <a href="http://www.neshq.com/nsf/">NotSo Fatso</a>? Plays normally. <a href="https://web.archive.org/web/20000816014543/http://www4.ncsu.edu/~nscorlet/nsf/">Bleep</a>? NESamp? <a href="https://web.archive.org/web/20001214085200/http://www.unc.edu/~thackett/nose.html">Nosefart</a><sup id="fnref:4"><a href="#fn:4" rel="footnote">4</a></sup>? <a href="http://gigo.retrogames.com/download.html#g-nsf">G-NSF</a>? <a href="https://disch.zophar.net/slicknsf.php">SlickNSF</a>? <a href="https://web.archive.org/web/20010405001217/http://smsoft.zophar.net/">MSP</a>? <a href="https://web.archive.org/web/20031118174453/http://meridian.overclocked.org/">Meridian Prime</a>? No, no, no, no, no, no, and no. It&rsquo;s a hell of a list, and as I kept failing to find what I was looking for I started to wonder if I&rsquo;d imagined the whole thing.</p>
+
+<p>Finally, I thought of something I should probably have considered in the first place. &ldquo;Meridian Advance&rdquo; implies it&rsquo;s the <em>second</em> Meridian, doesn&rsquo;t it? Just like the Game Boy Advance? Well, yes: Meridian Advance was the second of three Meridian sound players which started development after the developer lost the source code to the original Meridian in a hard drive crash<sup id="fnref:5"><a href="#fn:5" rel="footnote">5</a></sup>. I naively assumed that Meridian Advance could do everything the original could do, but that was a bad assumption. <a href="https://web.archive.org/web/20000815235259/http://meridian.overclocked.org/">The original Meridian</a> from 2000 really <em>did</em> have VRC7 support, and it was <em>exactly</em> the broken sound I remembered. Here it is:</p>
+
+<p><img src="/blog/images/lagrange_point/meridian.png" alt="Screenshot of Meridian, a Winamp-styled music player. It's showing the music for &quot;Lagrange Point&quot; as playing, and states &quot;VRC7 not supported&quot;." /></p>
+
+<p>(Yes, cloning Winamp was the most actual thing an audio player could do back then.) It runs fine under Wine so I gave it a shot and it really does sound <em>exactly</em> like I remember it.</p>
+
+<p>Want to hear it yourself? You can download Meridian <a href="/blog/data/Meridian.exe">right here</a>, and the <a href="https://www.zophar.net/music/nintendo-nes-nsf/lagrange-point">Lagrange Point NSF here</a>; should work fine on modern Windows or under Wine for Mac/Linux.</p>
+<div class="footnotes">
+<hr/>
+<ol>
+<li id="fn:1">
+<p>That&rsquo;s about half a second of streaming audio on YouTube.<a href="#fnref:1" rev="footnote">&#8617;</a></p></li>
+<li id="fn:2">
+<p>Yes, yes, I know, that <em>Tiny Toon</em> game uses it too. But it doesn&rsquo;t use it for <em>sound</em> now does it?<a href="#fnref:2" rev="footnote">&#8617;</a></p></li>
+<li id="fn:3">
+<p>To be exact, this is the same chip used in the Japanese Sega Master System and the MSX-Music, so it certainly had a history of being used on 8-bit systems. Outside Japan though, this sound is associated with systems much more advanced than the NES.<a href="#fnref:3" rev="footnote">&#8617;</a></p></li>
+<li id="fn:4">
+<p>Yes, really.<a href="#fnref:4" rev="footnote">&#8617;</a></p></li>
+<li id="fn:5">
+<p>Closed source was the default for this stuff back then! This was a pretty common death state for this kind of app.<a href="#fnref:5" rev="footnote">&#8617;</a></p></li>
+</ol>
+</div>
+
+</div>
+  
+  
+
+
+    </article>
   
   
     <article>
@@ -1299,79 +1378,6 @@
 
     </article>
   
-  
-    <article>
-      
-  <header>
-    
-      <h1 class="entry-title"><a href="/blog/blog/2024/04/07/unlocking-puyo-puyo-fever-for-macs-english-mode/">Unlocking Puyo Puyo Fever for Mac's English Mode</a></h1>
-    
-    
-      <p class="meta">
-        
-
-
-
-
-<time class='entry-date' datetime='2024-04-07T22:31:23-07:00'><span class='date'><span class='date-month'>Apr</span> <span class='date-day'>7</span><span class='date-suffix'>th</span>, <span class='date-year'>2024</span></span> <span class='time'>10:31 pm</span></time>
-        
-      </p>
-    
-  </header>
-
-
-  <div class="entry-content"><p><em>The short, no-clickbait version: to switch the Mac version of Puyo Puyo Fever to English, edit <code>~/Library/Preferences/PuyoPuyo Fever/PUYOF.BIN</code> and set the byte at <code>0x266</code> to <code>0x01</code>&mdash;or just download <a href="/blog/data/puyofever/PUYOF.BIN">this pre-patched save game</a> and place it in that directory.</em></p>
-
-<p><img src="/blog/images/puyofever/story.png" title="English Puyo Pop Fever in-game story mode screen" ></p>
-
-<p>I&rsquo;ve been a Mac user since 2005, and one of the very first Mac games I bought was the Mac port of Sega&rsquo;s <a href="https://en.wikipedia.org/wiki/Puyo_Pop_Fever">Puyo Puyo Fever</a>. I&rsquo;ve always been a Sega fangirl and I&rsquo;ve always loved puzzle games (even if I&rsquo;m not that good at Puyo Puyo), so when they actually released a Puyo Puyo game for Mac I knew I had to get it. This was back in the days when very, very few companies released games for Mac, so there weren&rsquo;t many options. Even Sega usually ignored Mac users; Puyo Puyo Fever only came out as part of a marketing gimmick that saw Sega release a new port every month for most of a year, leading them to target more niche platforms like Mac, Palm Pilot and Pocket PC.</p>
-
-<p>A few of the console versions came out in English, but the Mac port was exclusive to Japan. I didn&rsquo;t read any Japanese at the time, so I just muddled my way through the menus while wishing I could play it in English. I&rsquo;d thought that maybe I could try to transplant English game data from the console versions, but I didn&rsquo;t own any of them so I just resigned myself to playing the game in Japanese.</p>
-
-<p>Recently, though, I came across some information that made me realize there might be more to it. First, I finally got to try the Japan-exclusive Dreamcast port from 2004&hellip; and discovered that it was fully bilingual, with an option in the menu to switch between Japanese or English text and voices. I might have just thought that Dreamcast players were lucky and I was still out of luck until I ran into the <a href="https://puyonexus.com/wiki/Guide:PPF_PC_Translation">English Puyo Puyo fan community</a>&rsquo;s mod to enable English support in the Windows version. Their technique, which was discovered by community members Yoshi and nmn around 2009, involves modifying not the game itself but a flag in the save game&mdash;the same flag used by the Dreamcast version, which it&rsquo;s still programmed to respect despite the menu option having been removed.</p>
-
-<p>I wasn&rsquo;t able to use the <a href="https://puyonexus.com/forum/viewtopic.php?f=7&amp;t=1097">Windows save modding tool</a> produced by Puyo Puyo fan community member NickW for a couple of reasons:</p>
-
-<ol type="a">
-<li>It&rsquo;s hardcoded to open the save file from the Windows save location, <code>%AppData%\SEGA\PuyoF\PUYOF.BIN</code>, and can&rsquo;t just be given a save file at some other path, and</li>
-<li>The Windows version uses compressed save data, while the Mac version always uses uncompressed saves, and so the editor won&rsquo;t try to open uncompressed saves.</li>
-</ol>
-
-
-<p>I could have updated the editor to work around this but, knowing that that the save was uncompressed and I only had to change a single byte, it seemed like overkill. One byte is easy enough to edit without a specialized tool, so I just pulled out a hex editor. The Windows save editor is source-available, so I didn&rsquo;t have to reverse engineer the locations of the key flags in the save file myself. I guessed that the language flag offset wouldn&rsquo;t be different between the uncompressed Windows saves and the Mac saves, so after reading that it&rsquo;s stored at byte <code>0x288</code>, I tried changing it from <code>0x00</code> to <code>0x01</code> and started up the game.</p>
-
-<p><img src="/blog/images/puyofever/title.png" title="English Puyo Pop Fever title screen" ></p>
-
-<p>&hellip;and it just worked! Without any changes, the entire game swapped over to English&mdash;menus, dialogue, and even the title screen logo. After 20 years, suddenly I was playing Puyo Puyo Fever for Mac in English.</p>
-
-<p>According to the Windows save editor, the next byte (<code>0x289</code>) controls the voice language. Neither the Windows nor the Mac versions actually shipped with English voices on the disc, however, so setting this value just ends up silencing the game instead. The fan community prepared an <a href="https://puyonexus.com/wiki/Guide:PPF_PC_Translation">English voice pack</a> taken from the other versions, but I didn&rsquo;t bother trying it on Mac since proper timing data for the English voices is missing.</p>
-
-<p>At this point I figured I&rsquo;d discovered everything I was going to find until I noticed something at the start of the save data in the hex editor:</p>
-
-<p><img src="/blog/images/puyofever/hexeditor.png" width="300" title="Screenshot of a hex editor showing an image-like pattern" ></p>
-
-<p>I&rsquo;d only been paying attention to data later in the file, so I&rsquo;d overlooked the very beginning until now. But now that I looked at it, it was a <em>very</em> regular pattern. It looks suspiciously like an image; uncompressed bitmaps are usually recognizable to the naked eye in a hex editor, and I wondered if that could be what this was. So I dug out the Dreamcast version again, and lo and behold:</p>
-
-<p><img src="/blog/images/puyofever/PUYOFEVERSYS.png" title="A square pixel art image of a sign with the Japanese hiragana symbol &#34;pu&#34;" alt="A square pixel art image of a sign with the Japanese hiragana symbol &#34;pu&#34;"></p>
-
-<p>It&rsquo;s the Dreamcast version&rsquo;s save icon, displayed in the Dreamcast save menu and on the portable VMU save device. The Mac version doesn&rsquo;t have any reason to need this, and has nowhere to display it, but it&rsquo;s there anyway. Looking at the start of the header made me realize the default save file name from the Dreamcast port is there too&mdash;the very first bytes read 「システムファイル」, or &ldquo;System File&rdquo;. Grabbing an original Dreamcast save file, I was able to confirm that the Mac save is <em>completely identical</em> to the Dreamcast version, except for rendering multi-byte fields in big-endian format<sup id="fnref:1"><a href="#fn:1" rel="footnote">1</a></sup>. I guess by 2004 there was no reason to spend time rewriting the save data format just to save a few hundred bytes, so all the Dreamcast-specific features come along for the ride on Mac and Windows.</p>
-
-<p>Now, you might, ask, why would I spend so much time on a Mac port that doesn&rsquo;t even run on modern computers? (Though I&rsquo;d be happy to fix that - Sega, <a href="mailto:mistydemeo+puyopuyo@gmail.com">email me!</a>) Part of it is just that I love digging into older games like this to find out what makes them tick; it&rsquo;s as much a hobby as actually playing them. The other part, of course, is that I&rsquo;ll actually play it. As you might be able to guess from the <a href="https://github.com/mistydemeo/tigerbrew">PowerPC Mac package manager</a> I maintain, I still keep my old Macs around and every now and then I break out the PowerMac G4 for a few rounds of Puyo Puyo Fever. The next time I do, I&rsquo;ll be able to play it in English.</p>
-<div class="footnotes">
-<hr/>
-<ol>
-<li id="fn:1">
-<p>The <a href="https://en.wikipedia.org/wiki/Endianness">byte order</a>, or endianness, of multi-byte data types is different between different kinds of CPUs. The PowerPC processors used by that era of Macs use the big endian format.<a href="#fnref:1" rev="footnote">&#8617;</a></p></li>
-</ol>
-</div>
-
-</div>
-  
-  
-
-
-    </article>
-  
   <div class="pagination">
     
       <a class="prev" href="/blog/posts/2">&larr; Older</a>
@@ -1387,6 +1393,10 @@
   <ul id="recent_posts">
     
       <li class="post">
+        <a href="/blog/blog/2026/08/01/searching-for-the-broken-down-chiptune-player-of-my-dreams/">Searching for the Broken-down Chiptune Player of My Dreams</a>
+      </li>
+    
+      <li class="post">
         <a href="/blog/blog/2026/03/27/forget-spreadsheets/">Forget Spreadsheets, I Wrote My Own Visual Game Script Editor</a>
       </li>
     
@@ -1400,10 +1410,6 @@
     
       <li class="post">
         <a href="/blog/blog/2025/05/13/the-database-row-that-did-and-didnt-exist/">The Database Row That Did and Didn't Exist</a>
-      </li>
-    
-      <li class="post">
-        <a href="/blog/blog/2025/01/23/what-you-might-miss-when-backing-up-cds/">What You Might Miss When Backing Up CDs</a>
       </li>
     
   </ul>

@@ -4,7 +4,7 @@
   <title><![CDATA[The Future Is Now]]></title>
   <link href="http://mistys-internet.website/blog/atom.xml" rel="self"/>
   <link href="http://mistys-internet.website/blog/"/>
-  <updated>2026-06-24T09:13:03-07:00</updated>
+  <updated>2026-08-01T11:05:03-07:00</updated>
   <id>http://mistys-internet.website/blog/</id>
   <author>
     <name><![CDATA[Misty De Meo]]></name>
@@ -12,6 +12,65 @@
   </author>
   <generator uri="http://octopress.org/">Octopress</generator>
 
+  
+  <entry>
+    <title type="html"><![CDATA[Searching for the Broken-down Chiptune Player of My Dreams]]></title>
+    <link href="http://mistys-internet.website/blog/blog/2026/08/01/searching-for-the-broken-down-chiptune-player-of-my-dreams/"/>
+    <updated>2026-08-01T11:04:17-07:00</updated>
+    <id>http://mistys-internet.website/blog/blog/2026/08/01/searching-for-the-broken-down-chiptune-player-of-my-dreams</id>
+    <content type="html"><![CDATA[<p>This is a story from the old days before we had YouTube or the bandwidth to stream audio.</p>
+
+<p>Back then, if you wanted to listen to music from a video game, <em>maybe</em> you could track down an official soundtrack CD&mdash;or, if you were a mega nerd like me, you&rsquo;d download ripped chiptunes and their special players. These files are basically cut-down versions of the original game data, containing the game&rsquo;s music data and its original player; it&rsquo;s intended to be paired with a special audio player which is essentially a cut-down emulator for the console which emulates the CPU and sound chip but not the rest of the hardware. Since they stripped out anything the game didn&rsquo;t need to play the music, they were usually tiny. Entire soundtracks for 8-bit and 16-bit games could easily fit in under 50KB<sup id="fnref:1"><a href="#fn:1" rel="footnote">1</a></sup>, which made it easy for me to sample stuff on a whim even with a dialup internet connection.</p>
+
+<p>For me, these were a great way to try out the music to games I&rsquo;d read about but never actually played. It was <em>especially</em> great for those legendary games I&rsquo;d heard about that used weird hardware and that I&rsquo;d never have gotten to try on their original systems. There&rsquo;s one game in particular that fascinated me: Konami&rsquo;s <a href="https://en.wikipedia.org/wiki/Lagrange_Point_(video_game)"><em>Lagrange Point</em></a>. It was one of a set of NES games that were famous in the early emulation scene for using the &ldquo;expansion audio&rdquo; feature of the Famicom, the Japanese version of the system. This allowed game cartridges to include extra audio hardware which games could use simultaneously with the builtin chip for richer and much more complex music. This feature was missing from international versions of the NES, and until emulation most people outside Japan had only heard rumours about what games like <em>Castlevania III</em> had actually sounded like in their original versions.</p>
+
+<p><em>Lagrange Point</em> had an especially mystical reputation for being the only NES game using Konami&rsquo;s <a href="https://en.wikipedia.org/wiki/Memory_management_controller#VRC7">VRC7 sound chip</a><sup id="fnref:2"><a href="#fn:2" rel="footnote">2</a></sup>, which was much more advanced than anything else on the system. It used a sound chip using entirely different technology from every other NES game; its <a href="https://en.wikipedia.org/wiki/Yamaha_YM2413">Yamaha YM2413</a> is an FM synthesis chip closer to the 16-bit Sega Genesis than anything that anything else used on the NES<sup id="fnref:3"><a href="#fn:3" rel="footnote">3</a></sup>, and I just had to hear what that sounded like for myself. Here, click play and take a listen to the first track for yourself:</p>
+
+<p><audio controls src="http://mistys-internet.website/blog/audio/lagrange_point/ao.mp3"></audio></p>
+
+<p>It&rsquo;s a nice sound, isn&rsquo;t it? It&rsquo;s surreal to me hearing sound like this coming out of an NES game that feels like it should have much more primitive instruments.</p>
+
+<p>That said, when I grabbed an <a href="https://www.nesdev.org/wiki/NSF">.NSF</a> rip of the game and popped it in the first player I could find that did VRC7 audio, that&rsquo;s not what I heard. What I heard was this:</p>
+
+<p><audio controls src="http://mistys-internet.website/blog/audio/lagrange_point/meridian.mp3"></audio></p>
+
+<p>That&rsquo;s not really the same at all, is it? Those sound like different instruments entirely, something closer to a &ldquo;normal&rdquo; NES instrument sound than the warm smooth instruments the game is meant to use. That scratchiness in particular has always stuck with me; it gives the game a very distinctive broken-down sound with a texture completely unlike the original game&rsquo;s sound at all. Maybe this is the nostalgia talking, but I liked the sound at the time and I like it now. No one meant for it to sound this way, but I enjoy it all the same.</p>
+
+<p>Fast forward about 25 years. I still use these custom players and ripped game audio today and happened to dig out the <em>Lagrange Point</em> NSF. It didn&rsquo;t sound anything like the incorrect version I&rsquo;d imprinted on, so I thought I&rsquo;d hunt down that old player and take a listen again just to see if it was like I remembered. There was just one problem:</p>
+
+<p><em>I&rsquo;d forgotten what player it was.</em></p>
+
+<p>I wasn&rsquo;t going to be able to listen to the broken-down chiptunes of my dreams if I didn&rsquo;t have the right player! Thus started my desperate hunt to see if I could figure out what player it was.</p>
+
+<p>I had the vague memory that it was a player called <a href="https://web.archive.org/web/20031207130331/http://meridian.overclocked.org/oldadvanceweb/">Meridian Advance</a>, which was released back in 2001, but it definitely wasn&rsquo;t that. It doesn&rsquo;t have VRC7 support at all, so trying to play it back just got me silence and the very occasional sound it was playing from the regular NES sound chip.</p>
+
+<p>If my one memory was out, what <em>was</em> it? I started digging through every NSF player I could find from the late 90s through the early 00s, hoping <em>one</em> of them would be the right one. <a href="https://web.archive.org/web/20040414050747/http://rocknes.kinox.org/">BNSF</a>? No VRC7 support at all. <a href="http://nezplug.sourceforge.net/">NEZplug</a>? Plays normally. <a href="https://tnse.zophar.net/NSFten.htm">NSFten for Winamp</a>? No VRC7. <a href="http://www.neshq.com/nsf/">NotSo Fatso</a>? Plays normally. <a href="https://web.archive.org/web/20000816014543/http://www4.ncsu.edu/~nscorlet/nsf/">Bleep</a>? NESamp? <a href="https://web.archive.org/web/20001214085200/http://www.unc.edu/~thackett/nose.html">Nosefart</a><sup id="fnref:4"><a href="#fn:4" rel="footnote">4</a></sup>? <a href="http://gigo.retrogames.com/download.html#g-nsf">G-NSF</a>? <a href="https://disch.zophar.net/slicknsf.php">SlickNSF</a>? <a href="https://web.archive.org/web/20010405001217/http://smsoft.zophar.net/">MSP</a>? <a href="https://web.archive.org/web/20031118174453/http://meridian.overclocked.org/">Meridian Prime</a>? No, no, no, no, no, no, and no. It&rsquo;s a hell of a list, and as I kept failing to find what I was looking for I started to wonder if I&rsquo;d imagined the whole thing.</p>
+
+<p>Finally, I thought of something I should probably have considered in the first place. &ldquo;Meridian Advance&rdquo; implies it&rsquo;s the <em>second</em> Meridian, doesn&rsquo;t it? Just like the Game Boy Advance? Well, yes: Meridian Advance was the second of three Meridian sound players which started development after the developer lost the source code to the original Meridian in a hard drive crash<sup id="fnref:5"><a href="#fn:5" rel="footnote">5</a></sup>. I naively assumed that Meridian Advance could do everything the original could do, but that was a bad assumption. <a href="https://web.archive.org/web/20000815235259/http://meridian.overclocked.org/">The original Meridian</a> from 2000 really <em>did</em> have VRC7 support, and it was <em>exactly</em> the broken sound I remembered. Here it is:</p>
+
+<p><img src="http://mistys-internet.website/blog/images/lagrange_point/meridian.png" alt="Screenshot of Meridian, a Winamp-styled music player. It's showing the music for &quot;Lagrange Point&quot; as playing, and states &quot;VRC7 not supported&quot;." /></p>
+
+<p>(Yes, cloning Winamp was the most actual thing an audio player could do back then.) It runs fine under Wine so I gave it a shot and it really does sound <em>exactly</em> like I remember it.</p>
+
+<p>Want to hear it yourself? You can download Meridian <a href="http://mistys-internet.website/blog/data/Meridian.exe">right here</a>, and the <a href="https://www.zophar.net/music/nintendo-nes-nsf/lagrange-point">Lagrange Point NSF here</a>; should work fine on modern Windows or under Wine for Mac/Linux.</p>
+<div class="footnotes">
+<hr/>
+<ol>
+<li id="fn:1">
+<p>That&rsquo;s about half a second of streaming audio on YouTube.<a href="#fnref:1" rev="footnote">&#8617;</a></p></li>
+<li id="fn:2">
+<p>Yes, yes, I know, that <em>Tiny Toon</em> game uses it too. But it doesn&rsquo;t use it for <em>sound</em> now does it?<a href="#fnref:2" rev="footnote">&#8617;</a></p></li>
+<li id="fn:3">
+<p>To be exact, this is the same chip used in the Japanese Sega Master System and the MSX-Music, so it certainly had a history of being used on 8-bit systems. Outside Japan though, this sound is associated with systems much more advanced than the NES.<a href="#fnref:3" rev="footnote">&#8617;</a></p></li>
+<li id="fn:4">
+<p>Yes, really.<a href="#fnref:4" rev="footnote">&#8617;</a></p></li>
+<li id="fn:5">
+<p>Closed source was the default for this stuff back then! This was a pretty common death state for this kind of app.<a href="#fnref:5" rev="footnote">&#8617;</a></p></li>
+</ol>
+</div>
+
+]]></content>
+  </entry>
   
   <entry>
     <title type="html"><![CDATA[Forget Spreadsheets, I Wrote My Own Visual Game Script Editor]]></title>
@@ -1816,81 +1875,6 @@
 <li><em>Princess Snow White</em> - No cover art or homepage.</li>
 <li><em>War in Heaven</em> - Final cover art, but never included in any release lists.</li>
 </ul>
-
-]]></content>
-  </entry>
-  
-  <entry>
-    <title type="html"><![CDATA[Recover From FileVault Doom]]></title>
-    <link href="http://mistys-internet.website/blog/blog/2018/10/18/recover-from-filevault-doom/"/>
-    <updated>2018-10-18T19:19:04-03:00</updated>
-    <id>http://mistys-internet.website/blog/blog/2018/10/18/recover-from-filevault-doom</id>
-    <content type="html"><![CDATA[<p>Just upgraded to Mojave? Getting the 🚫 of doom when you try to boot your Mac? Worried you&rsquo;ve lost all your data? <strong>Don&rsquo;t panic!</strong> Your Mac is recoverable, and this guide will help you get your drive back in shape.</p>
-
-<p>This bug is caused by a new limitation introduced for FileVault encryption. As mentioned in the <a href="https://developer.apple.com/documentation/macos_release_notes/macos_mojave_10_14_release_notes">release notes</a>, any APFS volume encrypted using Mojave&rsquo;s implementation of FileVault becomes invisible to earlier versions of macOS until the encryption or decryption process completes. By itself, this is mostly harmless. However, this is rendered much worse by a bug<sup id="fnref:1"><a href="#fn:1" rel="footnote">1</a></sup> that causes the Mojave installer to incorrectly trigger reencryption of an already-encrypted FileVault volume during the install process. Because full drive encryption cannot complete in a timely manner, the Mojave installer times out before encryption completes. The result is a macOS 10.13 (or older) install with a macOS 10.14 FileVault volume that hasn&rsquo;t yet finished encrypting. This volume can&rsquo;t be read by the startup manager, and so becomes unbootable.</p>
-
-<p>In order to fix this issue, we&rsquo;ll need to let your drive finish encrypting. This guide will walk you through the process. Before we get started, make sure you have the right supplies on hand. You&rsquo;ll need a USB key with a capacity of at least 8GB and access to a working Mac.</p>
-
-<h3>1. Create a USB Mojave installer</h3>
-
-<p>Download the Mojave installer application on your working Mac using the App Store. Don&rsquo;t worry, you won&rsquo;t be using that to install - just to create a USB installer for your broken Mac. Then follow <a href="https://support.apple.com/en-us/HT201372">these instructions from Apple</a>. This will erase your USB key and turn it into a bootable USB install drive.</p>
-
-<h3>2. Boot into the USB installer</h3>
-
-<p>Turn off the Mac that you&rsquo;re upgrading to Mojave and insert the USB drive you just created. Turn the Mac back on, and immediately hold the option key until the Startup Manager appears. Select the drive you created.</p>
-
-<h3>3. Enter Recovery Mode</h3>
-
-<p>The installer should provide an option to enter Recovery Mode. This is a different version of Recovery Mode than the one that&rsquo;s builtin to your Mac, and it will be able to see your hard drive.</p>
-
-<h3>4. Unlock and mount your hard drive</h3>
-
-<p>From the Utilities menu bar at the top of the screen, select Terminal. From the terminal prompt, type <code>diskutil apfs list</code>. In the output, you should see one volume whose FileVault status is listed as <code>FileVault: in progress</code> (or something similar). If it&rsquo;s already listed as &ldquo;unlocked&rdquo;, then you&rsquo;re good - proceed to step 5.</p>
-
-<p>Unlock this drive by running <code>diskutil apfs unlockVolume DISK</code>, where <code>DISK</code> is the identifier listed after <code>APFS Volume Disk</code> for the volume you identified in the previous paragraph. For example, you might type <code>diskutil apfs unlockVolume disk1s1</code>. This command will ask you for a password; enter either your personal log in password, or a FileVault recovery key.</p>
-
-<p>Once you&rsquo;ve completed this step, exit Terminal. You should be returned to the Recovery Mode main menu.</p>
-
-<h3>5. Create a new APFS volume</h3>
-
-<p>Open Disk Utility from the Recovery Mode main menu. Select your main hard drive, right-click it, and choose &ldquo;Add APFS Volume&rdquo;. Don&rsquo;t worry, this isn&rsquo;t repartitioning your drive - this bootable volume will live on the same volume as your main volume, and you will be able to delete it later. Name it &ldquo;Temporary&rdquo;, then click &ldquo;Add&rdquo;.</p>
-
-<p><img src="http://mistys-internet.website/blog/images/mojave/1_volume.png" width="264" title="Creating a volume" ></p>
-
-<p><img src="http://mistys-internet.website/blog/images/mojave/2_volume.png" width="442" title="Volume options" ></p>
-
-<p>Once you&rsquo;ve completed this step, exit Disk Utility. You should be returned to the Recovery Mode main menu. Return to the main Mojave installer menu.</p>
-
-<h3>6. Install Mojave on the new volume</h3>
-
-<p>Choose to install Mojave on the volume named &ldquo;Temporary&rdquo; that you created in the previous step. This will be a temporary fresh install, so don&rsquo;t worry too much about it - go ahead and keep all the options at their defaults.</p>
-
-<h3>7. Allow drive encryption to finish</h3>
-
-<p>Once your install has finished and you&rsquo;ve logged in, open Disk Utility. Unlock your normal hard drive by clicking on it and clicking the &ldquo;mount&rdquo; button in the toolbar. You will be asked for a password; like in the previous step in the terminal, you will need to provide either your login password (from your old Mac install), or your recovery key.</p>
-
-<p>At this point, drive encryption will start back up again. You will need to wait for that to finish; this could take a few hours. If you want to check on the progress, you can open a terminal and look at the output of <code>diskutil apfs list</code>; encryption is finished when you run that command and see the status read <code>FileVault: Yes</code>.</p>
-
-<h3>8. Upgrade your main drive to Mojave</h3>
-
-<p>Now you&rsquo;re finally (finally!) ready to let the Mojave install complete. Open up your USB drive in the Finder and run the macOS installer app. This time, instead of picking the temporary volume, pick your original Mac volume. Let the installer complete. This time, your Mac should boot up like normal. You&rsquo;re saved!</p>
-
-<h3>9. Clean up</h3>
-
-<p>Now that your main Mac volume is bootable again, you can get rid of the temporary volume we created in the previous step. To do that, open Disk Utility and right-click the volume named &ldquo;Temporary&rdquo;. Click &ldquo;Delete APFS Volume&rdquo;, then confirm by clicking &ldquo;Delete&rdquo; again.</p>
-
-<p><img src="http://mistys-internet.website/blog/images/mojave/3_volume.png" width="205" title="Deleting the temporary volume" ></p>
-
-<h3>You&rsquo;re done!</h3>
-
-<p>With any luck, you should be all set at this point. Feel free to reach out to me if you&rsquo;re still having trouble! Big thanks to <a href="https://twitter.com/mikeymikey">@mikeymikey</a> for the suggestion of using a second APFS volume to install the temporary macOS 10.14. Thanks also to my manager, who allowed me to use my internal blog post as the basis for this post.</p>
-<div class="footnotes">
-<hr/>
-<ol>
-<li id="fn:1">
-<p>I wish I could provide more detail about this bug, but as far as I know no details have been published. I&rsquo;ve filed a radar but haven&rsquo;t received a response. All I know is that this occurs, seemingly at random, to a small percentage of people who try to upgrade from macOS 10.13.6 to macOS 10.14 when FileVault is already enabled.<a href="#fnref:1" rev="footnote">&#8617;</a></p></li>
-</ol>
-</div>
 
 ]]></content>
   </entry>

@@ -11,7 +11,7 @@
   <meta name="fediverse:creator" content="@misty@digipres.club">
 
   
-  <meta name="description" content="I got my copy of the Undertale vinyl soundtrack in the mail the other day. While I&rsquo;ve seen a lot of excitement for it, I haven&rsquo;t seen &hellip;">
+  <meta name="description" content="Just upgraded to Mojave? Getting the 🚫 of doom when you try to boot your Mac? Worried you&rsquo;ve lost all your data? Don&rsquo;t panic! Your Mac is &hellip;">
   
 
   <!-- http://t.co/dKP3o1e -->
@@ -65,6 +65,101 @@
     <div id="content">
       <div class="blog-index">
   
+  
+  
+    <article>
+      
+  <header>
+    
+      <h1 class="entry-title"><a href="/blog/blog/2018/10/18/recover-from-filevault-doom/">Recover From FileVault Doom</a></h1>
+    
+    
+      <p class="meta">
+        
+
+
+
+
+<time class='entry-date' datetime='2018-10-18T19:19:04-03:00'><span class='date'><span class='date-month'>Oct</span> <span class='date-day'>18</span><span class='date-suffix'>th</span>, <span class='date-year'>2018</span></span> <span class='time'>7:19 pm</span></time>
+        
+      </p>
+    
+  </header>
+
+
+  <div class="entry-content"><p>Just upgraded to Mojave? Getting the 🚫 of doom when you try to boot your Mac? Worried you&rsquo;ve lost all your data? <strong>Don&rsquo;t panic!</strong> Your Mac is recoverable, and this guide will help you get your drive back in shape.</p>
+
+<p>This bug is caused by a new limitation introduced for FileVault encryption. As mentioned in the <a href="https://developer.apple.com/documentation/macos_release_notes/macos_mojave_10_14_release_notes">release notes</a>, any APFS volume encrypted using Mojave&rsquo;s implementation of FileVault becomes invisible to earlier versions of macOS until the encryption or decryption process completes. By itself, this is mostly harmless. However, this is rendered much worse by a bug<sup id="fnref:1"><a href="#fn:1" rel="footnote">1</a></sup> that causes the Mojave installer to incorrectly trigger reencryption of an already-encrypted FileVault volume during the install process. Because full drive encryption cannot complete in a timely manner, the Mojave installer times out before encryption completes. The result is a macOS 10.13 (or older) install with a macOS 10.14 FileVault volume that hasn&rsquo;t yet finished encrypting. This volume can&rsquo;t be read by the startup manager, and so becomes unbootable.</p>
+
+<p>In order to fix this issue, we&rsquo;ll need to let your drive finish encrypting. This guide will walk you through the process. Before we get started, make sure you have the right supplies on hand. You&rsquo;ll need a USB key with a capacity of at least 8GB and access to a working Mac.</p>
+
+<h3>1. Create a USB Mojave installer</h3>
+
+<p>Download the Mojave installer application on your working Mac using the App Store. Don&rsquo;t worry, you won&rsquo;t be using that to install - just to create a USB installer for your broken Mac. Then follow <a href="https://support.apple.com/en-us/HT201372">these instructions from Apple</a>. This will erase your USB key and turn it into a bootable USB install drive.</p>
+
+<h3>2. Boot into the USB installer</h3>
+
+<p>Turn off the Mac that you&rsquo;re upgrading to Mojave and insert the USB drive you just created. Turn the Mac back on, and immediately hold the option key until the Startup Manager appears. Select the drive you created.</p>
+
+<h3>3. Enter Recovery Mode</h3>
+
+<p>The installer should provide an option to enter Recovery Mode. This is a different version of Recovery Mode than the one that&rsquo;s builtin to your Mac, and it will be able to see your hard drive.</p>
+
+<h3>4. Unlock and mount your hard drive</h3>
+
+<p>From the Utilities menu bar at the top of the screen, select Terminal. From the terminal prompt, type <code>diskutil apfs list</code>. In the output, you should see one volume whose FileVault status is listed as <code>FileVault: in progress</code> (or something similar). If it&rsquo;s already listed as &ldquo;unlocked&rdquo;, then you&rsquo;re good - proceed to step 5.</p>
+
+<p>Unlock this drive by running <code>diskutil apfs unlockVolume DISK</code>, where <code>DISK</code> is the identifier listed after <code>APFS Volume Disk</code> for the volume you identified in the previous paragraph. For example, you might type <code>diskutil apfs unlockVolume disk1s1</code>. This command will ask you for a password; enter either your personal log in password, or a FileVault recovery key.</p>
+
+<p>Once you&rsquo;ve completed this step, exit Terminal. You should be returned to the Recovery Mode main menu.</p>
+
+<h3>5. Create a new APFS volume</h3>
+
+<p>Open Disk Utility from the Recovery Mode main menu. Select your main hard drive, right-click it, and choose &ldquo;Add APFS Volume&rdquo;. Don&rsquo;t worry, this isn&rsquo;t repartitioning your drive - this bootable volume will live on the same volume as your main volume, and you will be able to delete it later. Name it &ldquo;Temporary&rdquo;, then click &ldquo;Add&rdquo;.</p>
+
+<p><img src="/blog/images/mojave/1_volume.png" width="264" title="Creating a volume" ></p>
+
+<p><img src="/blog/images/mojave/2_volume.png" width="442" title="Volume options" ></p>
+
+<p>Once you&rsquo;ve completed this step, exit Disk Utility. You should be returned to the Recovery Mode main menu. Return to the main Mojave installer menu.</p>
+
+<h3>6. Install Mojave on the new volume</h3>
+
+<p>Choose to install Mojave on the volume named &ldquo;Temporary&rdquo; that you created in the previous step. This will be a temporary fresh install, so don&rsquo;t worry too much about it - go ahead and keep all the options at their defaults.</p>
+
+<h3>7. Allow drive encryption to finish</h3>
+
+<p>Once your install has finished and you&rsquo;ve logged in, open Disk Utility. Unlock your normal hard drive by clicking on it and clicking the &ldquo;mount&rdquo; button in the toolbar. You will be asked for a password; like in the previous step in the terminal, you will need to provide either your login password (from your old Mac install), or your recovery key.</p>
+
+<p>At this point, drive encryption will start back up again. You will need to wait for that to finish; this could take a few hours. If you want to check on the progress, you can open a terminal and look at the output of <code>diskutil apfs list</code>; encryption is finished when you run that command and see the status read <code>FileVault: Yes</code>.</p>
+
+<h3>8. Upgrade your main drive to Mojave</h3>
+
+<p>Now you&rsquo;re finally (finally!) ready to let the Mojave install complete. Open up your USB drive in the Finder and run the macOS installer app. This time, instead of picking the temporary volume, pick your original Mac volume. Let the installer complete. This time, your Mac should boot up like normal. You&rsquo;re saved!</p>
+
+<h3>9. Clean up</h3>
+
+<p>Now that your main Mac volume is bootable again, you can get rid of the temporary volume we created in the previous step. To do that, open Disk Utility and right-click the volume named &ldquo;Temporary&rdquo;. Click &ldquo;Delete APFS Volume&rdquo;, then confirm by clicking &ldquo;Delete&rdquo; again.</p>
+
+<p><img src="/blog/images/mojave/3_volume.png" width="205" title="Deleting the temporary volume" ></p>
+
+<h3>You&rsquo;re done!</h3>
+
+<p>With any luck, you should be all set at this point. Feel free to reach out to me if you&rsquo;re still having trouble! Big thanks to <a href="https://twitter.com/mikeymikey">@mikeymikey</a> for the suggestion of using a second APFS volume to install the temporary macOS 10.14. Thanks also to my manager, who allowed me to use my internal blog post as the basis for this post.</p>
+<div class="footnotes">
+<hr/>
+<ol>
+<li id="fn:1">
+<p>I wish I could provide more detail about this bug, but as far as I know no details have been published. I&rsquo;ve filed a radar but haven&rsquo;t received a response. All I know is that this occurs, seemingly at random, to a small percentage of people who try to upgrade from macOS 10.13.6 to macOS 10.14 when FileVault is already enabled.<a href="#fnref:1" rev="footnote">&#8617;</a></p></li>
+</ol>
+</div>
+
+</div>
+  
+  
+
+
+    </article>
   
   
     <article>
@@ -891,35 +986,6 @@ In 1999, an unofficial mod titled <a href="http://www5.ocn.ne.jp/~afc/limitover/
 
     </article>
   
-  
-    <article>
-      
-  <header>
-    
-      <h1 class="entry-title"><a href="/blog/blog/2014/09/10/mind-the-dust/">Mind the Dust</a></h1>
-    
-    
-      <p class="meta">
-        
-
-
-
-
-<time class='entry-date' datetime='2014-09-10T08:42:12-07:00'><span class='date'><span class='date-month'>Sep</span> <span class='date-day'>10</span><span class='date-suffix'>th</span>, <span class='date-year'>2014</span></span> <span class='time'>8:42 am</span></time>
-        
-      </p>
-    
-  </header>
-
-
-  <div class="entry-content"><p>Please excuse the sparseness! I&rsquo;m in the process of migrating from Wordpress to Octopress; I haven&rsquo;t had time to change the default team or migrate over my older posts.</p>
-</div>
-  
-  
-
-
-    </article>
-  
   <div class="pagination">
     
       <a class="prev" href="/blog/posts/4">&larr; Older</a>
@@ -937,6 +1003,10 @@ In 1999, an unofficial mod titled <a href="http://www5.ocn.ne.jp/~afc/limitover/
   <ul id="recent_posts">
     
       <li class="post">
+        <a href="/blog/blog/2026/08/01/searching-for-the-broken-down-chiptune-player-of-my-dreams/">Searching for the Broken-down Chiptune Player of My Dreams</a>
+      </li>
+    
+      <li class="post">
         <a href="/blog/blog/2026/03/27/forget-spreadsheets/">Forget Spreadsheets, I Wrote My Own Visual Game Script Editor</a>
       </li>
     
@@ -950,10 +1020,6 @@ In 1999, an unofficial mod titled <a href="http://www5.ocn.ne.jp/~afc/limitover/
     
       <li class="post">
         <a href="/blog/blog/2025/05/13/the-database-row-that-did-and-didnt-exist/">The Database Row That Did and Didn't Exist</a>
-      </li>
-    
-      <li class="post">
-        <a href="/blog/blog/2025/01/23/what-you-might-miss-when-backing-up-cds/">What You Might Miss When Backing Up CDs</a>
       </li>
     
   </ul>
