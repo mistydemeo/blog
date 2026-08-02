@@ -4,7 +4,7 @@
   <title><![CDATA[The Future Is Now]]></title>
   <link href="http://mistys-internet.website/blog/atom.xml" rel="self"/>
   <link href="http://mistys-internet.website/blog/"/>
-  <updated>2026-08-01T11:14:07-07:00</updated>
+  <updated>2026-08-01T22:23:16-07:00</updated>
   <id>http://mistys-internet.website/blog/</id>
   <author>
     <name><![CDATA[Misty De Meo]]></name>
@@ -12,6 +12,69 @@
   </author>
   <generator uri="http://octopress.org/">Octopress</generator>
 
+  
+  <entry>
+    <title type="html"><![CDATA[Decoding Magic School Lunar's Save Game Format]]></title>
+    <link href="http://mistys-internet.website/blog/blog/2026/08/01/decoding-magic-school-lunars-save-game-format/"/>
+    <updated>2026-08-01T15:52:41-07:00</updated>
+    <id>http://mistys-internet.website/blog/blog/2026/08/01/decoding-magic-school-lunars-save-game-format</id>
+    <content type="html"><![CDATA[<p>As I&rsquo;ve mentioned in a <a href="http://mistys-internet.website/blog/blog/2026/03/27/forget-spreadsheets/">previous post</a>, I&rsquo;ve been working on a fan translation for a Sega Saturn game called <em>Magic School Lunar!</em> As I get closer to the end of the process I&rsquo;ve been doing more playtesting, but since I&rsquo;m only testing the script at this point I found myself wanting to cut out the parts of the game I don&rsquo;t really need to be testing right now. This game has an infamously high random battle rate; at least half my time playing the game is just going through battles<sup id="fnref:1"><a href="#fn:1" rel="footnote">1</a></sup>, and there&rsquo;s no reason to waste my time with any of that when I just want to check the script in-game.</p>
+
+<p>I already know how to turn the encounter rate off, but that wouldn&rsquo;t solve boss battles. I&rsquo;d need to be able to fight those for real, <em>and</em> since I&rsquo;d be skipping all of the random battles I&rsquo;d be going into each boss with underpowered level 1 characters.</p>
+
+<p>There are probably other ways to have tackled this, but I decided to go about it by working out the game&rsquo;s save file format so that I could just start the game giving every character maxed out stats. Being able to edit the save files further down the line might turn out to be handy.</p>
+
+<p>The Saturn, like other CD-based systems, uses a memory card<sup id="fnref:2"><a href="#fn:2" rel="footnote">2</a></sup> format with multiple saves per memory card, so I started by extracting the individual game save<sup id="fnref:3"><a href="#fn:3" rel="footnote">3</a></sup> as its own file so that I didn&rsquo;t need to worry about running into anything unrelated from other saves on the same cards. I made a save game right at the start of the game, noted down my party&rsquo;s stats, then started digging in the file to see if I could find them.</p>
+
+<p>&hellip;but I didn&rsquo;t, which surprised me. I started out looking for key stats like attack and defense, but none of the primary stats I wanted seemed to be present in the save game except HP and MP. I was a little puzzled, but as I tried searching for other stats I realized what was happening: the only value I could find was the character&rsquo;s total experience points&hellip; and that was also the only thing I <em>needed</em> to find.</p>
+
+<p><em>Magic School Lunar!</em> has no way for your character to raise their stats outside of gaining levels, and no way to gain levels outside of gaining experience. It wasn&rsquo;t storing the rest of those stats because it <em>didn&rsquo;t need to</em>: given just your current experience pool, the game can calculate what level you&rsquo;re at by checking where that puts you on the level curve, and then look up what your stats <em>should</em> be at that level. I wasn&rsquo;t finding the rest of those stats since they never really exist outside of memory!</p>
+
+<p>I&rsquo;d been hoping to just put all my stats up to the maximum, so this wasn&rsquo;t <em>quite</em> what I was after, but it&rsquo;s good enough<sup id="fnref:4"><a href="#fn:4" rel="footnote">4</a></sup>. I could just give everyone the maximum experience to bump them up to the highest possible level, and that&rsquo;ll be plenty<sup id="fnref:5"><a href="#fn:5" rel="footnote">5</a></sup>. So I edited one character&rsquo;s XP, loaded it in the game, and&hellip; it didn&rsquo;t work.</p>
+
+<p><img src="http://mistys-internet.website/blog/images/save-editor/unavailable.png" alt="Screenshot of the save game loading screen with a game simply marked &quot;Unavailable&quot;" /></p>
+
+<p>I wasn&rsquo;t all that surprised, though. Save game formats often have some kind of integrity protection feature, either to protect against cheating or corruption, so I&rsquo;d been expecting something like that here too. For a game like this it would almost certainly be using a simple checksum, which is usually just handled by literally summing all of the bytes in the data and storing that somewhere in the file. It&rsquo;s not a terribly secure hashing routine, but for something like this it doesn&rsquo;t need to be.</p>
+
+<p>So I tried loading the save, sitting for a minute, and then saving again. I figured that changing nothing else, not even moving my characters, should minimize the number of unrelated changes in the file and help me isolate the checksum. Unfortunately, as it turns out, it did that a little <em>too</em> well - the new save only had four bytes different, and I quickly identified those bytes not as a checksum but as a 32-bit integer at the start of the save tracking your playtime in seconds from the start of the game. It&rsquo;s useful knowing that&rsquo;s <em>not</em> the data I wanted, I suppose, but why didn&rsquo;t the checksum change?</p>
+
+<p>So I tried something different. I went out to fight a few battles, letting exactly one of my character gain a few experience points. I then tried comparing <em>that</em> save to the original one to see what changed. Obviously I had a lot more values to sift through, but I started narrowing it down. I also started producing some values to compare it to. Betting that this is probably a simple checksum format, I tried actually calculating the checksum for a few different possible slices of data and comparing them in 16-bit and 32-bit integer formats<sup id="fnref:6"><a href="#fn:6" rel="footnote">6</a></sup> to see if any of those values that had changed between the saves resembled them.</p>
+
+<p>This took me a little longer than I&rsquo;d expected, mostly because I made a bad assumption going in. Given the amount of data being summed here (about 1012 bytes), I presumed we were looking at at least a 16-bit value. Maybe it would reserve a full four bytes, even if it wouldn&rsquo;t need that much space. But as I started looking at potential hashes for the game, I noticed something. There was <em>one</em> byte that did resemble the checksums I&rsquo;d found&hellip; just one byte.</p>
+
+<p>As it turns out, <em>Magic School Lunar!</em> really has reserved a single byte for the checksum. It calculates a full sum over (most of) the save file, but then clips it down to only the most significant byte. So, for example, if the sum of all bytes is 18279 (<code>0x4767</code>), then it takes only the last byte of that number (<code>0x67</code>). The checksum also doesn&rsquo;t cover the <em>entire</em> file; it seems to exclude the first eight bytes, which act as a sort of header. That header includes the playtime (which I&rsquo;d already discovered wasn&rsquo;t checksummed!), the current chapter and average party level<sup id="fnref:7"><a href="#fn:7" rel="footnote">7</a></sup>, and the checksum itself. Once I started checksumming everything <em>past</em> the first eight bytes, I was able to produce a checksum that matched what the game itself did and ensured it would be happy to accept my changes.</p>
+
+<p><img src="http://mistys-internet.website/blog/images/save-editor/experience.png" alt="Screenshot of the character stats for a character named Elie, showing that she has 9999999 experience points." /></p>
+
+<p>So I tested it out and confirmed that, yes, the game was happy to accept my changes now! As it happens, a single character starts the game with the maximum amount of experience<sup id="fnref:8"><a href="#fn:8" rel="footnote">8</a></sup>, so I even knew the maximum experience I could assign everyone else to max their stats out and make them as powerful as I could.</p>
+
+<p><img src="http://mistys-internet.website/blog/images/save-editor/party.png" alt="Screenshot of the world map of an RPG at the beginning of the game, showing the party members are all at level 99." /></p>
+
+<p>To make these tweaks easier on myself, I threw together a quick and dirty save editor in Python. I&rsquo;ve also typed up my notes on where everything is located in the save file in case anyone else finds that useful in the future. I&rsquo;ve <a href="https://codeberg.org/mistydemeo/msl-save-editor">put it up on Codeberg</a>, and in the meantime I&rsquo;m back to testing now that I never have to worry about winning a battle again.</p>
+<div class="footnotes">
+<hr/>
+<ol>
+<li id="fn:1">
+<p>And that&rsquo;s <em>after</em> I&rsquo;ve adjusted the encounter rate from the original game to make it more fun to play!<a href="#fnref:1" rev="footnote">&#8617;</a></p></li>
+<li id="fn:2">
+<p>The Saturn actually also comes with builtin save memory, which is surprisingly convenient. It&rsquo;s only 32KB, but for the era that&rsquo;s spacious enough that I think a lot of Saturn owners never bothered buying an external memory card.<a href="#fnref:2" rev="footnote">&#8617;</a></p></li>
+<li id="fn:3">
+<p>Extracted Saturn saves are usually handled in a format called <a href="https://github.com/slinga-homebrew/Save-Game-BUP-Scripts">BUP</a>, which was created by the Saturn community and which is supported by a number of different tools now. I was working with BUP files, but note that all of my references to offsets in this post assume there&rsquo;s no BUP header at the start of the file. If you&rsquo;re reading along with your own save in BUP format and would like to compare, just add 0x40 to any offset I mention.<a href="#fnref:3" rev="footnote">&#8617;</a></p></li>
+<li id="fn:4">
+<p>I suppose I could also have edited the stats table in the game to max out those stats, but I&rsquo;m trying to avoid making too many code/data changes that are unrelated to the translation just to make sure I don&rsquo;t confuse bugs from my debug settings for bugs in the translation.<a href="#fnref:4" rev="footnote">&#8617;</a></p></li>
+<li id="fn:5">
+<p>My first testing playthrough, where I left battles on, I finished the game at level 41. Since level 99 is the cap, I should be able to easily stomp every boss at this level without needing to fight a single random battle.<a href="#fnref:5" rev="footnote">&#8617;</a></p></li>
+<li id="fn:6">
+<p><a href="https://imhex.werwolv.net">ImHex</a>&rsquo;s builtin checksum feature was pretty useful for this, since it updates in realtime as you select data in the file. Unfortunately it also seems to be <em>very</em> crash-prone, so it took me a little longer than it might have otherwise.<a href="#fnref:6" rev="footnote">&#8617;</a></p></li>
+<li id="fn:7">
+<p>The chapter and average party level are just for display in the save loading screen; changing them does nothing else. They&rsquo;re followed by what looks like a padding byte, since it&rsquo;s always been 0 in every save I&rsquo;ve checked.<a href="#fnref:7" rev="footnote">&#8617;</a></p></li>
+<li id="fn:8">
+<p>For a brief period, the characters are joined by an extremely powerful sorceror named Glen. He starts the game maxed out at level 99 and easily stomps out any enemy he runs into, just to emphasize how much more powerful he is than anyone else.<a href="#fnref:8" rev="footnote">&#8617;</a></p></li>
+</ol>
+</div>
+
+]]></content>
+  </entry>
   
   <entry>
     <title type="html"><![CDATA[Searching for the Broken-down Chiptune Player of My Dreams]]></title>
@@ -176,7 +239,7 @@
 
 <p>I&rsquo;ve just released <a href="https://github.com/axodotdev/cargo-dist/releases/tag/v0.28.1">version 0.28.1</a>, a bugfix release based on the last stable version. This fixes the critical issues around GitHub Actions runners and also includes a number of other important bugfixes. Please give it a try and let me know how it goes!</p>
 
-<p>I&rsquo;m planning an 0.29.0 in the near future containing all of the improvements that originated in Astral&rsquo;s forkm and longterm I&rsquo;m planning to keep it going as long as there are people interested in using it. I&rsquo;d like this to move forward in a community-supported model with members of the community contributing new features they&rsquo;re interested in.</p>
+<p>I&rsquo;m planning an 0.29.0 in the near future containing all of the improvements that originated in Astral&rsquo;s fork, and longterm I&rsquo;m planning to keep it going as long as there are people interested in using it. I&rsquo;d like this to move forward in a community-supported model with members of the community contributing new features they&rsquo;re interested in.</p>
 
 <p>Got thoughts? Let me know <a href="https://github.com/axodotdev/cargo-dist/issues">on the issue tracker</a> or <a href="https://discord.gg/MnyjrpTceV">on the official discord</a>.</p>
 ]]></content>
@@ -1809,73 +1872,6 @@
 
 
 <p>So the next time you&rsquo;re bashing your head against build failures in your project, give <code>brew bundle exec</code> a try. It might just solve your problems for you!</p>
-]]></content>
-  </entry>
-  
-  <entry>
-    <title type="html"><![CDATA[The Hunt for the Lost Phoenix Games]]></title>
-    <link href="http://mistys-internet.website/blog/blog/2019/02/20/the-hunt-for-the-lost-phoenix-games/"/>
-    <updated>2019-02-20T20:22:52-08:00</updated>
-    <id>http://mistys-internet.website/blog/blog/2019/02/20/the-hunt-for-the-lost-phoenix-games</id>
-    <content type="html"><![CDATA[<p>Among trashgame fans, Phoenix Games are one of the most infamous game publishers of all time. They&rsquo;re famous for making games of the lowest possible quality for the lowest possible price; their most infamous &ldquo;games&rdquo; <a href="https://youtu.be/j4sMwSWoSJY">were just poorly-animated movies on a PS2 disc</a>. They&rsquo;re the kind of fascinating bad you just can&rsquo;t help but love for their own sake.</p>
-
-<p>In their last year of life, Phoenix started publishing Nintendo DS games. They had an aggressive release schedule; in 2008 they announced plans to release 20 games inside of a year, most of which never came out. <em>Which</em> games did or didn&rsquo;t come out is still hard to figure out. Many online release lists take Phoenix Games&rsquo;s estimated release dates at face value, including many games that probably never came out. I&rsquo;ve put together a list of what I&rsquo;ve been able to confirm in the hopes that anyone with more information can help out.</p>
-
-<p>Out of the 20 games Phoenix announced, only five definitely came out under Phoenix themselves. There are confirmed physical copies of these games and ROM dumps on the internet. Three more were licensed to other publishers after Phoenix&rsquo;s bankruptcy. The other twelve are less certain; I&rsquo;ve divided these into three categories with explanations below. Phoenix declared bankruptcy in early 2009, and I haven&rsquo;t been able to confirm that any games were released after the end of 2008. If you have any information, please contact me via email or <a href="https://twitter.com/mistydemeo">on Twitter</a>!</p>
-
-<p>Definitely released:</p>
-
-<ul>
-<li><em>12</em> - NorthPole Studio, 2008</li>
-<li><em>Adventures of Pinocchio</em> - Unknown, 2008</li>
-<li><em>Peter Pan&rsquo;s Playground</em> - Unknown, 2008</li>
-<li><em>Polar Rampage</em> - CyberPlanet, 2008</li>
-<li><em>Valentines Day</em> - NorthPole Studio, 2008</li>
-</ul>
-
-
-<p>Released by other developers:</p>
-
-<ul>
-<li><em>Coral Savior</em> - NorthPole Studio; released as <em>Bermuda Triangle: Saving the Coral</em> by Storm City Games, in North America, 2010; and as <em>Bermuda Triangle</em> by Funbox Media, in Europe, 2011</li>
-<li><em>Hoppie II</em> - CyberPlanet; released as <em>Hoppie</em>, by Maximum Family Games, in North America, 2011</li>
-<li><em>Veggy World</em> - CyberPlanet; released by Maximum Family Games, in North America, 2011</li>
-</ul>
-
-
-<p>Possibly released:</p>
-
-<p>These games had finalized cover art and announced release dates. The games in this category have been found in some online store catalogues, suggesting they may have either been released or at least had already been offered to stores.</p>
-
-<ul>
-<li><em>Jungle Gang: Perfect Plans</em> - Listed in an <a href="https://www.mcvuk.com/business/whats-new-october-17th-08">MCV article</a> as having been released October 17, 2008. Listed in a few online store catalogues as sold out.</li>
-<li><em>Love Heart</em> - Reviewed by Polish site <a href="https://www.gry-online.pl/gry/love-heart/zb24cb">GRYOnline.pl</a>, who gave it a 2008 release date.</li>
-</ul>
-
-
-<p>Probably not released:</p>
-
-<p>Included in release lists, but with no store pages to indicate they were ever actually released. Some of these games were given multiple release dates, probably because they were delayed and solicited multiple times.</p>
-
-<ul>
-<li><em>Dalmatians 4</em> - Listed in a <a href="http://playstationcollecting.com/forum/messageview.cfm?catid=76&amp;threadid=73644&amp;StartRow=26">PlayStation Collecting forums</a> catalogue as having been released on February 13, 2009.</li>
-<li><em>Lion and the King 3</em> - Listed in a <a href="http://playstationcollecting.com/forum/messageview.cfm?catid=76&amp;threadid=73644&amp;StartRow=26">PlayStation Collecting forums</a> catalogue as having been released on both October 24, 2008 and February 13, 2009.</li>
-<li><em>Monster Egg II</em> - Listed in a <a href="http://playstationcollecting.com/forum/messageview.cfm?catid=76&amp;threadid=73644&amp;StartRow=26">PlayStation Collecting forums</a> catalogue as having been released on both November 28, 2008 and March 13, 2009.</li>
-<li><em>Rat-A-Box</em> - Listed in an <a href="https://www.mcvuk.com/business/whats-new-october-17th-08">MCV article</a> as having been released October 17, 2008, but no store catalogue entries.</li>
-</ul>
-
-
-<p>Definitely not released:</p>
-
-<ul>
-<li><em>Cinderella&rsquo;s Fairy Tale</em> - Final cover art, but never included in any release lists.</li>
-<li><em>Greatest Flood</em> - No cover art or homepage.</li>
-<li><em>Iron Chef II</em> - Final cover art, but never included in any release lists.</li>
-<li><em>Monster Dessert</em> - No cover art or homepage.</li>
-<li><em>Princess Snow White</em> - No cover art or homepage.</li>
-<li><em>War in Heaven</em> - Final cover art, but never included in any release lists.</li>
-</ul>
-
 ]]></content>
   </entry>
   

@@ -11,7 +11,7 @@
   <meta name="fediverse:creator" content="@misty@digipres.club">
 
   
-  <meta name="description" content="The short, no-clickbait version: to switch the Mac version of Puyo Puyo Fever to English, edit ~/Library/Preferences/PuyoPuyo Fever/PUYOF.BIN and set &hellip;">
+  <meta name="description" content="I&rsquo;ve used a lot of tools over the years, which means I&rsquo;ve seen a lot of tools hit a plateau. That&rsquo;s not always a problem; sometimes &hellip;">
   
 
   <!-- http://t.co/dKP3o1e -->
@@ -65,6 +65,47 @@
     <div id="content">
       <div class="blog-index">
   
+  
+  
+    <article>
+      
+  <header>
+    
+      <h1 class="entry-title"><a href="/blog/blog/2024/07/12/github-is-starting-to-feel-like-legacy-software/">"GitHub" Is Starting to Feel Like Legacy Software</a></h1>
+    
+    
+      <p class="meta">
+        
+
+
+
+
+<time class='entry-date' datetime='2024-07-12T12:58:54-07:00'><span class='date'><span class='date-month'>Jul</span> <span class='date-day'>12</span><span class='date-suffix'>th</span>, <span class='date-year'>2024</span></span> <span class='time'>12:58 pm</span></time>
+        
+      </p>
+    
+  </header>
+
+
+  <div class="entry-content"><p>I&rsquo;ve used a lot of tools over the years, which means I&rsquo;ve seen a lot of tools hit a plateau. That&rsquo;s not always a problem; sometimes something is just &ldquo;done&rdquo; and won&rsquo;t need any changes. Often, though, it&rsquo;s a sign of what&rsquo;s coming. Every now and then, something will pull back out of it and start improving again, but it&rsquo;s often an early sign of long-term decline. I can&rsquo;t always tell if something&rsquo;s just coasting along or if it&rsquo;s actually started to get worse; it&rsquo;s easy to be the boiling frog. That changes for me when something that <em>really</em> matters to me breaks.</p>
+
+<p>To me, one of GitHub&rsquo;s killer power user features is its <code>blame</code> view. <code>git blame</code> on the commandline is useful but hard to read; it&rsquo;s not the interface I reach for every day. GitHub&rsquo;s web UI is not only convenient, but the ease by which I can click through to older versions of the blame view on a line by line basis is uniquely powerful. It&rsquo;s one of those features that anchors me to a product: I stopped using offline graphical git clients because it was just that much nicer.</p>
+
+<p>The other day though, I tried to use the blame view on a large file and ran into an issue I don&rsquo;t remember seeing before: I just <em>couldn&rsquo;t find</em> the line of code I was searching for. I threw various keywords from that line into the browser&rsquo;s command+F search box, and nothing came up. I was stumped until a moment later, while I was idly scrolling the page while doing the search again, and it finally found the line I was looking for. I realized what must have happened.</p>
+
+<p>I&rsquo;d heard rumblings that GitHub&rsquo;s in the middle of shipping a frontend rewrite in React, and I realized this must be it. The problem wasn&rsquo;t that the line I wanted wasn&rsquo;t on the page&mdash;it&rsquo;s that the whole document wasn&rsquo;t being rendered at once, so my browser&rsquo;s builtin search bar just <em>couldn&rsquo;t find it</em>. On a hunch, I tried disabling JavaScript entirely in the browser, and suddenly it started working again. GitHub is <em>able</em> to send a fully server-side rendered version of the page, which actually works like it should, but doesn&rsquo;t do so unless JavaScript is completely unavailable.</p>
+
+<p>I&rsquo;m hardly anti-JavaScript, and I&rsquo;m not anti-React either. Any tool&rsquo;s perfectly fine when used in the right place. The problem: this <em>isn&rsquo;t the right place</em>, and what is to me personally a key feature suddenly doesn&rsquo;t work right all the time anymore. This isn&rsquo;t the only GitHub feature that&rsquo;s felt subtly worse in the past few years&mdash;the once-industry-leading status page no longer reports minor availability issues in an even vaguely timely manner; Actions runs randomly drop network connections to GitHub&rsquo;s own APIs; hitting the merge button sometimes scrolls the page to the wrong position&mdash;but this is the first moment where it really hit me that GitHub&rsquo;s probably not going to get better again from here.</p>
+
+<p>The corporate branding, the new &ldquo;AI-powered developer platform&rdquo; slogan, makes it clear that what I think of as &ldquo;GitHub&rdquo;&mdash;the traditional website, what are to me the core features&mdash;simply isn&rsquo;t Microsoft&rsquo;s priority at this point in time. I know many talented people at GitHub who care, but the company&rsquo;s priorities just don&rsquo;t seem to value what I value about the service. This isn&rsquo;t an anti-AI statement so much as a recognition that the tool I still need to use every day is past its prime. Copilot isn&rsquo;t navigating the website for me, replacing my need to the website as it exists today. I&rsquo;ve had tools hit this phase of decline and turn it around, but I&rsquo;m not optimistic. It&rsquo;s still plenty usable now, and probably will be for some years to come, but I&rsquo;ll want to know what other options I have <em>now</em> rather than when things get worse than this.</p>
+
+<p>And in the meantime, well&hellip; I still need to use GitHub everyday, but maybe it&rsquo;s time to start exploring new platforms&mdash;and find a good local <code>blame</code> tool that works as well as the GitHub web interface used to. (Got a fave? Send it to me at <a href="https://digipres.club/@misty">misty@digipres.club</a> / <a href="https://bsky.app/profile/cdrom.ca">@cdrom.ca</a>. Please!)</p>
+</div>
+  
+  
+
+
+    </article>
   
   
     <article>
@@ -933,93 +974,6 @@
 
     </article>
   
-  
-    <article>
-      
-  <header>
-    
-      <h1 class="entry-title"><a href="/blog/blog/2019/02/20/the-hunt-for-the-lost-phoenix-games/">The Hunt for the Lost Phoenix Games</a></h1>
-    
-    
-      <p class="meta">
-        
-
-
-
-
-<time class='entry-date' datetime='2019-02-20T20:22:52-08:00'><span class='date'><span class='date-month'>Feb</span> <span class='date-day'>20</span><span class='date-suffix'>th</span>, <span class='date-year'>2019</span></span> <span class='time'>8:22 pm</span></time>
-        
-      </p>
-    
-  </header>
-
-
-  <div class="entry-content"><p>Among trashgame fans, Phoenix Games are one of the most infamous game publishers of all time. They&rsquo;re famous for making games of the lowest possible quality for the lowest possible price; their most infamous &ldquo;games&rdquo; <a href="https://youtu.be/j4sMwSWoSJY">were just poorly-animated movies on a PS2 disc</a>. They&rsquo;re the kind of fascinating bad you just can&rsquo;t help but love for their own sake.</p>
-
-<p>In their last year of life, Phoenix started publishing Nintendo DS games. They had an aggressive release schedule; in 2008 they announced plans to release 20 games inside of a year, most of which never came out. <em>Which</em> games did or didn&rsquo;t come out is still hard to figure out. Many online release lists take Phoenix Games&rsquo;s estimated release dates at face value, including many games that probably never came out. I&rsquo;ve put together a list of what I&rsquo;ve been able to confirm in the hopes that anyone with more information can help out.</p>
-
-<p>Out of the 20 games Phoenix announced, only five definitely came out under Phoenix themselves. There are confirmed physical copies of these games and ROM dumps on the internet. Three more were licensed to other publishers after Phoenix&rsquo;s bankruptcy. The other twelve are less certain; I&rsquo;ve divided these into three categories with explanations below. Phoenix declared bankruptcy in early 2009, and I haven&rsquo;t been able to confirm that any games were released after the end of 2008. If you have any information, please contact me via email or <a href="https://twitter.com/mistydemeo">on Twitter</a>!</p>
-
-<p>Definitely released:</p>
-
-<ul>
-<li><em>12</em> - NorthPole Studio, 2008</li>
-<li><em>Adventures of Pinocchio</em> - Unknown, 2008</li>
-<li><em>Peter Pan&rsquo;s Playground</em> - Unknown, 2008</li>
-<li><em>Polar Rampage</em> - CyberPlanet, 2008</li>
-<li><em>Valentines Day</em> - NorthPole Studio, 2008</li>
-</ul>
-
-
-<p>Released by other developers:</p>
-
-<ul>
-<li><em>Coral Savior</em> - NorthPole Studio; released as <em>Bermuda Triangle: Saving the Coral</em> by Storm City Games, in North America, 2010; and as <em>Bermuda Triangle</em> by Funbox Media, in Europe, 2011</li>
-<li><em>Hoppie II</em> - CyberPlanet; released as <em>Hoppie</em>, by Maximum Family Games, in North America, 2011</li>
-<li><em>Veggy World</em> - CyberPlanet; released by Maximum Family Games, in North America, 2011</li>
-</ul>
-
-
-<p>Possibly released:</p>
-
-<p>These games had finalized cover art and announced release dates. The games in this category have been found in some online store catalogues, suggesting they may have either been released or at least had already been offered to stores.</p>
-
-<ul>
-<li><em>Jungle Gang: Perfect Plans</em> - Listed in an <a href="https://www.mcvuk.com/business/whats-new-october-17th-08">MCV article</a> as having been released October 17, 2008. Listed in a few online store catalogues as sold out.</li>
-<li><em>Love Heart</em> - Reviewed by Polish site <a href="https://www.gry-online.pl/gry/love-heart/zb24cb">GRYOnline.pl</a>, who gave it a 2008 release date.</li>
-</ul>
-
-
-<p>Probably not released:</p>
-
-<p>Included in release lists, but with no store pages to indicate they were ever actually released. Some of these games were given multiple release dates, probably because they were delayed and solicited multiple times.</p>
-
-<ul>
-<li><em>Dalmatians 4</em> - Listed in a <a href="http://playstationcollecting.com/forum/messageview.cfm?catid=76&amp;threadid=73644&amp;StartRow=26">PlayStation Collecting forums</a> catalogue as having been released on February 13, 2009.</li>
-<li><em>Lion and the King 3</em> - Listed in a <a href="http://playstationcollecting.com/forum/messageview.cfm?catid=76&amp;threadid=73644&amp;StartRow=26">PlayStation Collecting forums</a> catalogue as having been released on both October 24, 2008 and February 13, 2009.</li>
-<li><em>Monster Egg II</em> - Listed in a <a href="http://playstationcollecting.com/forum/messageview.cfm?catid=76&amp;threadid=73644&amp;StartRow=26">PlayStation Collecting forums</a> catalogue as having been released on both November 28, 2008 and March 13, 2009.</li>
-<li><em>Rat-A-Box</em> - Listed in an <a href="https://www.mcvuk.com/business/whats-new-october-17th-08">MCV article</a> as having been released October 17, 2008, but no store catalogue entries.</li>
-</ul>
-
-
-<p>Definitely not released:</p>
-
-<ul>
-<li><em>Cinderella&rsquo;s Fairy Tale</em> - Final cover art, but never included in any release lists.</li>
-<li><em>Greatest Flood</em> - No cover art or homepage.</li>
-<li><em>Iron Chef II</em> - Final cover art, but never included in any release lists.</li>
-<li><em>Monster Dessert</em> - No cover art or homepage.</li>
-<li><em>Princess Snow White</em> - No cover art or homepage.</li>
-<li><em>War in Heaven</em> - Final cover art, but never included in any release lists.</li>
-</ul>
-
-</div>
-  
-  
-
-
-    </article>
-  
   <div class="pagination">
     
       <a class="prev" href="/blog/posts/3">&larr; Older</a>
@@ -1037,6 +991,10 @@
   <ul id="recent_posts">
     
       <li class="post">
+        <a href="/blog/blog/2026/08/01/decoding-magic-school-lunars-save-game-format/">Decoding Magic School Lunar's Save Game Format</a>
+      </li>
+    
+      <li class="post">
         <a href="/blog/blog/2026/08/01/searching-for-the-broken-down-chiptune-player-of-my-dreams/">Searching for the Broken-down Chiptune Player of My Dreams</a>
       </li>
     
@@ -1050,10 +1008,6 @@
     
       <li class="post">
         <a href="/blog/blog/2025/07/20/dist-0-dot-28-dot-1-is-out/">Dist 0.28.1 Is Out</a>
-      </li>
-    
-      <li class="post">
-        <a href="/blog/blog/2025/05/13/the-database-row-that-did-and-didnt-exist/">The Database Row That Did and Didn't Exist</a>
       </li>
     
   </ul>

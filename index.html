@@ -11,7 +11,7 @@
   <meta name="fediverse:creator" content="@misty@digipres.club">
 
   
-  <meta name="description" content="This is a story from the old days before we had YouTube or the bandwidth to stream audio. Back then, if you wanted to listen to music from a video &hellip;">
+  <meta name="description" content="As I&rsquo;ve mentioned in a previous post, I&rsquo;ve been working on a fan translation for a Sega Saturn game called Magic School Lunar! As I get &hellip;">
   
 
   <!-- http://t.co/dKP3o1e -->
@@ -65,6 +65,89 @@
     <div id="content">
       <div class="blog-index">
   
+  
+  
+    <article>
+      
+  <header>
+    
+      <h1 class="entry-title"><a href="/blog/blog/2026/08/01/decoding-magic-school-lunars-save-game-format/">Decoding Magic School Lunar's Save Game Format</a></h1>
+    
+    
+      <p class="meta">
+        
+
+
+
+
+<time class='entry-date' datetime='2026-08-01T15:52:41-07:00'><span class='date'><span class='date-month'>Aug</span> <span class='date-day'>1</span><span class='date-suffix'>st</span>, <span class='date-year'>2026</span></span> <span class='time'>3:52 pm</span></time>
+        
+      </p>
+    
+  </header>
+
+
+  <div class="entry-content"><p>As I&rsquo;ve mentioned in a <a href="/blog/blog/2026/03/27/forget-spreadsheets/">previous post</a>, I&rsquo;ve been working on a fan translation for a Sega Saturn game called <em>Magic School Lunar!</em> As I get closer to the end of the process I&rsquo;ve been doing more playtesting, but since I&rsquo;m only testing the script at this point I found myself wanting to cut out the parts of the game I don&rsquo;t really need to be testing right now. This game has an infamously high random battle rate; at least half my time playing the game is just going through battles<sup id="fnref:1"><a href="#fn:1" rel="footnote">1</a></sup>, and there&rsquo;s no reason to waste my time with any of that when I just want to check the script in-game.</p>
+
+<p>I already know how to turn the encounter rate off, but that wouldn&rsquo;t solve boss battles. I&rsquo;d need to be able to fight those for real, <em>and</em> since I&rsquo;d be skipping all of the random battles I&rsquo;d be going into each boss with underpowered level 1 characters.</p>
+
+<p>There are probably other ways to have tackled this, but I decided to go about it by working out the game&rsquo;s save file format so that I could just start the game giving every character maxed out stats. Being able to edit the save files further down the line might turn out to be handy.</p>
+
+<p>The Saturn, like other CD-based systems, uses a memory card<sup id="fnref:2"><a href="#fn:2" rel="footnote">2</a></sup> format with multiple saves per memory card, so I started by extracting the individual game save<sup id="fnref:3"><a href="#fn:3" rel="footnote">3</a></sup> as its own file so that I didn&rsquo;t need to worry about running into anything unrelated from other saves on the same cards. I made a save game right at the start of the game, noted down my party&rsquo;s stats, then started digging in the file to see if I could find them.</p>
+
+<p>&hellip;but I didn&rsquo;t, which surprised me. I started out looking for key stats like attack and defense, but none of the primary stats I wanted seemed to be present in the save game except HP and MP. I was a little puzzled, but as I tried searching for other stats I realized what was happening: the only value I could find was the character&rsquo;s total experience points&hellip; and that was also the only thing I <em>needed</em> to find.</p>
+
+<p><em>Magic School Lunar!</em> has no way for your character to raise their stats outside of gaining levels, and no way to gain levels outside of gaining experience. It wasn&rsquo;t storing the rest of those stats because it <em>didn&rsquo;t need to</em>: given just your current experience pool, the game can calculate what level you&rsquo;re at by checking where that puts you on the level curve, and then look up what your stats <em>should</em> be at that level. I wasn&rsquo;t finding the rest of those stats since they never really exist outside of memory!</p>
+
+<p>I&rsquo;d been hoping to just put all my stats up to the maximum, so this wasn&rsquo;t <em>quite</em> what I was after, but it&rsquo;s good enough<sup id="fnref:4"><a href="#fn:4" rel="footnote">4</a></sup>. I could just give everyone the maximum experience to bump them up to the highest possible level, and that&rsquo;ll be plenty<sup id="fnref:5"><a href="#fn:5" rel="footnote">5</a></sup>. So I edited one character&rsquo;s XP, loaded it in the game, and&hellip; it didn&rsquo;t work.</p>
+
+<p><img src="/blog/images/save-editor/unavailable.png" alt="Screenshot of the save game loading screen with a game simply marked &quot;Unavailable&quot;" /></p>
+
+<p>I wasn&rsquo;t all that surprised, though. Save game formats often have some kind of integrity protection feature, either to protect against cheating or corruption, so I&rsquo;d been expecting something like that here too. For a game like this it would almost certainly be using a simple checksum, which is usually just handled by literally summing all of the bytes in the data and storing that somewhere in the file. It&rsquo;s not a terribly secure hashing routine, but for something like this it doesn&rsquo;t need to be.</p>
+
+<p>So I tried loading the save, sitting for a minute, and then saving again. I figured that changing nothing else, not even moving my characters, should minimize the number of unrelated changes in the file and help me isolate the checksum. Unfortunately, as it turns out, it did that a little <em>too</em> well - the new save only had four bytes different, and I quickly identified those bytes not as a checksum but as a 32-bit integer at the start of the save tracking your playtime in seconds from the start of the game. It&rsquo;s useful knowing that&rsquo;s <em>not</em> the data I wanted, I suppose, but why didn&rsquo;t the checksum change?</p>
+
+<p>So I tried something different. I went out to fight a few battles, letting exactly one of my character gain a few experience points. I then tried comparing <em>that</em> save to the original one to see what changed. Obviously I had a lot more values to sift through, but I started narrowing it down. I also started producing some values to compare it to. Betting that this is probably a simple checksum format, I tried actually calculating the checksum for a few different possible slices of data and comparing them in 16-bit and 32-bit integer formats<sup id="fnref:6"><a href="#fn:6" rel="footnote">6</a></sup> to see if any of those values that had changed between the saves resembled them.</p>
+
+<p>This took me a little longer than I&rsquo;d expected, mostly because I made a bad assumption going in. Given the amount of data being summed here (about 1012 bytes), I presumed we were looking at at least a 16-bit value. Maybe it would reserve a full four bytes, even if it wouldn&rsquo;t need that much space. But as I started looking at potential hashes for the game, I noticed something. There was <em>one</em> byte that did resemble the checksums I&rsquo;d found&hellip; just one byte.</p>
+
+<p>As it turns out, <em>Magic School Lunar!</em> really has reserved a single byte for the checksum. It calculates a full sum over (most of) the save file, but then clips it down to only the most significant byte. So, for example, if the sum of all bytes is 18279 (<code>0x4767</code>), then it takes only the last byte of that number (<code>0x67</code>). The checksum also doesn&rsquo;t cover the <em>entire</em> file; it seems to exclude the first eight bytes, which act as a sort of header. That header includes the playtime (which I&rsquo;d already discovered wasn&rsquo;t checksummed!), the current chapter and average party level<sup id="fnref:7"><a href="#fn:7" rel="footnote">7</a></sup>, and the checksum itself. Once I started checksumming everything <em>past</em> the first eight bytes, I was able to produce a checksum that matched what the game itself did and ensured it would be happy to accept my changes.</p>
+
+<p><img src="/blog/images/save-editor/experience.png" alt="Screenshot of the character stats for a character named Elie, showing that she has 9999999 experience points." /></p>
+
+<p>So I tested it out and confirmed that, yes, the game was happy to accept my changes now! As it happens, a single character starts the game with the maximum amount of experience<sup id="fnref:8"><a href="#fn:8" rel="footnote">8</a></sup>, so I even knew the maximum experience I could assign everyone else to max their stats out and make them as powerful as I could.</p>
+
+<p><img src="/blog/images/save-editor/party.png" alt="Screenshot of the world map of an RPG at the beginning of the game, showing the party members are all at level 99." /></p>
+
+<p>To make these tweaks easier on myself, I threw together a quick and dirty save editor in Python. I&rsquo;ve also typed up my notes on where everything is located in the save file in case anyone else finds that useful in the future. I&rsquo;ve <a href="https://codeberg.org/mistydemeo/msl-save-editor">put it up on Codeberg</a>, and in the meantime I&rsquo;m back to testing now that I never have to worry about winning a battle again.</p>
+<div class="footnotes">
+<hr/>
+<ol>
+<li id="fn:1">
+<p>And that&rsquo;s <em>after</em> I&rsquo;ve adjusted the encounter rate from the original game to make it more fun to play!<a href="#fnref:1" rev="footnote">&#8617;</a></p></li>
+<li id="fn:2">
+<p>The Saturn actually also comes with builtin save memory, which is surprisingly convenient. It&rsquo;s only 32KB, but for the era that&rsquo;s spacious enough that I think a lot of Saturn owners never bothered buying an external memory card.<a href="#fnref:2" rev="footnote">&#8617;</a></p></li>
+<li id="fn:3">
+<p>Extracted Saturn saves are usually handled in a format called <a href="https://github.com/slinga-homebrew/Save-Game-BUP-Scripts">BUP</a>, which was created by the Saturn community and which is supported by a number of different tools now. I was working with BUP files, but note that all of my references to offsets in this post assume there&rsquo;s no BUP header at the start of the file. If you&rsquo;re reading along with your own save in BUP format and would like to compare, just add 0x40 to any offset I mention.<a href="#fnref:3" rev="footnote">&#8617;</a></p></li>
+<li id="fn:4">
+<p>I suppose I could also have edited the stats table in the game to max out those stats, but I&rsquo;m trying to avoid making too many code/data changes that are unrelated to the translation just to make sure I don&rsquo;t confuse bugs from my debug settings for bugs in the translation.<a href="#fnref:4" rev="footnote">&#8617;</a></p></li>
+<li id="fn:5">
+<p>My first testing playthrough, where I left battles on, I finished the game at level 41. Since level 99 is the cap, I should be able to easily stomp every boss at this level without needing to fight a single random battle.<a href="#fnref:5" rev="footnote">&#8617;</a></p></li>
+<li id="fn:6">
+<p><a href="https://imhex.werwolv.net">ImHex</a>&rsquo;s builtin checksum feature was pretty useful for this, since it updates in realtime as you select data in the file. Unfortunately it also seems to be <em>very</em> crash-prone, so it took me a little longer than it might have otherwise.<a href="#fnref:6" rev="footnote">&#8617;</a></p></li>
+<li id="fn:7">
+<p>The chapter and average party level are just for display in the save loading screen; changing them does nothing else. They&rsquo;re followed by what looks like a padding byte, since it&rsquo;s always been 0 in every save I&rsquo;ve checked.<a href="#fnref:7" rev="footnote">&#8617;</a></p></li>
+<li id="fn:8">
+<p>For a brief period, the characters are joined by an extremely powerful sorceror named Glen. He starts the game maxed out at level 99 and easily stomps out any enemy he runs into, just to emphasize how much more powerful he is than anyone else.<a href="#fnref:8" rev="footnote">&#8617;</a></p></li>
+</ol>
+</div>
+
+</div>
+  
+  
+
+
+    </article>
   
   
     <article>
@@ -305,7 +388,7 @@
 
 <p>I&rsquo;ve just released <a href="https://github.com/axodotdev/cargo-dist/releases/tag/v0.28.1">version 0.28.1</a>, a bugfix release based on the last stable version. This fixes the critical issues around GitHub Actions runners and also includes a number of other important bugfixes. Please give it a try and let me know how it goes!</p>
 
-<p>I&rsquo;m planning an 0.29.0 in the near future containing all of the improvements that originated in Astral&rsquo;s forkm and longterm I&rsquo;m planning to keep it going as long as there are people interested in using it. I&rsquo;d like this to move forward in a community-supported model with members of the community contributing new features they&rsquo;re interested in.</p>
+<p>I&rsquo;m planning an 0.29.0 in the near future containing all of the improvements that originated in Astral&rsquo;s fork, and longterm I&rsquo;m planning to keep it going as long as there are people interested in using it. I&rsquo;d like this to move forward in a community-supported model with members of the community contributing new features they&rsquo;re interested in.</p>
 
 <p>Got thoughts? Let me know <a href="https://github.com/axodotdev/cargo-dist/issues">on the issue tracker</a> or <a href="https://discord.gg/MnyjrpTceV">on the official discord</a>.</p>
 </div>
@@ -1337,47 +1420,6 @@
 
     </article>
   
-  
-    <article>
-      
-  <header>
-    
-      <h1 class="entry-title"><a href="/blog/blog/2024/07/12/github-is-starting-to-feel-like-legacy-software/">"GitHub" Is Starting to Feel Like Legacy Software</a></h1>
-    
-    
-      <p class="meta">
-        
-
-
-
-
-<time class='entry-date' datetime='2024-07-12T12:58:54-07:00'><span class='date'><span class='date-month'>Jul</span> <span class='date-day'>12</span><span class='date-suffix'>th</span>, <span class='date-year'>2024</span></span> <span class='time'>12:58 pm</span></time>
-        
-      </p>
-    
-  </header>
-
-
-  <div class="entry-content"><p>I&rsquo;ve used a lot of tools over the years, which means I&rsquo;ve seen a lot of tools hit a plateau. That&rsquo;s not always a problem; sometimes something is just &ldquo;done&rdquo; and won&rsquo;t need any changes. Often, though, it&rsquo;s a sign of what&rsquo;s coming. Every now and then, something will pull back out of it and start improving again, but it&rsquo;s often an early sign of long-term decline. I can&rsquo;t always tell if something&rsquo;s just coasting along or if it&rsquo;s actually started to get worse; it&rsquo;s easy to be the boiling frog. That changes for me when something that <em>really</em> matters to me breaks.</p>
-
-<p>To me, one of GitHub&rsquo;s killer power user features is its <code>blame</code> view. <code>git blame</code> on the commandline is useful but hard to read; it&rsquo;s not the interface I reach for every day. GitHub&rsquo;s web UI is not only convenient, but the ease by which I can click through to older versions of the blame view on a line by line basis is uniquely powerful. It&rsquo;s one of those features that anchors me to a product: I stopped using offline graphical git clients because it was just that much nicer.</p>
-
-<p>The other day though, I tried to use the blame view on a large file and ran into an issue I don&rsquo;t remember seeing before: I just <em>couldn&rsquo;t find</em> the line of code I was searching for. I threw various keywords from that line into the browser&rsquo;s command+F search box, and nothing came up. I was stumped until a moment later, while I was idly scrolling the page while doing the search again, and it finally found the line I was looking for. I realized what must have happened.</p>
-
-<p>I&rsquo;d heard rumblings that GitHub&rsquo;s in the middle of shipping a frontend rewrite in React, and I realized this must be it. The problem wasn&rsquo;t that the line I wanted wasn&rsquo;t on the page&mdash;it&rsquo;s that the whole document wasn&rsquo;t being rendered at once, so my browser&rsquo;s builtin search bar just <em>couldn&rsquo;t find it</em>. On a hunch, I tried disabling JavaScript entirely in the browser, and suddenly it started working again. GitHub is <em>able</em> to send a fully server-side rendered version of the page, which actually works like it should, but doesn&rsquo;t do so unless JavaScript is completely unavailable.</p>
-
-<p>I&rsquo;m hardly anti-JavaScript, and I&rsquo;m not anti-React either. Any tool&rsquo;s perfectly fine when used in the right place. The problem: this <em>isn&rsquo;t the right place</em>, and what is to me personally a key feature suddenly doesn&rsquo;t work right all the time anymore. This isn&rsquo;t the only GitHub feature that&rsquo;s felt subtly worse in the past few years&mdash;the once-industry-leading status page no longer reports minor availability issues in an even vaguely timely manner; Actions runs randomly drop network connections to GitHub&rsquo;s own APIs; hitting the merge button sometimes scrolls the page to the wrong position&mdash;but this is the first moment where it really hit me that GitHub&rsquo;s probably not going to get better again from here.</p>
-
-<p>The corporate branding, the new &ldquo;AI-powered developer platform&rdquo; slogan, makes it clear that what I think of as &ldquo;GitHub&rdquo;&mdash;the traditional website, what are to me the core features&mdash;simply isn&rsquo;t Microsoft&rsquo;s priority at this point in time. I know many talented people at GitHub who care, but the company&rsquo;s priorities just don&rsquo;t seem to value what I value about the service. This isn&rsquo;t an anti-AI statement so much as a recognition that the tool I still need to use every day is past its prime. Copilot isn&rsquo;t navigating the website for me, replacing my need to the website as it exists today. I&rsquo;ve had tools hit this phase of decline and turn it around, but I&rsquo;m not optimistic. It&rsquo;s still plenty usable now, and probably will be for some years to come, but I&rsquo;ll want to know what other options I have <em>now</em> rather than when things get worse than this.</p>
-
-<p>And in the meantime, well&hellip; I still need to use GitHub everyday, but maybe it&rsquo;s time to start exploring new platforms&mdash;and find a good local <code>blame</code> tool that works as well as the GitHub web interface used to. (Got a fave? Send it to me at <a href="https://digipres.club/@misty">misty@digipres.club</a> / <a href="https://bsky.app/profile/cdrom.ca">@cdrom.ca</a>. Please!)</p>
-</div>
-  
-  
-
-
-    </article>
-  
   <div class="pagination">
     
       <a class="prev" href="/blog/posts/2">&larr; Older</a>
@@ -1393,6 +1435,10 @@
   <ul id="recent_posts">
     
       <li class="post">
+        <a href="/blog/blog/2026/08/01/decoding-magic-school-lunars-save-game-format/">Decoding Magic School Lunar's Save Game Format</a>
+      </li>
+    
+      <li class="post">
         <a href="/blog/blog/2026/08/01/searching-for-the-broken-down-chiptune-player-of-my-dreams/">Searching for the Broken-down Chiptune Player of My Dreams</a>
       </li>
     
@@ -1406,10 +1452,6 @@
     
       <li class="post">
         <a href="/blog/blog/2025/07/20/dist-0-dot-28-dot-1-is-out/">Dist 0.28.1 Is Out</a>
-      </li>
-    
-      <li class="post">
-        <a href="/blog/blog/2025/05/13/the-database-row-that-did-and-didnt-exist/">The Database Row That Did and Didn't Exist</a>
       </li>
     
   </ul>
