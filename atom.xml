@@ -4,7 +4,7 @@
   <title><![CDATA[The Future Is Now]]></title>
   <link href="http://mistys-internet.website/blog/atom.xml" rel="self"/>
   <link href="http://mistys-internet.website/blog/"/>
-  <updated>2026-08-02T11:52:01-07:00</updated>
+  <updated>2026-08-06T13:19:41-07:00</updated>
   <id>http://mistys-internet.website/blog/</id>
   <author>
     <name><![CDATA[Misty De Meo]]></name>
@@ -12,6 +12,37 @@
   </author>
   <generator uri="http://octopress.org/">Octopress</generator>
 
+  
+  <entry>
+    <title type="html"><![CDATA[What's Up With That Song From the Duck Game on Amiga CD-32 Anyway?]]></title>
+    <link href="http://mistys-internet.website/blog/blog/2026/08/06/whats-up-with-that-song-from-the-duck-game-on-amiga-cd-32-anyway/"/>
+    <updated>2026-08-06T13:18:23-07:00</updated>
+    <id>http://mistys-internet.website/blog/blog/2026/08/06/whats-up-with-that-song-from-the-duck-game-on-amiga-cd-32-anyway</id>
+    <content type="html"><![CDATA[<p>If you spend enough time on certain corners of YouTube there&rsquo;s a good chance you&rsquo;ve run into &ldquo;they didn&rsquo;t have to go this hard&rdquo; videos where people highlight the kinds of songs they&rsquo;ve found in obscure places they allege had no reason to be as good as they are. And, should you land on the video game sub-niche of this particular niche, there&rsquo;s a very good chance the title theme to <em>Donk! The Samurai Duck</em> for Amiga CD32 will eventually show up:</p>
+
+<iframe width="560" height="315" src="https://www.youtube.com/embed/yYIFQkVt2HY" title="YouTube video player" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" referrerpolicy="strict-origin-when-cross-origin" allowfullscreen></iframe>
+
+
+<p>I think a lot of these &ldquo;they didn&rsquo;t have to go this hard&rdquo; posts are overblown, but in this case they have a point. They quite genuinely did not need to go this hard!</p>
+
+<p>Listening to it, I found myself with questions. What exactly did this have to do with a samurai duck? (Nothing.) How did this make it into the game? And who is the eurodance song by?</p>
+
+<p>A quick search online told me I&rsquo;m not the only person wondering that. I&rsquo;ve seen quite a few posts by people asking who did that song, but no one seemed to have any answers. Which made me wonder, could I track it down myself?</p>
+
+<p>The game <em>does</em> have credits, which is normally where I&rsquo;d look to answer this kind of question. Given that it&rsquo;s still a mystery, you can imagine that it wasn&rsquo;t too much of a help this time. The game does have a credited composer, Tim Ericson, but the title theme is instead credited just to &ldquo;Fate!&rdquo; From context, it&rsquo;s not clear who Fate! <em>is</em>. Is that a band? A person? The abstract concept?</p>
+
+<p>This Tim Ericson has no other game credits at all, which isn&rsquo;t <em>rare</em> per se but it&rsquo;s definitely uncommon. That said, in the early CD game era a number of companies ended up pulling in people with experience in the pop or electronic music world since they were familiar with CD music production. Guessing that might be what was happening here, I went to Discogs where I found a <a href="https://www.discogs.com/artist/334008-Tim-Ericson">plausible looking Tim Ericson</a>. This one started out doing house/pop music production in the mid-90s before moving onto techno, and, well. Just have a listen to this song from two years after <em>Donk</em>:</p>
+
+<iframe width="560" height="315" src="https://www.youtube.com/embed/V6xaQd9IH5g" title="YouTube video player" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" referrerpolicy="strict-origin-when-cross-origin" allowfullscreen></iframe>
+
+
+<p>I&rsquo;d say that&rsquo;s a good match for the duck song, wouldn&rsquo;t you?</p>
+
+<p>So, at this point, I&rsquo;m pretty sure I know who Tim Ericson is, but who&rsquo;s Fate!? I have no definitive answers, but I&rsquo;ve got a reasonable guess. It&rsquo;s not unheard of for a production like this to put together a little virtual band; grab a few musicians and a singer you know, or even a group you&rsquo;ve been trying to launch professionally, and record a song with them. There&rsquo;s a good chance the name was coined one-off for the game with was no intention of ever using the name a second time. It&rsquo;s certainly a good way to imply they were using a licensed track from a band that you&rsquo;re meant to recognize.</p>
+
+<p>Wherever that &ldquo;Fate!&rdquo; name comes from, it&rsquo;s almost certainly the same Tim Ericson composing and producing this track just like with the rest of the game. Is it a bit of an anticlimax to say &ldquo;the credited composer of the game is the person who made the song people are wondering about&rdquo;? Maybe, but it seems many people asking this question haven&rsquo;t connected these particular dots. I&rsquo;d sure love all the details someday though!</p>
+]]></content>
+  </entry>
   
   <entry>
     <title type="html"><![CDATA[Decoding Magic School Lunar's Save Game Format]]></title>
@@ -1808,70 +1839,6 @@
 </ol>
 </div>
 
-]]></content>
-  </entry>
-  
-  <entry>
-    <title type="html"><![CDATA[Bundle Install With Homebrew Magic Using Brew Bundle Exec]]></title>
-    <link href="http://mistys-internet.website/blog/blog/2020/11/23/bundle-install-with-homebrew-magic-using-brew-bundle-exec/"/>
-    <updated>2020-11-23T20:30:00-08:00</updated>
-    <id>http://mistys-internet.website/blog/blog/2020/11/23/bundle-install-with-homebrew-magic-using-brew-bundle-exec</id>
-    <content type="html"><![CDATA[<p>Has this ever happened to you? You&rsquo;re writing a project in Ruby, JavaScript, Go, etc., and you have to build a dependency that uses a system library. So you <code>bundle install</code> and then, a few minutes later, your terminal spits up an ugly set of C compiler errors you don&rsquo;t know how to deal with. After dealing with this enough times I decided to do something about it.</p>
-
-<p><a href="https://brew.sh">Homebrew</a> already has a great tool in its arsenal for dealing with these problems. Homebrew needs to be able to build software reliably and robustly, after all - even if the user&rsquo;s system has weird software installed on it or strange misconfigurations. The <a href="https://docs.brew.sh/Formula-Cookbook#superenv-notes">&ldquo;superenv&rdquo; build environment</a> features intelligent automatic setup of build-related environment variables and <code>PATH</code>s based on just the requested dependencies, which filters out unrequested software and prevents a lot of common build failures that come from interfering software. It also uses shims for many common build tools to enforce just the right arguments passing through to the real tools.</p>
-
-<p>So I thought to myself - we solved that problem for Homebrew builds already, right? Wouldn&rsquo;t it be nice if I could just reuse that work for other things? So that&rsquo;s what I did. Homebrew already provides the <code>Brewfile</code> dependency declaration format and the <code>brew bundle</code> tool to library dependencies with Homebrew, and as a result there&rsquo;s already a great way to get the dependency information we&rsquo;d need to produce a reliable build environment. Since <code>brew bundle</code> is a Homebrew plugin, it has access to Homebrew&rsquo;s core code - including build environment setup. Putting these together, I wrote a feature called <code>brew bundle exec</code>. It takes the software you specify in your Brewfile and builds a dependency tree out of that, then sets up just the right build flags to let anything you want use them.</p>
-
-<p>For example, say I want to <code>gem install mysql2</code>. Often, you get something like this:</p>
-
-<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-<span class='line-number'>2</span>
-<span class='line-number'>3</span>
-<span class='line-number'>4</span>
-<span class='line-number'>5</span>
-<span class='line-number'>6</span>
-<span class='line-number'>7</span>
-</pre></td><td class='code'><pre><code class=''><span class='line'>$ gem install mysql2
-</span><span class='line'>Building native extensions. This could take a while...
-</span><span class='line'># several dozen lines later...
-</span><span class='line'>linking shared-object mysql2/mysql2.bundle
-</span><span class='line'>ld: library not found for -lssl
-</span><span class='line'>clang: error: linker command failed with exit code 1 (use -v to see invocation)
-</span><span class='line'>make: *** [mysql2.bundle] Error 1</span></code></pre></td></tr></table></div></figure>
-
-
-<p>Ew, right? Let&rsquo;s make that better.</p>
-
-<p>By creating a <code>Brewfile</code> with the line <code>brew "mysql"</code>, we can specify that we want to build against a Homebrew-installed MySQL <em>and</em> all of its dependencies. Just by running our command prefixed with <code>brew bundle exec --</code>, for example, <code>brew bundle exec -- gem install mysql2</code>, we can run that command in a build environment that knows exactly how to use its dependencies. Suddenly, everything works&mdash;no messing around with flags, no special options passed to <code>gem install</code>, and no fragile <code>bundle config</code> trickery.</p>
-
-<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-<span class='line-number'>2</span>
-<span class='line-number'>3</span>
-<span class='line-number'>4</span>
-<span class='line-number'>5</span>
-<span class='line-number'>6</span>
-<span class='line-number'>7</span>
-</pre></td><td class='code'><pre><code class=''><span class='line'>$ brew bundle exec -- gem install mysql2
-</span><span class='line'>Building native extensions. This could take a while...
-</span><span class='line'>Successfully installed mysql2-0.5.3
-</span><span class='line'>Parsing documentation for mysql2-0.5.3
-</span><span class='line'>Installing ri documentation for mysql2-0.5.3
-</span><span class='line'>Done installing documentation for mysql2 after 0 seconds
-</span><span class='line'>1 gem installed</span></code></pre></td></tr></table></div></figure>
-
-
-<p>What exactly does <code>brew bundle exec</code> set? There&rsquo;s a variety of flags set which are useful for a variety of different compilers and buildsystems.</p>
-
-<ul>
-<li><code>CC</code> and <code>CXX</code>, the compiler specification flags, point to Homebrew&rsquo;s compiler shims which help ensure that the right flags are passed to the real compiler being used.</li>
-<li><code>CFLAGS</code>, <code>CXXFLAGS</code>, and <code>CPPFLAGS</code> ensure that C and C++ compilers know about the header and library lookup paths for all of the <code>Brewfile</code> dependencies.</li>
-<li><code>PATH</code> ensures that all of the executables installed by <code>Brewfile</code> dependencies will be found first, before any tools of the same name that may be installed elsewhere on your system.</li>
-<li><code>PKG_CONFIG_LIBDIR</code> and <code>PKG_CONFIG_LIBDIR</code> ensure that the <code>pkg-config</code> tool finds <code>Brewfile</code> dependencies.</li>
-<li>Buildsystem-specific flags, such as <code>CMAKE_PREFIX_PATH</code>, ensure that buildsystems can make use of the <code>Brewfile</code> dependencies.</li>
-</ul>
-
-
-<p>So the next time you&rsquo;re bashing your head against build failures in your project, give <code>brew bundle exec</code> a try. It might just solve your problems for you!</p>
 ]]></content>
   </entry>
   

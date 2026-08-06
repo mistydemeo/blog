@@ -1,6 +1,10 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <urlset xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.sitemaps.org/schemas/sitemap/0.9 http://www.sitemaps.org/schemas/sitemap/0.9/sitemap.xsd" xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
 <url>
+<loc>http://mistys-internet.website/blog/blog/2026/08/06/whats-up-with-that-song-from-the-duck-game-on-amiga-cd-32-anyway/</loc>
+<lastmod>2026-08-06T13:18:23-07:00</lastmod>
+</url>
+<url>
 <loc>http://mistys-internet.website/blog/blog/2026/08/01/decoding-magic-school-lunars-save-game-format/</loc>
 <lastmod>2026-08-01T15:52:41-07:00</lastmod>
 </url>
@@ -204,5 +208,8 @@
 </url>
 <url>
 <loc>http://mistys-internet.website/blog/posts/4/</loc>
+</url>
+<url>
+<loc>http://mistys-internet.website/blog/posts/5/</loc>
 </url>
 </urlset>

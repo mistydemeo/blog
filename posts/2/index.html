@@ -11,7 +11,7 @@
   <meta name="fediverse:creator" content="@misty@digipres.club">
 
   
-  <meta name="description" content="I&rsquo;ve used a lot of tools over the years, which means I&rsquo;ve seen a lot of tools hit a plateau. That&rsquo;s not always a problem; sometimes &hellip;">
+  <meta name="description" content="I&rsquo;ve seen a lot of professional archivists who use flux disc image archiving techniques for their collections&mdash;a technique in which a &hellip;">
   
 
   <!-- http://t.co/dKP3o1e -->
@@ -65,6 +65,289 @@
     <div id="content">
       <div class="blog-index">
   
+  
+  
+    <article>
+      
+  <header>
+    
+      <h1 class="entry-title"><a href="/blog/blog/2024/09/13/the-working-archivists-guide-to-enthusiast-cd-rom-archiving-tools/">The Working Archivist's Guide to Enthusiast CD-ROM Archiving Tools</a></h1>
+    
+    
+      <p class="meta">
+        
+
+
+
+
+<time class='entry-date' datetime='2024-09-13T16:32:48-07:00'><span class='date'><span class='date-month'>Sep</span> <span class='date-day'>13</span><span class='date-suffix'>th</span>, <span class='date-year'>2024</span></span> <span class='time'>4:32 pm</span></time>
+        
+      </p>
+    
+  </header>
+
+
+  <div class="entry-content"><p>I&rsquo;ve seen a lot of professional archivists who use flux disc image archiving techniques for their collections&mdash;a technique in which a specialized floppy controller captures the raw signal coming from the floppy drive so that it can be preserved and decoded in software. I haven&rsquo;t, however, seen many archivists using enthusiast-developed low-level reading techniques for CD-ROM. I&rsquo;ve personally been making use of these techniques and I find them very helpful; I know that many other archivists and institutions could make great use of them. However, I know that information about enthusiast-developed tools are usually deeply embedded in those communities and can be hard to find for others. As someone with a foot in both worlds, I want to try to bridge the gap and make this information available a bit more widely. This post will summarize why archivists might be interested in these tools, what they can do, and how to make use of them.</p>
+
+<h2>Redump</h2>
+
+<p>People who are familiar with emulation may think of Redump as collections of disc images online, but they&rsquo;re really a <em>metadata</em> database for CD-ROM preservation focused primarily on games. It collects metadata of transfers of disc images but also, crucially for us, it <em>sets standards</em> on how disc images should be created in order to ensure accuracy. Those standards are publicly available and are easy enough to follow by anyone&mdash;not just people looking to submit to Redump&rsquo;s database.</p>
+
+<p>Because Redump&rsquo;s disc imaging standards are of sufficiently high quality, and their software and guides are freely available, I highly recommend them to all people looking to preserve CD-ROMs.</p>
+
+<h2>What does dumping to Redump&rsquo;s standards do that typical dumping doesn&rsquo;t?</h2>
+
+<p>Although the <em>end product</em> of Redump&rsquo;s dumping process is a disc image in the common BIN/CUE format, the actual <em>process</em> is different in some key ways.</p>
+
+<p>Typically, when reading a CD-ROM, the data the computer receives has been processed and transformed by the drive&rsquo;s firmware. Data on a CD-ROM is stored in a scrambled<sup id="fnref:1"><a href="#fn:1" rel="footnote">1</a></sup> (encoded) format, which the drive&rsquo;s firmware descrambles into the standard format before the computer receives it. The firmware also performs checksum comparison using CD-ROM&rsquo;s builtin fixity format and automatically corrects any errors it finds. (The next section will describe the format of CD-ROM in more detail.)</p>
+
+<p>By comparison, analogous to how a raw flux read performs a low level image of a floppy<sup id="fnref:2"><a href="#fn:2" rel="footnote">2</a></sup> and then processes it using software, Redump&rsquo;s standards makes use of raw reading functions that are available on a certain set of CD drives. These raw reading functions completely disable the processing the firmware would normally apply to data tracks: the data is read in its original scrambled form, with error correction disabled, so that data is returned in as close to its original form as possible. The software then performs descrambling and error correction after it&rsquo;s read. (For those interested in a more detailed technical summary of exactly what&rsquo;s being done here, <a href="https://github.com/superg/redumper?tab=readme-ov-file#good-drives-technical">the redumper README</a> goes into extensive detail.)</p>
+
+<p>The primary benefit to performing rips this way is metadata: it&rsquo;s possible to log better, more legible information about the descrambling and integrity check processes when it&rsquo;s performed in software like this. The other benefit is that it becomes easier to reason about discs with unusual formats, disc with mastering errors from when they were produced, and discs with complex copy protection formats. Strangely-mastered or mis-mastered discs are surprisingly common, and this has been helpful for me in the past with a few discs that would otherwise have been difficult to reason about. Here are two recent examples:</p>
+
+<ul>
+<li>One disc contains a mastering error which corrupted the fixity data for a single 2048-byte sector. Using a typical read, this would manifest as a read error and it would be difficult to tell from the logs that this was the result of a mastering error and not disc damage. With a raw read, it became easier to separate out the reading process from the decoding process and thus to get a better understanding of what had happened.</li>
+<li>One disc contains a mastering error which places 75 sectors (150KB) of data at the start of an audio track. This would otherwise have been very easy to miss, and may not have been properly decoded by the drive&rsquo;s firmware.</li>
+</ul>
+
+
+<h2>But Why? (aka, why is CD-ROM so weird?)</h2>
+
+<p>The CD-ROM format is very complex, and not all software or all disc image formats support its full set of features.</p>
+
+<ul>
+<li>CD-ROM&rsquo;s relationship to the audio disc format means discs can have a complex structure.</li>
+<li>&ldquo;ISO&rdquo; files can only represent the most simple kinds of discs.</li>
+<li>CD has a builtin metadata format which most disc image formats don&rsquo;t support.</li>
+<li>The same CD-ROM disc can have different data when viewed on different operating systems. OS-specific imaging tools may discard data for other OSs.</li>
+</ul>
+
+
+<h3>CD-ROM, CD audio, and multi track support</h3>
+
+<p>The CD format wasn&rsquo;t originally designed for data at all&mdash;the original CD standard was purely designed around digital <em>audio</em>. The CD-ROM standard was only finalized later, and it acts as an extension to the CD audio format. The interaction between these two formats is the reason behind much of CD-ROM&rsquo;s complexity.</p>
+
+<p>CD audio isn&rsquo;t a file-based format, and instead uses a series of unnamed, numbered <em>tracks</em>. CD-ROM extends this by making it possible for a <em>track</em> on a disc to contain data and a filesystem instead of audio. Since CD-ROM extends CD audio, the two formats aren&rsquo;t mutually exclusive: a CD-ROM disc can still contain multiple tracks, and it can even contain more than one data track or a mixture of data and audio tracks.</p>
+
+<p>The most commonly used disc image file format, the ISO, doesn&rsquo;t support any of this advanced structure. An ISO represents a <em>data track</em>, not necessarily a full disc. Producing an ISO from a disc containing multiple tracks means that the rest of the disc is ignored, and only a single data track has been backed up.</p>
+
+<p>The other unique feature of the ISO format compared to other disc image formats is that it omits fixity information. CD contains a builtin form of integrity protection, intended to protect against physical damage to a disc; up to a certain level of read error can be recovered using information in the error correction data. Typical data discs have sectors which are 2352 bytes long, of which 2048 bytes are data and 304 are error correction<sup id="fnref:3"><a href="#fn:3" rel="footnote">3</a></sup>. ISOs use a &ldquo;cooked&rdquo; format which strips the error correction component of each sector, leaving just the data. This data is less critical for a disc after it&rsquo;s been transferred to a disc image, but it does mean that it serves as a less accurate representation of the physical structure of the original disc.</p>
+
+<h3>Subcode - CD&rsquo;s builtin metadata format</h3>
+
+<p>CD defines a sidecar metadata format called the &ldquo;subcode&rdquo; or &ldquo;subchannel&rdquo;. It allows for small amounts of data to be stored alongside the audio or data on a disc. In most cases, it doesn&rsquo;t contain anything significant and so most CD disc image formats omit it entirely. However, it&rsquo;s possible for it to contain interesting or unique data that would be lost if it&rsquo;s not transferred along with a disc. Examples include <a href="https://en.wikipedia.org/wiki/CD-Text">CD-Text</a> (track names for CD audio discs); <a href="https://en.wikipedia.org/wiki/CD%2BG">CD graphics</a> (usually used for karaoke graphics on otherwise normal audio discs); and copy protection data for commercial software.</p>
+
+<p>Other builtin metadata that&rsquo;s not typically preserved is contained in the disc&rsquo;s leadin and leadout segments. The leadin contains the disc&rsquo;s table of contents; typically, this information is preserved in a processed form via the drive&rsquo;s firmware, but not in the raw format direct from the disc. Likewise, the leadout contains finalizing metadata that isn&rsquo;t otherwise preserved when a CD is backed up.</p>
+
+<h3>Multiple filesystems in a single track</h3>
+
+<p>The CD-ROM format doesn&rsquo;t dictate which filesystem is used on a disc, and it&rsquo;s possible for a single track on a disc to contain more than one filesystem. This also means that the same disc can display drastically different content depending on whether it&rsquo;s inserted into a Windows, Mac or Linux PC. I&rsquo;ve personally witnessed a hybrid Mac/PC disc which had completely different contents on both systems, without a single shared file between them. This means that simply backing up a disc by copying the files off the disc is unsafe: you may be missing data from one of the other filesystems. This also means that filesystem-specific backup tools can be unsafe.</p>
+
+<p>I&rsquo;ve seen some archivists use HFS Explorer to back up Mac CDs, for example, but this tool backs up individual <em>filesystems</em> from a disc&mdash;using it for a disc like this one would mean that the Windows contents would be completely lost. Even in the case that a disc is only for Mac, HFS Explorer doesn&rsquo;t necessarily preserve structural filesystem content in the same format as it was stored on disc.</p>
+
+<h3>CD disc image formats</h3>
+
+<p>There are a wide variety of disc image formats, many of which are specific to the vendor of a particular disc image reading program, and which can represent differing levels of a CD&rsquo;s features. A few common examples:</p>
+
+<ul>
+<li>ISO, as mentioned above, represents a <em>single data track</em> at the start of a disc, and isn&rsquo;t able to represent the remainder of a disc. It&rsquo;s stored in a &ldquo;cooked&rdquo; format with error correction data removed, and omits subcode data.</li>
+<li>BIN/CUE, which can represent a full multi-track disc. Stored in a &ldquo;raw&rdquo; format, with error correction data retained. Modern versions of the format can include subcode data and can represent complex disc structures. It uses a human-readable metadata format called the &ldquo;<a href="https://en.wikipedia.org/wiki/Cue_sheet_(computing)">cue sheet</a>&rdquo;. The software I&rsquo;ll be talking about later in this post use the modern extended versions of BIN/CUE.</li>
+<li>CloneCD, which was originally created to properly back up discs with complex copy protection schemes. It supports the same complex disc structures as BIN/CUE, and preserves subcode information, but differs in that its metadata format is lower level and not intended to be human-readable.</li>
+</ul>
+
+
+<h3>In summary</h3>
+
+<p>CD-ROM is a complex format with a wide number of variations, and many disc image formats support only some of the kinds of discs which exist in the real world. Capturing in a complex format ensures nothing is lost while still leaving the flexibility to convert into a simpler format in the future.</p>
+
+<h2>The Hardware</h2>
+
+<p>Unlike floppy disk image flux archiving, there&rsquo;s no special enthusiast equipment needed here. Backing up CDs using these techniques uses certain models of standard off the shelf drives manufactured by Plextor. While these drives are no longer manufactured, they&rsquo;re readily available secondhand from eBay or computer recycling stores. They can be frequently purchased in good working condition for $40 or less. A full list of compatible drives can be found on the Redump wiki: <a href="https://wiki.redump.info/index.php?title=Optical_Disc_Drive_Compatibility">https://wiki.redump.info/index.php?title=Optical_Disc_Drive_Compatibility</a></p>
+
+<p>This list contains a mixture of internal drives and USB-based external drives. Interal drives can also be converted into external drives using a cheap USB adapter.</p>
+
+<h2>The Software</h2>
+
+<p>There are a number of different tools available; this post will focus on the most popular ones and the ones with which I have personal experience. <a href="https://wiki.redump.info/index.php?title=Dumping_Guides">Redump&rsquo;s wiki</a> provides step-by-step usage guides for all of the tools I recommend.</p>
+
+<h3>Media Preservation Frontend (Windows only)</h3>
+
+<p>For users who prefer GUI tools to commandline tools, <a href="https://github.com/SabreTools/MPF">Media Preservation Frontend</a> (MPF) provides a graphical interface to the redumper, DiscImageCreator and Aaru tools. (This blog post won&rsquo;t be discussing Aaru.) Unfortunately, it&rsquo;s only available for Windows at this time.</p>
+
+<p>It exposes each underlying tool&rsquo;s feature set to the fullest extent it can, and captures the appropriate metadata. Because it&rsquo;s oriented around submissions to the Redump database it also contains some data entry fields specific to Redump, but they&rsquo;re not mandatory and can be easily ignored.</p>
+
+<h3>redumper</h3>
+
+<p><a href="https://github.com/superg/redumper">redumper</a> is a relatively new commandline disc archiving program which has quickly emerged as the Redump community&rsquo;s new preferred disc backup tool. For archivists interested in using a commandline tool, redumper is my current recommendation.</p>
+
+<p>Its feature set is relatively restricted compared to DiscImageCreator, but its opinionated defaults ensure it just does the right thing without extra configuration. Its focus on simplicity and reliability also extends to its metadata files: while it provides the same metadata as other options, it produces a smaller number of more organized files which I find easier to reason about. It also provides some additional metadata that I find useful.</p>
+
+<h3>DiscImageCreator</h3>
+
+<p><a href="https://github.com/saramibreak/DiscImageCreator">DiscImageCreator</a> was formerly the tool Redump recommended, but its standards no longer recommend it. Compared to redumper, whose focus is reliability and simplicity, DiscImageCreator features a vast suite of options but is comparably less reliable. Its metadata is also less organized and harder to read.</p>
+
+<p>Its large feature set does mean that there are times when DiscImageCreator can come in handy for something specialized, but at the moment I don&rsquo;t recommend it as a primary tool.</p>
+
+<h2>Converting from more complex formats to simpler ones</h2>
+
+<p>After capturing in the formats produced by redumper and DiscImageCreator, it&rsquo;s possible to convert into simpler formats for access. This provides a useful tradeoff: the more complex formats are kept for longterm preservation, while copies in other formats can be temporarily produced for access and compatibility with software that needs plain ISO images.</p>
+
+<p>On Mac and Linux, <a href="http://he.fi/bchunk/">bchunk</a> is an open source program which can convert BIN/CUE disc images into plain ISO files. For audio CDs or mixed-mode CDs which contain audio tracks, it can also convert audio tracks to WAV files. On Windows, <a href="https://www.isobuster.com">IsoBuster</a> can similarly convert disc images from one format to another.</p>
+
+<p>Both redumper and DiscImageCreator produce their BIN/CUE images in a split format with one BIN file per track. For those who need a unified image with a single BIN for the same disc, <a href="https://github.com/putnam/binmerge">binmerge</a> (cross-platform, written in Python) and <a href="https://docs.mamedev.org/tools/chdman.html">chdman</a> (cross-platform, written in C) can perform the conversion.</p>
+
+<h2>Useful metadata</h2>
+
+<p>In addition to backing up discs, both redumper and DiscImageCreator produce some very useful metadata after the read is complete. This information isn&rsquo;t necessarily unique to this dumping technique&mdash;other software could do the same things after dumping a disc&mdash;but it&rsquo;s very useful to have this automatically performed for every disc.</p>
+
+<p>Both redumper and DiscImageCreator produce machine-readable XML metadata containing metadata about each track on the disc: its size, and hashes in several formats. DiscImageCreator places it in a file named <code>.dat</code>, while Redumper places it in the <code>dat:</code> section of its log file.</p>
+
+<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+</pre></td><td class='code'><pre><code class=''><span class='line'>&lt;rom name="moonlight (Track 1).bin" size="658917504" crc="ec48aea4" md5="ed350360b8f40c9c5fc4a8ce1bc41c99" sha1="8b0022a6b14842678f0beee961720103d6ca5431" /&gt;
+</span><span class='line'>&lt;rom name="moonlight (Track 2).bin" size="21226800" crc="06284fb2" md5="e97b60b95764212ba4788911e236c349" sha1="8a112d2f60693f6c767d60514c9a35d3855c55b1" /&gt;
+</span><span class='line'>&lt;rom name="moonlight (Track 3).bin" size="50189328" crc="2358ba07" md5="191b3f4132b862b8f9239cbe0ad22dd9" sha1="cfbb15b6782a482305a90dea00b1bf4288e617b3" /&gt;
+</span><span class='line'>&lt;rom name="moonlight (Track 4).bin" size="25371024" crc="31a7d363" md5="1a5a08d9c4c4084e1a390ad5b32454bf" sha1="710ee4cb7a85d627ec9bc9c29deb0620a3d67cba" /&gt;</span></code></pre></td></tr></table></div></figure>
+
+
+<p>For ISO 9660/PC format discs, both programs also extract mastering date information. This comes from the primary volume descriptor (PVD) information, and contains date information pertaining to the disc&rsquo;s creation. For example, from the logs for the same disc as the one above:</p>
+
+<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+</pre></td><td class='code'><pre><code class=''><span class='line'>ISO9660 [moonlight (Track 1).bin]:
+</span><span class='line'>  volume identifier: CAFFE
+</span><span class='line'>  PVD:
+</span><span class='line'>0320 : 20 20 20 20 20 20 20 20  20 20 20 20 20 31 39 39                199
+</span><span class='line'>0330 : 36 30 36 30 37 31 34 32  39 31 36 30 30 00 31 39   6060714291600.19
+</span><span class='line'>0340 : 39 36 30 36 30 37 31 34  32 39 31 36 30 30 00 30   96060714291600.0
+</span><span class='line'>0350 : 30 30 30 30 30 30 30 30  30 30 30 30 30 30 30 00   000000000000000.
+</span><span class='line'>0360 : 30 30 30 30 30 30 30 30  30 30 30 30 30 30 30 30   0000000000000000
+</span><span class='line'>0370 : 00 01 00 00 00 00 00 00  00 00 00 00 00 00 00 00   ................</span></code></pre></td></tr></table></div></figure>
+
+
+<p>This shows that the disc has the title <code>CAFFE</code>, and four embedded timestamps representing the disc&rsquo;s creation:</p>
+
+<ul>
+<li>Volume creation date and time - <code>1996060714291600</code>, aka June 7, 1996, at 14:29:16 (UTC)</li>
+<li>Volume moditification date - identical to the above</li>
+<li>Volume expiration date - date the disc should be considered obsolete; often left with null values, as it is here</li>
+<li>Volume effective date - date the disc should be used starting from; also often left null</li>
+</ul>
+
+
+<p>Redumper also produces a full file listing for ISO 9660 discs, along with calculating their hashes. An abbreviated example from the same disc:</p>
+
+<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+</pre></td><td class='code'><pre><code class=''><span class='line'>*** SKELETON (time check: 3s)
+</span><span class='line'>
+</span><span class='line'>excluded areas hashes (SHA-1):
+</span><span class='line'>1a7334e9350d06a69f5dbf1e8ec8ca9c98ad89da SYSTEM_AREA
+</span><span class='line'>edcae21603e3564acfea07e81c205031101976ea /SAVER/OPENING.MOV
+</span><span class='line'>1d73c3b2f53d251a56b61e0b75c6b5184600c4ae /SAVER/TOKIMEKI.MOV
+</span><span class='line'>4f89fe21c61e44e1b9dedc85e09b2c1390055f9b /SAVER/ENDING.MOV
+</span><span class='line'>091492f54a3a182921d5255ae3560f26d4dc4d11 /SAVER/CAFFES.MOV
+</span><span class='line'>c1589aa3e8f55b86d0be614e835127d254eabb54 /README.TXT</span></code></pre></td></tr></table></div></figure>
+
+
+<h2>What do all these files mean?</h2>
+
+<p>Both redumper and DiscImageCreator produce a large number of files, which can be overwhelming at first; this list provides a little guide as to what those files mean, and which ones are most important to retain for longterm preservation.</p>
+
+<h3>redumper</h3>
+
+<p>A list of files can also be found on the <a href="http://wiki.redump.info/index.php?title=redumper#Output_Files">Redump wiki</a>.</p>
+
+<ul>
+<li>All <code>.bin</code> files - The disc&rsquo;s data and audio tracks, one file per track.</li>
+<li><code>discname.log</code> - The full set of logs and metadata from the read process.</li>
+<li><code>discname.cue</code> - The disc&rsquo;s table of contents (list of tracks) in a human-readable cuesheet format.</li>
+<li><code>discname.toc</code> and <code>discname.fulltoc</code> - The disc&rsquo;s table of contents, in its original, low-level binary format.</li>
+<li><code>discname.state</code> - The disc&rsquo;s original fixity information, in a binary format.</li>
+<li><code>discname.subcode</code> - The subcode metadata, in its original binary format, as stored on the disc.</li>
+<li><code>discname.scram</code> - The scrambled version of the disc, as a single file. While this is generally no longer needed after the reading process is complete and the data has been decoded, it contains the leadin and leadout data that is normally omitted when reading a disc; some people may elect to preserve it for that reason.</li>
+</ul>
+
+
+<h3>DiscImageCreator</h3>
+
+<ul>
+<li>All <code>.bin</code> files - The disc&rsquo;s data and audio tracks, one file per track.</li>
+<li>All <code>.txt</code> files - The full set of logs and metadata from the read process. Unlike redumper, these are stored as a large number of separate files.</li>
+<li><code>discname.sub</code> - The subcode metadata, in a processed binary format which reorders the data in order to be easier to read.</li>
+<li><code>discname.cue</code> - The disc&rsquo;s table of contents (list of tracks) in a human-readable cuesheet format.</li>
+<li><code>discname.ccd</code> - The disc&rsquo;s table of contents (list of tracks) in the CloneCD format, which is more complex and not designed to be read by humans.</li>
+<li><code>discname.toc</code> - The disc&rsquo;s table of contents, in its original, low-level binary format.</li>
+<li><code>discname.dat</code> - XML-format metadata for each track, containing file sizes and hashes/checksums in several formats. The same data is contained in the <code>.log</code> file from redumper.</li>
+<li><code>discname.c2</code> - The disc&rsquo;s original fixity information, in a binary format.</li>
+<li>Filenames containing <code>Track 0</code> and <code>Track AA</code> - The leadin and leadout sections of the disc.</li>
+<li><code>discname.img</code> - A single-file copy of the disc&rsquo;s data. This duplicates exactly the contents of the <code>.bin</code> files, and can be easily recreated by concatenating them in the future, so it&rsquo;s not important to keep.</li>
+<li><code>discname_img.cue</code> - A copy of the cuesheet adjusted for the above file.</li>
+</ul>
+
+
+<h2>Obtaining the tools</h2>
+
+<p>All of these tools are open source and can be downloaded from GitHub.</p>
+
+<ul>
+<li>MPF: <a href="https://github.com/SabreTools/MPF/releases">https://github.com/SabreTools/MPF/releases</a></li>
+<li>redumper: <a href="https://github.com/superg/redumper/releases">https://github.com/superg/redumper/releases</a></li>
+<li>DiscImageCreator: <a href="https://github.com/saramibreak/DiscImageCreator/releases">https://github.com/saramibreak/DiscImageCreator/releases</a></li>
+</ul>
+
+
+<p>In addition, for Mac users, I package redumper and DiscImageCreator in Homebrew. While my packages aren&rsquo;t always 100% up to date, I try to ensure that they work. They can be installed via:</p>
+
+<ul>
+<li>redumper: <code>brew install mistydemeo/digipres/redumper</code></li>
+<li>DiscImageCreator: <code>brew install mistydemeo/digipres/disc-image-creator</code></li>
+</ul>
+
+
+<h2>Limitations</h2>
+
+<p>Certain especially complex types of copy protection are still not fully supported by these tools, although the situation is improving. While Redumper recently added support for the SafeDisc protection format, for example, there are still discs it&rsquo;s not able to handle properly; closed-source tools such as CloneCD are still needed to handle these discs.</p>
+
+<p>Redumper has plans to add support for ring-based copy protection such as Ring Protech in the future, but it&rsquo;s poorly-supported at the moment; again, closed-source tools such as Alcohol 120% are necessary to handle these discs.</p>
+
+<h2>Conclusion</h2>
+
+<p>I hope this guide has been helpful for those who are interested. If readers have any questions or need any other information, please feel free to reach out to me <a href="https://digipres.club/@misty">on Mastodon</a> or <a href="https://bsky.app/profile/cdrom.ca">Bluesky</a>.</p>
+<div class="footnotes">
+<hr/>
+<ol>
+<li id="fn:1">
+<p>Amazingly, this is actually the technical term - see <a href="https://ecma-international.org/publications-and-standards/standards/ecma-130/">ECMA-130</a> Annex B.<a href="#fnref:1" rev="footnote">&#8617;</a></p></li>
+<li id="fn:2">
+<p>It&rsquo;s not quite analogous: a Redump-style disc rip isn&rsquo;t operating on <em>as</em> low a level as a raw flux read is, but it&rsquo;s lower-level than standard disc reading software. While the <a href="https://www.domesday86.com">Domesday86 project</a> exists to perform truly low-level raw laser dumps of laserdisc and LD-ROM discs, there isn&rsquo;t a mature project to apply the same technique to CD.<a href="#fnref:2" rev="footnote">&#8617;</a></p></li>
+<li id="fn:3">
+<p>There are a few alternate sector formats which divide up the 2352 bytes differently; they devote more space to data and less space to error correction, at the risk of making a disc more susceptible to physical damage.<a href="#fnref:3" rev="footnote">&#8617;</a></p></li>
+</ol>
+</div>
+
+</div>
+  
+  
+
+
+    </article>
   
   
     <article>
@@ -890,90 +1173,6 @@
 
     </article>
   
-  
-    <article>
-      
-  <header>
-    
-      <h1 class="entry-title"><a href="/blog/blog/2020/11/23/bundle-install-with-homebrew-magic-using-brew-bundle-exec/">Bundle Install With Homebrew Magic Using Brew Bundle Exec</a></h1>
-    
-    
-      <p class="meta">
-        
-
-
-
-
-<time class='entry-date' datetime='2020-11-23T20:30:00-08:00'><span class='date'><span class='date-month'>Nov</span> <span class='date-day'>23</span><span class='date-suffix'>rd</span>, <span class='date-year'>2020</span></span> <span class='time'>8:30 pm</span></time>
-        
-      </p>
-    
-  </header>
-
-
-  <div class="entry-content"><p>Has this ever happened to you? You&rsquo;re writing a project in Ruby, JavaScript, Go, etc., and you have to build a dependency that uses a system library. So you <code>bundle install</code> and then, a few minutes later, your terminal spits up an ugly set of C compiler errors you don&rsquo;t know how to deal with. After dealing with this enough times I decided to do something about it.</p>
-
-<p><a href="https://brew.sh">Homebrew</a> already has a great tool in its arsenal for dealing with these problems. Homebrew needs to be able to build software reliably and robustly, after all - even if the user&rsquo;s system has weird software installed on it or strange misconfigurations. The <a href="https://docs.brew.sh/Formula-Cookbook#superenv-notes">&ldquo;superenv&rdquo; build environment</a> features intelligent automatic setup of build-related environment variables and <code>PATH</code>s based on just the requested dependencies, which filters out unrequested software and prevents a lot of common build failures that come from interfering software. It also uses shims for many common build tools to enforce just the right arguments passing through to the real tools.</p>
-
-<p>So I thought to myself - we solved that problem for Homebrew builds already, right? Wouldn&rsquo;t it be nice if I could just reuse that work for other things? So that&rsquo;s what I did. Homebrew already provides the <code>Brewfile</code> dependency declaration format and the <code>brew bundle</code> tool to library dependencies with Homebrew, and as a result there&rsquo;s already a great way to get the dependency information we&rsquo;d need to produce a reliable build environment. Since <code>brew bundle</code> is a Homebrew plugin, it has access to Homebrew&rsquo;s core code - including build environment setup. Putting these together, I wrote a feature called <code>brew bundle exec</code>. It takes the software you specify in your Brewfile and builds a dependency tree out of that, then sets up just the right build flags to let anything you want use them.</p>
-
-<p>For example, say I want to <code>gem install mysql2</code>. Often, you get something like this:</p>
-
-<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-<span class='line-number'>2</span>
-<span class='line-number'>3</span>
-<span class='line-number'>4</span>
-<span class='line-number'>5</span>
-<span class='line-number'>6</span>
-<span class='line-number'>7</span>
-</pre></td><td class='code'><pre><code class=''><span class='line'>$ gem install mysql2
-</span><span class='line'>Building native extensions. This could take a while...
-</span><span class='line'># several dozen lines later...
-</span><span class='line'>linking shared-object mysql2/mysql2.bundle
-</span><span class='line'>ld: library not found for -lssl
-</span><span class='line'>clang: error: linker command failed with exit code 1 (use -v to see invocation)
-</span><span class='line'>make: *** [mysql2.bundle] Error 1</span></code></pre></td></tr></table></div></figure>
-
-
-<p>Ew, right? Let&rsquo;s make that better.</p>
-
-<p>By creating a <code>Brewfile</code> with the line <code>brew "mysql"</code>, we can specify that we want to build against a Homebrew-installed MySQL <em>and</em> all of its dependencies. Just by running our command prefixed with <code>brew bundle exec --</code>, for example, <code>brew bundle exec -- gem install mysql2</code>, we can run that command in a build environment that knows exactly how to use its dependencies. Suddenly, everything works&mdash;no messing around with flags, no special options passed to <code>gem install</code>, and no fragile <code>bundle config</code> trickery.</p>
-
-<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-<span class='line-number'>2</span>
-<span class='line-number'>3</span>
-<span class='line-number'>4</span>
-<span class='line-number'>5</span>
-<span class='line-number'>6</span>
-<span class='line-number'>7</span>
-</pre></td><td class='code'><pre><code class=''><span class='line'>$ brew bundle exec -- gem install mysql2
-</span><span class='line'>Building native extensions. This could take a while...
-</span><span class='line'>Successfully installed mysql2-0.5.3
-</span><span class='line'>Parsing documentation for mysql2-0.5.3
-</span><span class='line'>Installing ri documentation for mysql2-0.5.3
-</span><span class='line'>Done installing documentation for mysql2 after 0 seconds
-</span><span class='line'>1 gem installed</span></code></pre></td></tr></table></div></figure>
-
-
-<p>What exactly does <code>brew bundle exec</code> set? There&rsquo;s a variety of flags set which are useful for a variety of different compilers and buildsystems.</p>
-
-<ul>
-<li><code>CC</code> and <code>CXX</code>, the compiler specification flags, point to Homebrew&rsquo;s compiler shims which help ensure that the right flags are passed to the real compiler being used.</li>
-<li><code>CFLAGS</code>, <code>CXXFLAGS</code>, and <code>CPPFLAGS</code> ensure that C and C++ compilers know about the header and library lookup paths for all of the <code>Brewfile</code> dependencies.</li>
-<li><code>PATH</code> ensures that all of the executables installed by <code>Brewfile</code> dependencies will be found first, before any tools of the same name that may be installed elsewhere on your system.</li>
-<li><code>PKG_CONFIG_LIBDIR</code> and <code>PKG_CONFIG_LIBDIR</code> ensure that the <code>pkg-config</code> tool finds <code>Brewfile</code> dependencies.</li>
-<li>Buildsystem-specific flags, such as <code>CMAKE_PREFIX_PATH</code>, ensure that buildsystems can make use of the <code>Brewfile</code> dependencies.</li>
-</ul>
-
-
-<p>So the next time you&rsquo;re bashing your head against build failures in your project, give <code>brew bundle exec</code> a try. It might just solve your problems for you!</p>
-</div>
-  
-  
-
-
-    </article>
-  
   <div class="pagination">
     
       <a class="prev" href="/blog/posts/3">&larr; Older</a>
@@ -991,6 +1190,10 @@
   <ul id="recent_posts">
     
       <li class="post">
+        <a href="/blog/blog/2026/08/06/whats-up-with-that-song-from-the-duck-game-on-amiga-cd-32-anyway/">What's Up With That Song From the Duck Game on Amiga CD-32 Anyway?</a>
+      </li>
+    
+      <li class="post">
         <a href="/blog/blog/2026/08/01/decoding-magic-school-lunars-save-game-format/">Decoding Magic School Lunar's Save Game Format</a>
       </li>
     
@@ -1004,10 +1207,6 @@
     
       <li class="post">
         <a href="/blog/blog/2025/12/22/watchy/">It's Not Called Watchy; or, Solving a Minor Video Game Mystery</a>
-      </li>
-    
-      <li class="post">
-        <a href="/blog/blog/2025/07/20/dist-0-dot-28-dot-1-is-out/">Dist 0.28.1 Is Out</a>
       </li>
     
   </ul>
