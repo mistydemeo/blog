@@ -11,7 +11,7 @@
   <meta name="fediverse:creator" content="@misty@digipres.club">
 
   
-  <meta name="description" content="If you spend enough time on certain corners of YouTube there&rsquo;s a good chance you&rsquo;ve run into &ldquo;they didn&rsquo;t have to go this &hellip;">
+  <meta name="description" content="Now, I know almost every technical writeup on this blog is obscure, but this is going to be a really weird one. This is about a round of surgery I &hellip;">
   
 
   <!-- http://t.co/dKP3o1e -->
@@ -65,6 +65,193 @@
     <div id="content">
       <div class="blog-index">
   
+  
+  
+    <article>
+      
+  <header>
+    
+      <h1 class="entry-title"><a href="/blog/blog/2026/08/25/how-i-fixed-an-mt-32-midi-soundtrack-for-the-hardware-i-use/">Performing Digital Surgery to Fix MIDIs for My Hardware (and Then Discovering the Entire Premise of My Post Was Wrong)</a></h1>
+    
+    
+      <p class="meta">
+        
+
+
+
+
+<time class='entry-date' datetime='2026-08-25T09:27:25-07:00'><span class='date'><span class='date-month'>Aug</span> <span class='date-day'>25</span><span class='date-suffix'>th</span>, <span class='date-year'>2026</span></span> <span class='time'>9:27 am</span></time>
+        
+      </p>
+    
+  </header>
+
+
+  <div class="entry-content"><p>Now, I know almost every technical writeup on this blog is obscure, but this is going to be a really weird one. This is about a round of surgery I applied to a set of MIDI files a few years back to get them playing on a device I owned. I started out thinking this was going to be a quick writeup on something I&rsquo;d already done but, as you&rsquo;ll see, I encountered a significant plot twist that greatly complicated things. But I get ahead of myself!</p>
+
+<hr />
+
+<p>This will shock no one who&rsquo;s read my recent posts, but I love retro music technology. One of my personal prize possessions is a <a href="https://en.wikipedia.org/wiki/Roland_MT-32">Roland MT-32</a>, a classic MIDI synthesizer from the 80s, and I&rsquo;ve got an enormous collection of hundreds of MIDIs I listen to. Yes, my life is exactly like the <a href="https://www.youtube.com/watch?v=UteyS6tUqXk">Cinco MIDI organizer sketch</a>.</p>
+
+<p>I especially love listening to MT-32 songs on original hardware because it&rsquo;s just such an <em>unusual</em> synth. It&rsquo;s one of a few devices Roland made using their <a href="https://en.wikipedia.org/wiki/Linear_arithmetic_synthesis">&ldquo;linear arithmetic synthesis&rdquo;</a>, which combines traditional synthesis<sup id="fnref:1"><a href="#fn:1" rel="footnote">1</a></sup> with PCM-based samples. The marriage of two very different styles of synthesis gives it an incredibly unique sound unlike pretty much anything else, and I adore hearing what people do with it. On top of its unique style of synthesis, it was completely programmable - unlike pretty much all of the other early PCM-based synthesizers. It allowed musicians to blend its PCM samples in novel ways and to freely program the substractive synthesis portions, which meant that on top of its 128 builtin instruments it was possible to produce an incredibly wide range of different sounds.</p>
+
+<p>There&rsquo;s a good chance you&rsquo;ve heard a higher-end version of the sound from the <a href="https://en.wikipedia.org/wiki/Roland_D-50">Roland D-50</a>, the MT-32&rsquo;s older cousin - for example, the main instrument from the backing track to <a href="https://www.youtube.com/watch?v=LTrk4X9ACtw">Orinoco Flow</a>. Never heard an MT-32? Here&rsquo;s a recent song by <a href="https://bubblegumoctopus.bandcamp.com">Bubblegum Octopus</a>, who I consider to be the modern-day master of the MT-32&rsquo;s sound:</p>
+
+<iframe style="border: 0; width: 100%; height: 120px;" src="https://bandcamp.com/EmbeddedPlayer/album=4094980965/size=large/bgcol=ffffff/linkcol=0687f5/tracklist=false/artwork=small/track=3976760464/transparent=true/" seamless><a href="https://bubblegumoctopus.bandcamp.com/album/big-battles-ii">Big Battles II by Bubblegum Octopus</a></iframe>
+
+
+<p><p></p>
+
+<p>A few years back, I was linked to a set of about 20 MT-32 MIDIs I really wanted to listen to&hellip; which, unfortunately, didn&rsquo;t play back correctly on my hardware. The problem is, MT-32 isn&rsquo;t really one device but a family of compatible devices. <em>Mostly</em> compatible devices, that is. I have an original-model &ldquo;old&rdquo; MT-32, but Roland followed it up with a couple of newer models: a revised model with slightly improved sound quality; and a newer device called the CM-32L, which adds a few extra builtin instruments<sup id="fnref:2"><a href="#fn:2" rel="footnote">2</a></sup>. The &ldquo;new&rdquo; MT-32 wasn&rsquo;t marked as a different device from the old one, but unluckily for me it and the CM-32L have one big compatibility difference from the &ldquo;old&rdquo; MT-32 that breaks some music for me.</p>
+
+<p>Since the MT-32 has programmable instruments, it obviously needs to be able to accept commands to program them. And since it&rsquo;s a pure MIDI device, it needs to be able to take those commands <em>over MIDI</em>. To support things like this, MIDI has a feature called <a href="https://en.wikipedia.org/wiki/MIDI#System_Exclusive_messages">system exclusive commands</a> which allows sending MIDI messages with contents that are specific to a particular set of hardware or a particular manufacturer&rsquo;s products. You can transfer them separately from music, but since they&rsquo;re just MIDI messages like actual music commands you can actually embed them right in a MIDI file so they&rsquo;ll be sent as you play it.</p>
+
+<p>The earliest model of MT-32 has a tiny amount of RAM to serve as a buffer that can easily get overwhelmed by sending too many large MIDI commands too quickly. Many sources will give you strict instructions to include at least 40ms of delay between each command, which was widely ignored - especially since the later models all included a larger buffer that didn&rsquo;t need you to be nearly as strict about it. If you, like me, have an older model MT-32 you may well find that a lot of music composed for the newer models just won&rsquo;t play back right without tweaks. (I&rsquo;m very used to the dreaded &ldquo;Buffer Overflow&rdquo; and &ldquo;Exc. Checksum Error&rdquo; messages on its builtin LCD.)</p>
+
+<p>There are fixes for this if you&rsquo;re using emulators or certain other retro software environments; DOSBox has a configuration option to enforce 40ms between messages, for example, which will adjust the timing of data on the fly before sending it off to real hardware. None of that helps me when I&rsquo;ve just got a set of MIDIs I&rsquo;m listening to on a normal MIDI player, though. This is a bit too specialized a feature to show up in any normal MIDI player, and I&rsquo;m not far gone enough to be writing my own yet<sup id="fnref:3"><a href="#fn:3" rel="footnote">3</a></sup>.</p>
+
+<p>I could have just opened the files in a sequencer and done it by hand, but there were 20 songs in this set and I didn&rsquo;t really want to be doing that much manual editing. Since this keeps happening to me, I&rsquo;d rather have some kind of solution that I can use for other music in the future instead of needing to do manual surgery every single time. The plan: come up with some way to programmatically open MIDI data; identify the system exclusive commands; adjust the space between them so there&rsquo;s always at least 40ms; and then shift the actual music data by the total of all the delays I&rsquo;d introduced so that the rest of the timing still lines up.</p>
+
+<p>While I was looking around for options, <a href="https://nya.social/notes/818cfc2c52d9639c62b4dcde">someone suggested</a> I try out a pair of interesting-looking tools: <a href="https://www.fourmilab.ch/webtools/midicsv/"><code>midicsv</code> and <code>csvmidi</code></a>. The former takes a binary MIDI file and transforms it into a plaintext CSV file, and the latter does the opposite. If it worked, this looked like it would be perfect. It would take no time to write up a short script to manipulate the CSV and transform it back into a MIDI, and it should be pretty easy to apply whatever I figured out here to other files in the future. First, though, a test: if I was going to be round-tripping this through CSV and back again, could I convert it from MIDI to CSV to back again and have it be the same?</p>
+
+<p><figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+</pre></td><td class='code'><pre><code class=''><span class='line'>$ sha2 -256 01.mid
+</span><span class='line'>SHA-256 (01.mid) = 617a8e8144c1d7da0c2be712635a61cdccbfa49dd3c2c5e50942247dc26a7a6a
+</span><span class='line'>$ midicsv 01.mid 01.csv
+</span><span class='line'>$ csvmidi 01.csv 01-roundtripped.mid
+</span><span class='line'>SHA-256 (01-roundtripped.mid) = 617a8e8144c1d7da0c2be712635a61cdccbfa49dd3c2c5e50942247dc26a7a6a</span></code></pre></td></tr></table></div></figure></p>
+
+<p>Yes! The files are byte-identical. I should be able to trust that any changes in the output file are the ones I want.</p>
+
+<p>Now that I know this workflow looks viable, let&rsquo;s take a look at that CSV output:</p>
+
+<p><figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+</pre></td><td class='code'><pre><code class=''><span class='line'>0, 0, Header, 0, 1, 384
+</span><span class='line'>1, 0, Start_track
+</span><span class='line'>1, 0, Tempo, 500000
+</span><span class='line'>1, 0, Time_signature, 4, 2, 24, 8
+</span><span class='line'>1, 209, Control_c, 1, 10, 64
+</span><span class='line'>1, 326, System_exclusive, 12, 65, 0, 22, 64, 6, 0, 0, 0, 64, 0, 58, 247</span></code></pre></td></tr></table></div></figure></p>
+
+<p>Pretty simple format. As expected, this is raw MIDI data represented in text rather than binary data. MIDI is, essentially, a series of events which occur on a timeline; each of them is a command like, say, &ldquo;play a certain note on a certain channel&rdquo;. Each row in this CSV is an individual command, which makes it very easy for us to find exactly what we want to work with. There&rsquo;s only really two fields that are relevant to us here for what we want to do: the third field is the name of the event, which lets us identify the <code>System_exclusive</code> messages, while the second field is the absolute time at which this event occurs. Since we don&rsquo;t need to actually read the <em>content</em> of the system exclusive messages and don&rsquo;t need to care about any other messages except what timestamp they&rsquo;re at, this is nearly all the information we need for automated MIDI surgery.</p>
+
+<p>That time field requires a little explanation. Since MIDI is a protocol for <em>sequenced</em> music, not <em>recorded</em> music, it&rsquo;s not using an absolute time measurement; it&rsquo;s using a value relative to the song&rsquo;s time signature. This is measured in <a href="https://en.wikipedia.org/wiki/MIDI_beat_clock">&ldquo;MIDI clocks&rdquo;</a>, which are defined as 1/24 of a quarter note. We can turn that into absolute time values using the value defined in the tempo command, which is defined as taking the number of microseconds per quarter note. In this case our <code>Tempo 500000</code> lets us know that each quarter note is 500,000μs (0.5 seconds) and the song plays at a tempo of 120 beats per minute<sup id="fnref:4"><a href="#fn:4" rel="footnote">4</a></sup>, so we can derive what our 40ms interval is in MIDI clock units from that. Given these numbers we can determine that at 120bpm, one MIDI clock is about 20.83ms, so we need at least two MIDI clocks between each system exclusive message to be safe. Now that we&rsquo;ve worked that out, let&rsquo;s take a look at the actual system exclusive messages in this song. This is from the original, unmodified song and represents MIDI messages 29 through 38 in the file.</p>
+
+<p><figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+</pre></td><td class='code'><pre><code class=''><span class='line'>1, 326, System_exclusive, 12, 65, 0, 22, 64, 6, 0, 0, 0, 64, 0, 58, 247
+</span><span class='line'>1, 444, System_exclusive, 255, 65, 16, 22, 66, 5, 0, 0, 0, 0, 24, 50, 12, 0, 1, 0, 0, 1, 24, 50, 12, 0, 1, 0, 0, 2, 24, 50, 12, 0, 1, 0, 0, 3, 24, 50, 12, 0, 1, 0, 0, 4, 24, 50, 12, 0, 1, 0, 0, 5, 24, 50, 12, 0, 1, 0, 0, 6, 24, 50, 12, 0, 1, 0, 0, 7, 24, 50, 12, 0, 1, 0, 0, 8, 24, 50, 12, 0, 1, 0, 0, 9, 24, 50, 12, 0, 1, 0, 0, 10, 24, 50, 12, 0, 1, 0, 0, 11, 24, 50, 12, 0, 1, 0, 0, 12, 24, 50, 12, 0, 1, 0, 0, 13, 24, 50, 12, 0, 1, 0, 2, 6, 24, 50, 12, 0, 1, 0, 0, 15, 24, 50, 12, 0, 1, 0, 0, 16, 24, 50, 12, 0, 1, 0, 0, 17, 24, 50, 12, 0, 1, 0, 0, 18, 24, 50, 12, 0, 1, 0, 0, 19, 24, 50, 12, 0, 1, 0, 0, 20, 24, 50, 12, 0, 1, 0, 0, 21, 24, 50, 12, 0, 1, 0, 0, 22, 24, 50, 12, 0, 1, 0, 0, 23, 24, 50, 12, 0, 1, 0, 0, 24, 24, 50, 12, 0, 1, 0, 0, 25, 24, 50, 12, 0, 1, 0, 0, 26, 24, 50, 12, 0, 1, 0, 0, 27, 24, 50, 12, 0, 1, 0, 0, 28, 24, 50, 12, 0, 1, 0, 0, 29, 24, 50, 12, 0, 1, 0, 0, 30, 24, 50, 12, 0, 1, 0
+</span><span class='line'>1, 446, System_exclusive_packet, 10, 0, 31, 24, 50, 12, 0, 1, 0, 49, 247
+</span><span class='line'>1, 510, System_exclusive, 255, 65, 16, 22, 66, 5, 2, 0, 0, 32, 24, 50, 12, 0, 1, 0, 0, 33, 24, 50, 12, 0, 1, 0, 0, 34, 24, 50, 12, 0, 1, 0, 0, 35, 24, 50, 12, 0, 1, 0, 0, 36, 24, 50, 12, 0, 1, 0, 0, 37, 24, 50, 12, 0, 1, 0, 0, 38, 24, 50, 12, 0, 1, 0, 0, 39, 24, 50, 12, 0, 1, 0, 0, 40, 24, 50, 12, 0, 1, 0, 0, 41, 24, 50, 12, 0, 1, 0, 0, 42, 24, 50, 12, 0, 1, 0, 0, 43, 24, 50, 12, 0, 1, 0, 0, 44, 24, 50, 12, 0, 1, 0, 0, 45, 24, 50, 12, 0, 1, 0, 0, 46, 24, 50, 12, 0, 1, 0, 0, 47, 24, 50, 12, 0, 1, 0, 0, 48, 24, 50, 12, 0, 1, 0, 0, 49, 24, 50, 12, 0, 1, 0, 0, 50, 24, 50, 12, 0, 1, 0, 0, 51, 24, 50, 12, 0, 1, 0, 2, 5, 24, 50, 12, 0, 1, 0, 2, 18, 24, 50, 12, 0, 1, 0, 0, 54, 24, 50, 12, 0, 1, 0, 0, 55, 24, 50, 12, 0, 1, 0, 0, 56, 24, 50, 12, 0, 1, 0, 0, 57, 24, 50, 12, 0, 1, 0, 0, 58, 24, 50, 12, 0, 1, 0, 0, 59, 24, 50, 12, 0, 1, 0, 0, 60, 24, 50, 12, 0, 1, 0, 0, 61, 24, 50, 12, 0, 1, 0, 0, 62, 24, 50, 12, 0, 1, 0
+</span><span class='line'>1, 513, System_exclusive_packet, 10, 0, 63, 24, 50, 12, 0, 1, 0, 119, 247
+</span><span class='line'>1, 577, System_exclusive, 255, 65, 16, 22, 66, 5, 4, 0, 1, 0, 24, 50, 12, 0, 1, 0, 1, 1, 24, 50, 12, 0, 1, 0, 1, 2, 24, 50, 12, 0, 1, 0, 1, 3, 24, 50, 12, 0, 1, 0, 1, 4, 24, 50, 12, 0, 1, 0, 1, 5, 24, 50, 12, 0, 1, 0, 1, 6, 24, 50, 12, 0, 1, 0, 1, 7, 24, 50, 12, 0, 1, 0, 1, 8, 24, 50, 12, 0, 1, 0, 1, 9, 24, 50, 12, 0, 1, 0, 1, 10, 24, 50, 12, 0, 1, 0, 1, 11, 24, 50, 12, 0, 1, 0, 1, 12, 24, 50, 12, 0, 1, 0, 1, 13, 24, 50, 12, 0, 1, 0, 1, 14, 24, 50, 12, 0, 1, 0, 1, 15, 24, 50, 12, 0, 1, 0, 1, 16, 24, 50, 12, 0, 1, 0, 1, 17, 24, 50, 12, 0, 1, 0, 1, 18, 24, 50, 12, 0, 1, 0, 1, 19, 24, 50, 12, 0, 1, 0, 1, 20, 24, 50, 12, 0, 1, 0, 1, 21, 24, 50, 12, 0, 1, 0, 1, 22, 24, 50, 12, 0, 1, 0, 1, 23, 24, 50, 12, 0, 1, 0, 1, 24, 24, 50, 12, 0, 1, 0, 1, 25, 24, 50, 12, 0, 1, 0, 1, 26, 24, 50, 12, 0, 1, 0, 1, 27, 24, 50, 12, 0, 1, 0, 1, 28, 24, 50, 12, 0, 1, 0, 1, 29, 24, 50, 12, 0, 1, 0, 1, 30, 24, 50, 12, 0, 1, 0
+</span><span class='line'>1, 579, System_exclusive_packet, 10, 1, 31, 24, 50, 12, 0, 1, 0, 7, 247
+</span><span class='line'>1, 643, System_exclusive, 255, 65, 16, 22, 66, 5, 6, 0, 1, 32, 24, 50, 12, 0, 1, 0, 1, 33, 24, 50, 12, 0, 1, 0, 1, 34, 24, 50, 12, 0, 1, 0, 1, 35, 24, 50, 12, 0, 1, 0, 2, 19, 24, 50, 12, 0, 1, 0, 1, 37, 24, 50, 12, 0, 1, 0, 1, 38, 24, 50, 12, 0, 1, 0, 1, 39, 24, 50, 12, 0, 1, 0, 1, 40, 24, 50, 12, 0, 1, 0, 2, 17, 24, 50, 12, 0, 1, 0, 1, 42, 24, 50, 12, 0, 1, 0, 2, 11, 24, 50, 12, 0, 1, 0, 1, 44, 24, 50, 12, 0, 1, 0, 1, 45, 24, 50, 12, 0, 1, 0, 1, 46, 24, 50, 12, 0, 1, 0, 1, 47, 24, 50, 12, 0, 1, 0, 2, 9, 24, 50, 12, 0, 1, 0, 1, 49, 24, 50, 12, 0, 1, 0, 1, 50, 24, 50, 12, 0, 1, 0, 1, 51, 24, 50, 12, 0, 1, 0, 1, 52, 24, 50, 12, 0, 1, 0, 1, 53, 24, 50, 12, 0, 1, 0, 1, 54, 24, 50, 12, 0, 1, 0, 2, 13, 24, 50, 12, 0, 1, 0, 2, 10, 24, 50, 12, 0, 0, 0, 2, 12, 24, 50, 12, 0, 1, 0, 2, 16, 24, 50, 12, 0, 1, 0, 2, 4, 24, 50, 12, 0, 1, 0, 2, 8, 24, 50, 12, 0, 1, 0, 2, 2, 24, 50, 12, 0, 1, 0, 2, 7, 24, 50, 12, 0, 1, 0
+</span><span class='line'>1, 645, System_exclusive_packet, 10, 2, 1, 12, 50, 12, 0, 0, 0, 64, 247
+</span><span class='line'>1, 647, System_exclusive, 5, 65, 16, 22, 69, 247</span></code></pre></td></tr></table></div></figure></p>
+
+<p>Taking a look at those gaps, this seemed&hellip; less problematic than I expected. This shows gaps between system exclusive messages of at most 118 ticks and at least 2. The two-clock gaps are pretty close to the line, but it looks like everything should be at least above our 40ms target. I tried adjusting the timing to push them out by a minimum of three clocks, but in this case I wasn&rsquo;t seeing the improvements I was hoping for. The MT-32 was still displaying an &ldquo;Exc. Checksum Error&rdquo; as it parsed these messages. So if it&rsquo;s not <em>just</em> the timing, what else could it be?</p>
+
+<p>Let&rsquo;s take a look at that system exclusive data again. Something jumps out at me from looking at it, but I&rsquo;ll need to explain a little bit about how system exclusive data is structured for this to make sense.</p>
+
+<p>Each message starts with an <code>F0</code> (240) byte identifying the message as a system exclusive message, which midicsv has translated into the <code>System_exclusive</code> header we see here. That&rsquo;s followed by a byte indicating a count of how many bytes are in the remainder of the message, then the bytes that contain the actual data being sent by the device. It then ends with a checksum byte, which allows the device to validate the integrity of the message, and an <code>F7</code> (247) byte that indicates that the system exclusive data is finished. The rest of the content between those bytes is specific to a given family of hardware and isn&rsquo;t relevant to us here.</p>
+
+<p>Now, if we look at that data a little closer, do you notice what&rsquo;s missing at the end of the <code>System_exclusive</code> messages? That&rsquo;s right, <em>all of them are missing the <code>F7</code> termination byte</em>! But if we look at the <code>System_exclusive_packet</code> event that follows each <code>System_exclusive</code>, it&rsquo;s there instead: we can see that each of those <em>does</em> end with an <code>F7</code>. We can also see that every <code>System_exclusive</code> that is followed by a <code>System_exclusive_packet</code> is stated to be exactly 255 bytes long.</p>
+
+<p>In other words, it looks like what we&rsquo;re seeing here is a set of system exclusive messages that have been chunked into smaller sizes: each of them has been capped at 256 bytes maximum (255 bytes plus one byte to indicate the length), and if the <em>total size</em> of a single system exclusive message is longer than 255 bytes, then the remaining bytes are sent in a followup message. Looking up documentation online, such as <a href="http://midi.teragonaudio.com/tech/midifile/evts.htm">in this Standard MIDI File Format guide</a>, let me confirm that this is unusual but perfectly valid behaviour and that we should be reading the full thing together as a single message. If we still assume we&rsquo;re seeing some kind of weird timing error with the MT-32, what if we try joining these messages together into a single system exclusive message? In other words, we take these two messages:</p>
+
+<p><figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+</pre></td><td class='code'><pre><code class=''><span class='line'>1, 509, System_exclusive, 255, 65, 16, 22, 66, 5, 0, 0, 0, 0, 24, 50, 12, 0, 1, 0, 0, 1, 24, 50, 12, 0, 1, 0, 0, 2, 24, 50, 12, 0, 1, 0, 0, 3, 24, 50, 12, 0, 1, 0, 0, 4, 24, 50, 12, 0, 1, 0, 0, 5, 24, 50, 12, 0, 1, 0, 0, 6, 24, 50, 12, 0, 1, 0, 0, 7, 24, 50, 12, 0, 1, 0, 0, 8, 24, 50, 12, 0, 1, 0, 0, 9, 24, 50, 12, 0, 1, 0, 0, 10, 24, 50, 12, 0, 1, 0, 0, 11, 24, 50, 12, 0, 1, 0, 0, 12, 24, 50, 12, 0, 1, 0, 0, 13, 24, 50, 12, 0, 1, 0, 2, 6, 24, 50, 12, 0, 1, 0, 0, 15, 24, 50, 12, 0, 1, 0, 0, 16, 24, 50, 12, 0, 1, 0, 0, 17, 24, 50, 12, 0, 1, 0, 0, 18, 24, 50, 12, 0, 1, 0, 0, 19, 24, 50, 12, 0, 1, 0, 0, 20, 24, 50, 12, 0, 1, 0, 0, 21, 24, 50, 12, 0, 1, 0, 0, 22, 24, 50, 12, 0, 1, 0, 0, 23, 24, 50, 12, 0, 1, 0, 0, 24, 24, 50, 12, 0, 1, 0, 0, 25, 24, 50, 12, 0, 1, 0, 0, 26, 24, 50, 12, 0, 1, 0, 0, 27, 24, 50, 12, 0, 1, 0, 0, 28, 24, 50, 12, 0, 1, 0, 0, 29, 24, 50, 12, 0, 1, 0, 0, 30, 24, 50, 12, 0, 1, 0
+</span><span class='line'>1, 512, System_exclusive_packet, 10, 0, 31, 24, 50, 12, 0, 1, 0, 49, 247</span></code></pre></td></tr></table></div></figure></p>
+
+<p>And transform them into this:</p>
+
+<p><figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+</pre></td><td class='code'><pre><code class=''><span class='line'>1, 509, System_exclusive, 265, 65, 16, 22, 66, 5, 0, 0, 0, 0, 24, 50, 12, 0, 1, 0, 0, 1, 24, 50, 12, 0, 1, 0, 0, 2, 24, 50, 12, 0, 1, 0, 0, 3, 24, 50, 12, 0, 1, 0, 0, 4, 24, 50, 12, 0, 1, 0, 0, 5, 24, 50, 12, 0, 1, 0, 0, 6, 24, 50, 12, 0, 1, 0, 0, 7, 24, 50, 12, 0, 1, 0, 0, 8, 24, 50, 12, 0, 1, 0, 0, 9, 24, 50, 12, 0, 1, 0, 0, 10, 24, 50, 12, 0, 1, 0, 0, 11, 24, 50, 12, 0, 1, 0, 0, 12, 24, 50, 12, 0, 1, 0, 0, 13, 24, 50, 12, 0, 1, 0, 2, 6, 24, 50, 12, 0, 1, 0, 0, 15, 24, 50, 12, 0, 1, 0, 0, 16, 24, 50, 12, 0, 1, 0, 0, 17, 24, 50, 12, 0, 1, 0, 0, 18, 24, 50, 12, 0, 1, 0, 0, 19, 24, 50, 12, 0, 1, 0, 0, 20, 24, 50, 12, 0, 1, 0, 0, 21, 24, 50, 12, 0, 1, 0, 0, 22, 24, 50, 12, 0, 1, 0, 0, 23, 24, 50, 12, 0, 1, 0, 0, 24, 24, 50, 12, 0, 1, 0, 0, 25, 24, 50, 12, 0, 1, 0, 0, 26, 24, 50, 12, 0, 1, 0, 0, 27, 24, 50, 12, 0, 1, 0, 0, 28, 24, 50, 12, 0, 1, 0, 0, 29, 24, 50, 12, 0, 1, 0, 0, 30, 24, 50, 12, 0, 1, 0, 0, 31, 24, 50, 12, 0, 1, 0, 49, 247</span></code></pre></td></tr></table></div></figure></p>
+
+<p>That retains all of the data from the two events except that it strips the length indicator byte from the <code>System_exclusive_packet</code> before joining the rest of its bytes to the previous message. So I tried playing <em>that</em>, and, lo and behold: no more &ldquo;Exc. Checksum Error&rdquo; on the MT-32&rsquo;s display! The file now plays 100% correctly, with no issues. It seems like we&rsquo;ve finally gotten to the bottom of it.</p>
+
+<hr />
+
+<p>Meanwhile, as I was finishing up, I started reaching out to people who owned the newer models to get them to test the original, unaltered MIDIs for me. I&rsquo;d known all along that these files were composed for a CM-32L, but I&rsquo;d never actually <em>confirmed</em> whether they played back correctly on the newer models. For all I knew, maybe these files had actually been bad on all models all along and the entire first half of this blog post had been resting on a bad assumption. (Which it was, as it turns out, just not the one I was worried about that this point.) Reports from owners of a CM-64 and a CM-32L came back just as I&rsquo;d have imagined: the original files played back correctly, and the fixed files weren&rsquo;t necessary to get them working.</p>
+
+<p>Then came an unexpected message. NMIError from the ScummVM Discord also had an original model MT-32, same as me, and tried the unaltered files on that. <em>They worked correctly.</em></p>
+
+<p>I started to dig in to figure out what was different. Other than the fact we were using the same model MT-32, our software and hardware setup was pretty different; they were running Windows 11 with a USB ESI M4U eX MIDI interface and Falcosoft Midi Player, while I&rsquo;m running macOS with a Yamaha MD-BT01 Bluetooth MIDI interface and Sweet MIDI Player Pro. But it didn&rsquo;t take us long to work out what was at fault here: I had a hunch that my MIDI player was the bad link in the chain here, and that was it. When they tried Sweet MIDI Player for Windows, they saw the same error as me; when I tried alternate players for Mac, I was able to get it to work<sup id="fnref:5"><a href="#fn:5" rel="footnote">5</a></sup>.</p>
+
+<p>At this point it&rsquo;s become clear my original premise <em>and</em> my second premise were both wrong, but it seems we&rsquo;re finally closing in on a <em>real</em> explanation. Checking that <a href="http://midi.teragonaudio.com/tech/midifile/evts.htm">MIDI documentation I linked earlier</a>, we see something that helps explain the error that my MIDI player was exhibiting:</p>
+
+<blockquote><p>The first packet begins with an F0, but it doesn&rsquo;t end with an F7. The subsequent packets don&rsquo;t start with an F0 nor end with F7. The last packet doesn&rsquo;t start with an F0, but does end with the F7. So, between the first packet&rsquo;s opening F0 and the last packet&rsquo;s closing F7, there&rsquo;s 1 SYSEX message there. [&hellip;] Of course, since a delay is needed inbetween each packet, you need to store each packet as a separate event with its own time in the MTrk. Also, you need some way of knowing which events shouldn&rsquo;t begin with an F0 (ie, all of them except the first packet). So, the MIDI file redefines a midi status of F7 (normally used as an end mark for SYSEX packets) as a way to indicate an event that doesn&rsquo;t begin with F0. If such an event follows an F0 event, then it&rsquo;s assumed that the F7 event is the second &ldquo;packet&rdquo; of a series. In this context, it&rsquo;s referred to as a SYSEX CONTINUATION event.</p></blockquote>
+
+<p>Like I mentioned earlier, an <code>F7</code> byte typically indicates the end of a system exclusive message, but it can <em>also represent the start of a continuation event</em>. Looking at the raw MIDI data in a hex editor, that is indeed what&rsquo;s happening: the start of the event that midicsv labelled <code>System_exclusive_packet</code> is an <code>F7</code> byte. I believe that what&rsquo;s happening is that the MIDI player I&rsquo;m using saw that <code>F7</code> byte and mistook it for the <em>end</em> of a system exclusive message, when in fact it&rsquo;s the <em>start</em> of the next event in the MIDI file. (We can tell it&rsquo;s not actually the end of the message because we have a count telling us the length of the packet, and that <code>F7</code> comes <em>after</em> the end of the first packet, not inside it.) Having made that mistake, the MIDI player sends the first part of the message, ends it with an <code>F7</code>, and then skips the continuation event completely. That then tells the MT-32 that the system exclusive message is complete, at which point it tries to calculate the checksum and fails because the second last byte it received isn&rsquo;t a checksum at all! This also explains why merging the messages had fixed it for me. It&rsquo;s <em>not</em> because it helped with the timing of sending that data, as I thought, but because it avoided the system exclusive message format that the player I was using would misinterpret.</p>
+
+<p>We&rsquo;ve been through quite a few plot twists just to get here. I started out assuming this was the classic MT-32 delay problem, which I&rsquo;ve encountered many times before; then I assumed it was the hardware having issues with the chunked message format; before finally figuring out this was a software problem all along. It&rsquo;s been a journey.</p>
+
+<hr />
+
+<p>Now, at this point, I have to come clean with you. I have something to admit, but you have to promise not to get mad. You see,</p>
+
+<p><em>I didn&rsquo;t actually do any of that stuff I described above.</em></p>
+
+<p>At least, not at the time. I did all of that research <em>now</em>, while writing up this blog post, so that I could go into this with full technical detail. At the time, I did something much simpler. Since I&rsquo;d started with opening one of the files in a MIDI sequencer and peeking at their contents after converting them into CSV, I&rsquo;d noticed two things:</p>
+
+<ol>
+<li>All of the files had the same number of system exclusive messages, which were in the same place in every song; and</li>
+<li>I&rsquo;d already worked out by hand a small tweak to the timing that would get each of the files playable on my MT-32.</li>
+</ol>
+
+
+<p>So, when I actually did this two years ago, I just wrote a simple script that hardcoded everything: I knew exactly the parts of the MIDI files that needed a delay, and I knew what amount of delay was working, so I could just manually shift everything around.</p>
+
+<p>Of course, as we&rsquo;ve already established, that wouldn&rsquo;t have accidentally fixed anything. So why did I think it was fixed? Well, it seems that I fixed it by accident: I did experiment briefly with opening the files in various MIDI-editing tools, and it seems that at least one of them must have automatically merged the system exclusive messages together without telling me. So, for <em>two years</em> I&rsquo;ve been convinced I fixed these files via csvmidi surgery when it was completely unrelated! I tricked myself this whole time!</p>
+
+<hr />
+
+<p>This was a long journey just to find out that nothing was wrong with the MIDIs in the first place. Now that we&rsquo;re finally at our destination, let&rsquo;s listen to some MIDIs, shall we?</p>
+
+<p><iframe width="560" height="315" src="https://www.youtube.com/embed/wT5SONC3gUU?si=Ecvgjv-LSs334eue" title="YouTube video player" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" referrerpolicy="strict-origin-when-cross-origin" allowfullscreen></iframe></p>
+
+<p><hr>
+<ol>
+<li id="fn:1">
+<p>It specifically uses <a href="https://en.wikipedia.org/wiki/Subtractive_synthesis">subtractive synthesis</a>.<a href="#fnref:1" rev="footnote">&#8617;</a></p></li></p>
+
+<p><li id="fn:2">
+<p>These are largely sound effects rather than instruments, though I&rsquo;m sure some songs used them anyway.<a href="#fnref:2" rev="footnote">&#8617;</a></p></li></p>
+
+<p><li id="fn:3">
+<p>Yet. You never know&hellip;<a href="#fnref:3" rev="footnote">&#8617;</a></p></li></p>
+
+<p><li id="fn:4">
+<p>As far as I can tell, 120 beats per minute is also considered the default MIDI tempo unless a file specifies otherwise.<a href="#fnref:4" rev="footnote">&#8617;</a></p></li></p>
+
+<p><li id="fn:5">
+<p>Little compatibility report: Sweet MIDI Player Pro for Mac and Windows and PXR MIDI Player for Mac both exhibit the same error with these files, while TMIDI Player for Windows and Drumstick MIDI File Player for Mac play them back correctly. And don&rsquo;t worry, I&rsquo;ve submitted bug reports to both players that had the issue.<a href="#fnref:5" rev="footnote">&#8617;</a></p></li>
+</ol></p>
+</div>
+  
+  
+
+
+    </article>
   
   
     <article>
@@ -1091,103 +1278,6 @@
 
     </article>
   
-  
-    <article>
-      
-  <header>
-    
-      <h1 class="entry-title"><a href="/blog/blog/2024/09/21/what-happened-to-the-japanese-pc-platforms/">What Happened to the Japanese PC Platforms?</a></h1>
-    
-    
-      <p class="meta">
-        
-
-
-
-
-<time class='entry-date' datetime='2024-09-21T14:01:19-07:00'><span class='date'><span class='date-month'>Sep</span> <span class='date-day'>21</span><span class='date-suffix'>st</span>, <span class='date-year'>2024</span></span> <span class='time'>2:01 pm</span></time>
-        
-      </p>
-    
-  </header>
-
-
-  <div class="entry-content"><p><em>(This was originally posted on a social media site; I&rsquo;ve revised and updated it for my blog.)</em></p>
-
-<p>The other day <a href="https://nex-3.com">a friend</a> asked me a pretty interesting question: what <em>happened</em> to all those companies who made those Japanese computer platforms that were never released outside Japan? I thought it&rsquo;d be worth expanding that answer into a full-size post.</p>
-
-<h3>A quick introduction: the players</h3>
-
-<p>It&rsquo;s hard to remember these days, but there there used to be an incredible amount of variety in the computer space. There were a <em>lot</em> of different computer platforms, pretty much all of them totally incompatible with each other. North America settled on the IBM PC/Mac duopoly pretty early<sup id="fnref:1"><a href="#fn:1" rel="footnote">1</a></sup>, but Europe still had plenty of other computers popular well into the 90s, and Japan had its own computers that essentially didn&rsquo;t exist anywhere else.</p>
-
-<p>So who were they? By the 16-bit computer era, there&rsquo;s three I&rsquo;m going to talk about today<sup id="fnref:2"><a href="#fn:2" rel="footnote">2</a></sup>: NEC&rsquo;s PC-98, Fujitsu&rsquo;s FM Towns, and Sharp&rsquo;s X68000. The PC-98 was far and away the biggest of those platforms, with the other two having a more niche market.</p>
-
-<h3>The PC-98 in a time of transition</h3>
-
-<p>First, a quick digression: what is this DOS thing?</p>
-
-<p>The thing about DOS is that it&rsquo;s a much thinner OS than what we think of in 2024. When you&rsquo;re writing DOS software of any kind of complexity, you&rsquo;re talking straight to the hardware, or to drivers that are specific to particular classes of hardware. When we talk about &ldquo;DOS&rdquo; in the west, we specifically mean &ldquo;DOS on IBM compatible PCs&rdquo;. PC-98 and FM Towns both had DOS-based operating systems, but their hardware was nothing at all like IBM compatible PCs and there was no level of software compatibility between them. The PC-98 was originally a DOS-based computer without a GUI of any kind - just like DOS-based IBM PCs. When we talk about &ldquo;PC-98&rdquo; games and software, what we really mean is DOS-based PC-98 software that only runs on that platform.</p>
-
-<p>Windows software is very different from DOS in one important way: Windows incorporates a hardware abstraction layer. Software written for Windows APIs doesn&rsquo;t need to be specific to particular hardware, and that set the stage for the major transition that was going to come.</p>
-
-<p>NEC and Microsoft teamed up on porting Windows to the PC-98 platform. Both the PC-98 and the IBM PC use the same CPU, even though the rest of their hardware is very different, which made the port technically feasible. The first Windows release for PC-98 came out in 1992, but Windows didn&rsquo;t really take off in a big way until Windows 95 in the mid-90s. And so, suddenly, for the first time software could run on both IBM PCs running Japanese language Windows <em>and</em> PC-98 running Windows.<sup id="fnref:3"><a href="#fn:3" rel="footnote">3</a></sup> Software developers didn&rsquo;t have to do anything special to get that compatibility: it happened by default, so long as they were using the standard Windows software features and didn&rsquo;t talk directly to the hardware.</p>
-
-<p>Around the same time, NEC started making IBM-compatible PCs. As far as I can tell, they made both PC-98s and IBM PCs alongside each other for quite a few years. With Windows software not caring what the underlying hardware was, the distinction between &ldquo;PC-98&rdquo; and &ldquo;PC&rdquo; got a lot fuzzier. If you were buying a PC, you had no reason to buy a PC-98 unless you wanted to run DOS-based PC-98 software. If you just wanted that shiny new Windows software, why not buy the cheaper IBM PC that NEC would also sell you?</p>
-
-<p>So, for the PC-98, the answer isn&rsquo;t really that it <em>died</em> - it sort of faded away and merged into what every other system was becoming.</p>
-
-<h3>The FM Towns</h3>
-
-<p>The FM Towns had a similar transition. While it had a homegrown GUI-based OS called Towns OS, it was relatively primitive compared to Windows 3 and especially Windows 95. The FM Towns also used the same CPU as IBM PCs and the PC-98, which means Microsoft could work with Fujitsu to port their software to the platform. And, just like what happened with the PC-98, the platform became far less relevant and less distinctive when it was just another platform to run Windows software on. If you didn&rsquo;t care about running the older FM Towns-specific software, why would you care about buying an FM Towns instead of any other IBM PC?</p>
-
-<p>Fujitsu, just like NEC, made the transition to making standard Windows PCs and discontinued the FM Towns a few years later.</p>
-
-<h3>The X68000 loses out in the CPU wars</h3>
-
-<p>Unlike the other two platforms, the X68000 had a different CPU and a distinct homegrown OS. It used the 68000 series of processors from Motorola, which were incredibly popular in the 80s and 90s. The same CPU was used by the Mac until the mid 90s, the Amiga, and a huge number of home consoles and arcade boards. It was a powerful CPU, but when every other platform was looking for a way to merge with the Windows platform, they had a big problem: you simply couldn&rsquo;t port Windows to the platform and get it to run regular Windows software because they didn&rsquo;t use the same CPUs. Sharp were locked out. While they also switched to making Windows PCs in the 90s, they had no way to bring their existing users with them by giving them a transition path.</p>
-
-<h3>The lure of multitasking</h3>
-
-<p>Why did Windows win out, though? In the west we often credit Microsoft Office as the killer app, but it wasn&rsquo;t a major player in Japan where Japanese language-specific word processors were huge in the market for years. I&rsquo;d argue instead that multitasking was the killer feature.</p>
-
-<p>In the DOS era, you ran one program at a time. You might have a lot of software you used, but you&rsquo;d pick one program to use at a time. If you wanted to switch to something else, you&rsquo;d have to save whatever you&rsquo;re doing, quit, and open a completely different full-screen app. While competing platforms like the Mac<sup id="fnref:4"><a href="#fn:4" rel="footnote">4</a></sup> had multitasking via their GUIs for years, Windows and especially Windows 3 is what brought it to the wider market.</p>
-
-<p>If you&rsquo;re going to be using more than one program at the same time, having a wider amount of software <em>that&rsquo;s inter-compatible</em> becomes more important. I&rsquo;d argue that multitasking is what nudged market consolidation onto a smaller number of computers. Windows, and especially Windows 95, became <em>very</em> hard for other platforms to compete with because its base of software was just so large. It made far more sense for NEC and Fujitsu to bring Windows to their users even if it meant losing the lock-in that their unique OSs and platform-specific software had gotten them.</p>
-
-<h3>Shifts in the gaming market</h3>
-
-<p>In the 16-bit era, the FM Towns and X68000 were doing great in the computer gaming niche. They had powerful 2D gaming hardware and a lot of very sophisticated action games. Their original games and ports of arcade games compared extremely well against what 16-bit consoles could do, giving them a reputation of being the real gamers' platforms. By 1994 though, they had a problem: the 32-bit consoles were out, which could do 2D games just as well as the FM Towns and X68000, and the consoles could also do 3D that blew away anything those computers could handle. Fujitsu and Sharp, meanwhile, just weren&rsquo;t releasing new hardware that could keep up. The PC gaming niche had already been shrinking and moving towards consoles for a few years, and this killed off a lot of what was left.</p>
-
-<p>I also suspect that Sony&rsquo;s marketing for the PlayStation changed things significantly. Home computers had older players than the 16-bit consoles did, but Sony was marketing the PS1 towards those same older audiences. It probably made it easy for computer players to look at the new consoles and decide to move on.</p>
-
-<h3>What about the 8-bit platforms?</h3>
-
-<p>Japan had a variety of 8-bit computer platforms, some of which (like the MSX) were also well-known in western countries. While in Europe the 8-bit micros held on right into the 90s, and many users upgraded straight from 8-bit micros to Windows PCs, in Japan the 8-bit computers had already been supplanted by native 16-bit computing platforms before the Windows era. In some cases, these were 16-bit computers by the same manufacturers - both Sharp and NEC had been major players in the 8-bit computing era too. The MSX, meanwhile, had failed to produce either a 16-bit evolution of the platform or a 16-bit successor and so many of its users had already moved on by the time Windows 95 came out.</p>
-
-<h3>So, in conclusion</h3>
-
-<p>None of the 16-bit Japanese computer makers acutally died off - they just switched to making standard Windows PCs that were interchangeable with anything else out there. Microsoft took over that market just like they did everywhere else in the world, but at least the companies themselves survived better than the Commodores and Ataris of the world.</p>
-<div class="footnotes">
-<hr/>
-<ol>
-<li id="fn:1">
-<p>Some of the 16-bit competitors, like Amiga and Atari ST, had <em>some</em> market penetration in North America, but they were pretty niche compared to Europe.<a href="#fnref:1" rev="footnote">&#8617;</a></p></li>
-<li id="fn:2">
-<p>There were some others too, like Sony NEWS, but they mostly settled into the &ldquo;professional workstation market&rdquo; that was its own weird thing. Just like the international SGI, Sun and NeXT workstations, they had their own reasons for fading away.<a href="#fnref:2" rev="footnote">&#8617;</a></p></li>
-<li id="fn:3">
-<p>A lot of the earlier Japanese Windows games I have list their system requirements in terms of both PC-98 and IBM PC, even though they&rsquo;re not using anything specific to either platform.<a href="#fnref:3" rev="footnote">&#8617;</a></p></li>
-<li id="fn:4">
-<p>Outside Japan the Amiga and many others also had high-quality multitasking GUIs for years, but I&rsquo;m focusing specifically on Japan here.<a href="#fnref:4" rev="footnote">&#8617;</a></p></li>
-</ol>
-</div>
-
-</div>
-  
-  
-
-
-    </article>
-  
   <div class="pagination">
     
       <a class="prev" href="/blog/posts/2">&larr; Older</a>
@@ -1203,6 +1293,10 @@
   <ul id="recent_posts">
     
       <li class="post">
+        <a href="/blog/blog/2026/08/25/how-i-fixed-an-mt-32-midi-soundtrack-for-the-hardware-i-use/">Performing Digital Surgery to Fix MIDIs for My Hardware (and Then Discovering the Entire Premise of My Post Was Wrong)</a>
+      </li>
+    
+      <li class="post">
         <a href="/blog/blog/2026/08/06/whats-up-with-that-song-from-the-duck-game-on-amiga-cd-32-anyway/">What's Up With That Song From the Duck Game on Amiga CD-32 Anyway?</a>
       </li>
     
@@ -1216,10 +1310,6 @@
     
       <li class="post">
         <a href="/blog/blog/2026/03/27/forget-spreadsheets/">Forget Spreadsheets, I Wrote My Own Visual Game Script Editor</a>
-      </li>
-    
-      <li class="post">
-        <a href="/blog/blog/2025/12/22/watchy/">It's Not Called Watchy; or, Solving a Minor Video Game Mystery</a>
       </li>
     
   </ul>

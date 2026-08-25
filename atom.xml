@@ -4,7 +4,7 @@
   <title><![CDATA[The Future Is Now]]></title>
   <link href="http://mistys-internet.website/blog/atom.xml" rel="self"/>
   <link href="http://mistys-internet.website/blog/"/>
-  <updated>2026-08-06T13:19:41-07:00</updated>
+  <updated>2026-08-25T09:28:12-07:00</updated>
   <id>http://mistys-internet.website/blog/</id>
   <author>
     <name><![CDATA[Misty De Meo]]></name>
@@ -12,6 +12,173 @@
   </author>
   <generator uri="http://octopress.org/">Octopress</generator>
 
+  
+  <entry>
+    <title type="html"><![CDATA[Performing Digital Surgery to Fix MIDIs for My Hardware (and Then Discovering the Entire Premise of My Post Was Wrong)]]></title>
+    <link href="http://mistys-internet.website/blog/blog/2026/08/25/how-i-fixed-an-mt-32-midi-soundtrack-for-the-hardware-i-use/"/>
+    <updated>2026-08-25T09:27:25-07:00</updated>
+    <id>http://mistys-internet.website/blog/blog/2026/08/25/how-i-fixed-an-mt-32-midi-soundtrack-for-the-hardware-i-use</id>
+    <content type="html"><![CDATA[<p>Now, I know almost every technical writeup on this blog is obscure, but this is going to be a really weird one. This is about a round of surgery I applied to a set of MIDI files a few years back to get them playing on a device I owned. I started out thinking this was going to be a quick writeup on something I&rsquo;d already done but, as you&rsquo;ll see, I encountered a significant plot twist that greatly complicated things. But I get ahead of myself!</p>
+
+<hr />
+
+<p>This will shock no one who&rsquo;s read my recent posts, but I love retro music technology. One of my personal prize possessions is a <a href="https://en.wikipedia.org/wiki/Roland_MT-32">Roland MT-32</a>, a classic MIDI synthesizer from the 80s, and I&rsquo;ve got an enormous collection of hundreds of MIDIs I listen to. Yes, my life is exactly like the <a href="https://www.youtube.com/watch?v=UteyS6tUqXk">Cinco MIDI organizer sketch</a>.</p>
+
+<p>I especially love listening to MT-32 songs on original hardware because it&rsquo;s just such an <em>unusual</em> synth. It&rsquo;s one of a few devices Roland made using their <a href="https://en.wikipedia.org/wiki/Linear_arithmetic_synthesis">&ldquo;linear arithmetic synthesis&rdquo;</a>, which combines traditional synthesis<sup id="fnref:1"><a href="#fn:1" rel="footnote">1</a></sup> with PCM-based samples. The marriage of two very different styles of synthesis gives it an incredibly unique sound unlike pretty much anything else, and I adore hearing what people do with it. On top of its unique style of synthesis, it was completely programmable - unlike pretty much all of the other early PCM-based synthesizers. It allowed musicians to blend its PCM samples in novel ways and to freely program the substractive synthesis portions, which meant that on top of its 128 builtin instruments it was possible to produce an incredibly wide range of different sounds.</p>
+
+<p>There&rsquo;s a good chance you&rsquo;ve heard a higher-end version of the sound from the <a href="https://en.wikipedia.org/wiki/Roland_D-50">Roland D-50</a>, the MT-32&rsquo;s older cousin - for example, the main instrument from the backing track to <a href="https://www.youtube.com/watch?v=LTrk4X9ACtw">Orinoco Flow</a>. Never heard an MT-32? Here&rsquo;s a recent song by <a href="https://bubblegumoctopus.bandcamp.com">Bubblegum Octopus</a>, who I consider to be the modern-day master of the MT-32&rsquo;s sound:</p>
+
+<iframe style="border: 0; width: 100%; height: 120px;" src="https://bandcamp.com/EmbeddedPlayer/album=4094980965/size=large/bgcol=ffffff/linkcol=0687f5/tracklist=false/artwork=small/track=3976760464/transparent=true/" seamless><a href="https://bubblegumoctopus.bandcamp.com/album/big-battles-ii">Big Battles II by Bubblegum Octopus</a></iframe>
+
+
+<p><p></p>
+
+<p>A few years back, I was linked to a set of about 20 MT-32 MIDIs I really wanted to listen to&hellip; which, unfortunately, didn&rsquo;t play back correctly on my hardware. The problem is, MT-32 isn&rsquo;t really one device but a family of compatible devices. <em>Mostly</em> compatible devices, that is. I have an original-model &ldquo;old&rdquo; MT-32, but Roland followed it up with a couple of newer models: a revised model with slightly improved sound quality; and a newer device called the CM-32L, which adds a few extra builtin instruments<sup id="fnref:2"><a href="#fn:2" rel="footnote">2</a></sup>. The &ldquo;new&rdquo; MT-32 wasn&rsquo;t marked as a different device from the old one, but unluckily for me it and the CM-32L have one big compatibility difference from the &ldquo;old&rdquo; MT-32 that breaks some music for me.</p>
+
+<p>Since the MT-32 has programmable instruments, it obviously needs to be able to accept commands to program them. And since it&rsquo;s a pure MIDI device, it needs to be able to take those commands <em>over MIDI</em>. To support things like this, MIDI has a feature called <a href="https://en.wikipedia.org/wiki/MIDI#System_Exclusive_messages">system exclusive commands</a> which allows sending MIDI messages with contents that are specific to a particular set of hardware or a particular manufacturer&rsquo;s products. You can transfer them separately from music, but since they&rsquo;re just MIDI messages like actual music commands you can actually embed them right in a MIDI file so they&rsquo;ll be sent as you play it.</p>
+
+<p>The earliest model of MT-32 has a tiny amount of RAM to serve as a buffer that can easily get overwhelmed by sending too many large MIDI commands too quickly. Many sources will give you strict instructions to include at least 40ms of delay between each command, which was widely ignored - especially since the later models all included a larger buffer that didn&rsquo;t need you to be nearly as strict about it. If you, like me, have an older model MT-32 you may well find that a lot of music composed for the newer models just won&rsquo;t play back right without tweaks. (I&rsquo;m very used to the dreaded &ldquo;Buffer Overflow&rdquo; and &ldquo;Exc. Checksum Error&rdquo; messages on its builtin LCD.)</p>
+
+<p>There are fixes for this if you&rsquo;re using emulators or certain other retro software environments; DOSBox has a configuration option to enforce 40ms between messages, for example, which will adjust the timing of data on the fly before sending it off to real hardware. None of that helps me when I&rsquo;ve just got a set of MIDIs I&rsquo;m listening to on a normal MIDI player, though. This is a bit too specialized a feature to show up in any normal MIDI player, and I&rsquo;m not far gone enough to be writing my own yet<sup id="fnref:3"><a href="#fn:3" rel="footnote">3</a></sup>.</p>
+
+<p>I could have just opened the files in a sequencer and done it by hand, but there were 20 songs in this set and I didn&rsquo;t really want to be doing that much manual editing. Since this keeps happening to me, I&rsquo;d rather have some kind of solution that I can use for other music in the future instead of needing to do manual surgery every single time. The plan: come up with some way to programmatically open MIDI data; identify the system exclusive commands; adjust the space between them so there&rsquo;s always at least 40ms; and then shift the actual music data by the total of all the delays I&rsquo;d introduced so that the rest of the timing still lines up.</p>
+
+<p>While I was looking around for options, <a href="https://nya.social/notes/818cfc2c52d9639c62b4dcde">someone suggested</a> I try out a pair of interesting-looking tools: <a href="https://www.fourmilab.ch/webtools/midicsv/"><code>midicsv</code> and <code>csvmidi</code></a>. The former takes a binary MIDI file and transforms it into a plaintext CSV file, and the latter does the opposite. If it worked, this looked like it would be perfect. It would take no time to write up a short script to manipulate the CSV and transform it back into a MIDI, and it should be pretty easy to apply whatever I figured out here to other files in the future. First, though, a test: if I was going to be round-tripping this through CSV and back again, could I convert it from MIDI to CSV to back again and have it be the same?</p>
+
+<p><figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+</pre></td><td class='code'><pre><code class=''><span class='line'>$ sha2 -256 01.mid
+</span><span class='line'>SHA-256 (01.mid) = 617a8e8144c1d7da0c2be712635a61cdccbfa49dd3c2c5e50942247dc26a7a6a
+</span><span class='line'>$ midicsv 01.mid 01.csv
+</span><span class='line'>$ csvmidi 01.csv 01-roundtripped.mid
+</span><span class='line'>SHA-256 (01-roundtripped.mid) = 617a8e8144c1d7da0c2be712635a61cdccbfa49dd3c2c5e50942247dc26a7a6a</span></code></pre></td></tr></table></div></figure></p>
+
+<p>Yes! The files are byte-identical. I should be able to trust that any changes in the output file are the ones I want.</p>
+
+<p>Now that I know this workflow looks viable, let&rsquo;s take a look at that CSV output:</p>
+
+<p><figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+</pre></td><td class='code'><pre><code class=''><span class='line'>0, 0, Header, 0, 1, 384
+</span><span class='line'>1, 0, Start_track
+</span><span class='line'>1, 0, Tempo, 500000
+</span><span class='line'>1, 0, Time_signature, 4, 2, 24, 8
+</span><span class='line'>1, 209, Control_c, 1, 10, 64
+</span><span class='line'>1, 326, System_exclusive, 12, 65, 0, 22, 64, 6, 0, 0, 0, 64, 0, 58, 247</span></code></pre></td></tr></table></div></figure></p>
+
+<p>Pretty simple format. As expected, this is raw MIDI data represented in text rather than binary data. MIDI is, essentially, a series of events which occur on a timeline; each of them is a command like, say, &ldquo;play a certain note on a certain channel&rdquo;. Each row in this CSV is an individual command, which makes it very easy for us to find exactly what we want to work with. There&rsquo;s only really two fields that are relevant to us here for what we want to do: the third field is the name of the event, which lets us identify the <code>System_exclusive</code> messages, while the second field is the absolute time at which this event occurs. Since we don&rsquo;t need to actually read the <em>content</em> of the system exclusive messages and don&rsquo;t need to care about any other messages except what timestamp they&rsquo;re at, this is nearly all the information we need for automated MIDI surgery.</p>
+
+<p>That time field requires a little explanation. Since MIDI is a protocol for <em>sequenced</em> music, not <em>recorded</em> music, it&rsquo;s not using an absolute time measurement; it&rsquo;s using a value relative to the song&rsquo;s time signature. This is measured in <a href="https://en.wikipedia.org/wiki/MIDI_beat_clock">&ldquo;MIDI clocks&rdquo;</a>, which are defined as 1/24 of a quarter note. We can turn that into absolute time values using the value defined in the tempo command, which is defined as taking the number of microseconds per quarter note. In this case our <code>Tempo 500000</code> lets us know that each quarter note is 500,000μs (0.5 seconds) and the song plays at a tempo of 120 beats per minute<sup id="fnref:4"><a href="#fn:4" rel="footnote">4</a></sup>, so we can derive what our 40ms interval is in MIDI clock units from that. Given these numbers we can determine that at 120bpm, one MIDI clock is about 20.83ms, so we need at least two MIDI clocks between each system exclusive message to be safe. Now that we&rsquo;ve worked that out, let&rsquo;s take a look at the actual system exclusive messages in this song. This is from the original, unmodified song and represents MIDI messages 29 through 38 in the file.</p>
+
+<p><figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+</pre></td><td class='code'><pre><code class=''><span class='line'>1, 326, System_exclusive, 12, 65, 0, 22, 64, 6, 0, 0, 0, 64, 0, 58, 247
+</span><span class='line'>1, 444, System_exclusive, 255, 65, 16, 22, 66, 5, 0, 0, 0, 0, 24, 50, 12, 0, 1, 0, 0, 1, 24, 50, 12, 0, 1, 0, 0, 2, 24, 50, 12, 0, 1, 0, 0, 3, 24, 50, 12, 0, 1, 0, 0, 4, 24, 50, 12, 0, 1, 0, 0, 5, 24, 50, 12, 0, 1, 0, 0, 6, 24, 50, 12, 0, 1, 0, 0, 7, 24, 50, 12, 0, 1, 0, 0, 8, 24, 50, 12, 0, 1, 0, 0, 9, 24, 50, 12, 0, 1, 0, 0, 10, 24, 50, 12, 0, 1, 0, 0, 11, 24, 50, 12, 0, 1, 0, 0, 12, 24, 50, 12, 0, 1, 0, 0, 13, 24, 50, 12, 0, 1, 0, 2, 6, 24, 50, 12, 0, 1, 0, 0, 15, 24, 50, 12, 0, 1, 0, 0, 16, 24, 50, 12, 0, 1, 0, 0, 17, 24, 50, 12, 0, 1, 0, 0, 18, 24, 50, 12, 0, 1, 0, 0, 19, 24, 50, 12, 0, 1, 0, 0, 20, 24, 50, 12, 0, 1, 0, 0, 21, 24, 50, 12, 0, 1, 0, 0, 22, 24, 50, 12, 0, 1, 0, 0, 23, 24, 50, 12, 0, 1, 0, 0, 24, 24, 50, 12, 0, 1, 0, 0, 25, 24, 50, 12, 0, 1, 0, 0, 26, 24, 50, 12, 0, 1, 0, 0, 27, 24, 50, 12, 0, 1, 0, 0, 28, 24, 50, 12, 0, 1, 0, 0, 29, 24, 50, 12, 0, 1, 0, 0, 30, 24, 50, 12, 0, 1, 0
+</span><span class='line'>1, 446, System_exclusive_packet, 10, 0, 31, 24, 50, 12, 0, 1, 0, 49, 247
+</span><span class='line'>1, 510, System_exclusive, 255, 65, 16, 22, 66, 5, 2, 0, 0, 32, 24, 50, 12, 0, 1, 0, 0, 33, 24, 50, 12, 0, 1, 0, 0, 34, 24, 50, 12, 0, 1, 0, 0, 35, 24, 50, 12, 0, 1, 0, 0, 36, 24, 50, 12, 0, 1, 0, 0, 37, 24, 50, 12, 0, 1, 0, 0, 38, 24, 50, 12, 0, 1, 0, 0, 39, 24, 50, 12, 0, 1, 0, 0, 40, 24, 50, 12, 0, 1, 0, 0, 41, 24, 50, 12, 0, 1, 0, 0, 42, 24, 50, 12, 0, 1, 0, 0, 43, 24, 50, 12, 0, 1, 0, 0, 44, 24, 50, 12, 0, 1, 0, 0, 45, 24, 50, 12, 0, 1, 0, 0, 46, 24, 50, 12, 0, 1, 0, 0, 47, 24, 50, 12, 0, 1, 0, 0, 48, 24, 50, 12, 0, 1, 0, 0, 49, 24, 50, 12, 0, 1, 0, 0, 50, 24, 50, 12, 0, 1, 0, 0, 51, 24, 50, 12, 0, 1, 0, 2, 5, 24, 50, 12, 0, 1, 0, 2, 18, 24, 50, 12, 0, 1, 0, 0, 54, 24, 50, 12, 0, 1, 0, 0, 55, 24, 50, 12, 0, 1, 0, 0, 56, 24, 50, 12, 0, 1, 0, 0, 57, 24, 50, 12, 0, 1, 0, 0, 58, 24, 50, 12, 0, 1, 0, 0, 59, 24, 50, 12, 0, 1, 0, 0, 60, 24, 50, 12, 0, 1, 0, 0, 61, 24, 50, 12, 0, 1, 0, 0, 62, 24, 50, 12, 0, 1, 0
+</span><span class='line'>1, 513, System_exclusive_packet, 10, 0, 63, 24, 50, 12, 0, 1, 0, 119, 247
+</span><span class='line'>1, 577, System_exclusive, 255, 65, 16, 22, 66, 5, 4, 0, 1, 0, 24, 50, 12, 0, 1, 0, 1, 1, 24, 50, 12, 0, 1, 0, 1, 2, 24, 50, 12, 0, 1, 0, 1, 3, 24, 50, 12, 0, 1, 0, 1, 4, 24, 50, 12, 0, 1, 0, 1, 5, 24, 50, 12, 0, 1, 0, 1, 6, 24, 50, 12, 0, 1, 0, 1, 7, 24, 50, 12, 0, 1, 0, 1, 8, 24, 50, 12, 0, 1, 0, 1, 9, 24, 50, 12, 0, 1, 0, 1, 10, 24, 50, 12, 0, 1, 0, 1, 11, 24, 50, 12, 0, 1, 0, 1, 12, 24, 50, 12, 0, 1, 0, 1, 13, 24, 50, 12, 0, 1, 0, 1, 14, 24, 50, 12, 0, 1, 0, 1, 15, 24, 50, 12, 0, 1, 0, 1, 16, 24, 50, 12, 0, 1, 0, 1, 17, 24, 50, 12, 0, 1, 0, 1, 18, 24, 50, 12, 0, 1, 0, 1, 19, 24, 50, 12, 0, 1, 0, 1, 20, 24, 50, 12, 0, 1, 0, 1, 21, 24, 50, 12, 0, 1, 0, 1, 22, 24, 50, 12, 0, 1, 0, 1, 23, 24, 50, 12, 0, 1, 0, 1, 24, 24, 50, 12, 0, 1, 0, 1, 25, 24, 50, 12, 0, 1, 0, 1, 26, 24, 50, 12, 0, 1, 0, 1, 27, 24, 50, 12, 0, 1, 0, 1, 28, 24, 50, 12, 0, 1, 0, 1, 29, 24, 50, 12, 0, 1, 0, 1, 30, 24, 50, 12, 0, 1, 0
+</span><span class='line'>1, 579, System_exclusive_packet, 10, 1, 31, 24, 50, 12, 0, 1, 0, 7, 247
+</span><span class='line'>1, 643, System_exclusive, 255, 65, 16, 22, 66, 5, 6, 0, 1, 32, 24, 50, 12, 0, 1, 0, 1, 33, 24, 50, 12, 0, 1, 0, 1, 34, 24, 50, 12, 0, 1, 0, 1, 35, 24, 50, 12, 0, 1, 0, 2, 19, 24, 50, 12, 0, 1, 0, 1, 37, 24, 50, 12, 0, 1, 0, 1, 38, 24, 50, 12, 0, 1, 0, 1, 39, 24, 50, 12, 0, 1, 0, 1, 40, 24, 50, 12, 0, 1, 0, 2, 17, 24, 50, 12, 0, 1, 0, 1, 42, 24, 50, 12, 0, 1, 0, 2, 11, 24, 50, 12, 0, 1, 0, 1, 44, 24, 50, 12, 0, 1, 0, 1, 45, 24, 50, 12, 0, 1, 0, 1, 46, 24, 50, 12, 0, 1, 0, 1, 47, 24, 50, 12, 0, 1, 0, 2, 9, 24, 50, 12, 0, 1, 0, 1, 49, 24, 50, 12, 0, 1, 0, 1, 50, 24, 50, 12, 0, 1, 0, 1, 51, 24, 50, 12, 0, 1, 0, 1, 52, 24, 50, 12, 0, 1, 0, 1, 53, 24, 50, 12, 0, 1, 0, 1, 54, 24, 50, 12, 0, 1, 0, 2, 13, 24, 50, 12, 0, 1, 0, 2, 10, 24, 50, 12, 0, 0, 0, 2, 12, 24, 50, 12, 0, 1, 0, 2, 16, 24, 50, 12, 0, 1, 0, 2, 4, 24, 50, 12, 0, 1, 0, 2, 8, 24, 50, 12, 0, 1, 0, 2, 2, 24, 50, 12, 0, 1, 0, 2, 7, 24, 50, 12, 0, 1, 0
+</span><span class='line'>1, 645, System_exclusive_packet, 10, 2, 1, 12, 50, 12, 0, 0, 0, 64, 247
+</span><span class='line'>1, 647, System_exclusive, 5, 65, 16, 22, 69, 247</span></code></pre></td></tr></table></div></figure></p>
+
+<p>Taking a look at those gaps, this seemed&hellip; less problematic than I expected. This shows gaps between system exclusive messages of at most 118 ticks and at least 2. The two-clock gaps are pretty close to the line, but it looks like everything should be at least above our 40ms target. I tried adjusting the timing to push them out by a minimum of three clocks, but in this case I wasn&rsquo;t seeing the improvements I was hoping for. The MT-32 was still displaying an &ldquo;Exc. Checksum Error&rdquo; as it parsed these messages. So if it&rsquo;s not <em>just</em> the timing, what else could it be?</p>
+
+<p>Let&rsquo;s take a look at that system exclusive data again. Something jumps out at me from looking at it, but I&rsquo;ll need to explain a little bit about how system exclusive data is structured for this to make sense.</p>
+
+<p>Each message starts with an <code>F0</code> (240) byte identifying the message as a system exclusive message, which midicsv has translated into the <code>System_exclusive</code> header we see here. That&rsquo;s followed by a byte indicating a count of how many bytes are in the remainder of the message, then the bytes that contain the actual data being sent by the device. It then ends with a checksum byte, which allows the device to validate the integrity of the message, and an <code>F7</code> (247) byte that indicates that the system exclusive data is finished. The rest of the content between those bytes is specific to a given family of hardware and isn&rsquo;t relevant to us here.</p>
+
+<p>Now, if we look at that data a little closer, do you notice what&rsquo;s missing at the end of the <code>System_exclusive</code> messages? That&rsquo;s right, <em>all of them are missing the <code>F7</code> termination byte</em>! But if we look at the <code>System_exclusive_packet</code> event that follows each <code>System_exclusive</code>, it&rsquo;s there instead: we can see that each of those <em>does</em> end with an <code>F7</code>. We can also see that every <code>System_exclusive</code> that is followed by a <code>System_exclusive_packet</code> is stated to be exactly 255 bytes long.</p>
+
+<p>In other words, it looks like what we&rsquo;re seeing here is a set of system exclusive messages that have been chunked into smaller sizes: each of them has been capped at 256 bytes maximum (255 bytes plus one byte to indicate the length), and if the <em>total size</em> of a single system exclusive message is longer than 255 bytes, then the remaining bytes are sent in a followup message. Looking up documentation online, such as <a href="http://midi.teragonaudio.com/tech/midifile/evts.htm">in this Standard MIDI File Format guide</a>, let me confirm that this is unusual but perfectly valid behaviour and that we should be reading the full thing together as a single message. If we still assume we&rsquo;re seeing some kind of weird timing error with the MT-32, what if we try joining these messages together into a single system exclusive message? In other words, we take these two messages:</p>
+
+<p><figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+</pre></td><td class='code'><pre><code class=''><span class='line'>1, 509, System_exclusive, 255, 65, 16, 22, 66, 5, 0, 0, 0, 0, 24, 50, 12, 0, 1, 0, 0, 1, 24, 50, 12, 0, 1, 0, 0, 2, 24, 50, 12, 0, 1, 0, 0, 3, 24, 50, 12, 0, 1, 0, 0, 4, 24, 50, 12, 0, 1, 0, 0, 5, 24, 50, 12, 0, 1, 0, 0, 6, 24, 50, 12, 0, 1, 0, 0, 7, 24, 50, 12, 0, 1, 0, 0, 8, 24, 50, 12, 0, 1, 0, 0, 9, 24, 50, 12, 0, 1, 0, 0, 10, 24, 50, 12, 0, 1, 0, 0, 11, 24, 50, 12, 0, 1, 0, 0, 12, 24, 50, 12, 0, 1, 0, 0, 13, 24, 50, 12, 0, 1, 0, 2, 6, 24, 50, 12, 0, 1, 0, 0, 15, 24, 50, 12, 0, 1, 0, 0, 16, 24, 50, 12, 0, 1, 0, 0, 17, 24, 50, 12, 0, 1, 0, 0, 18, 24, 50, 12, 0, 1, 0, 0, 19, 24, 50, 12, 0, 1, 0, 0, 20, 24, 50, 12, 0, 1, 0, 0, 21, 24, 50, 12, 0, 1, 0, 0, 22, 24, 50, 12, 0, 1, 0, 0, 23, 24, 50, 12, 0, 1, 0, 0, 24, 24, 50, 12, 0, 1, 0, 0, 25, 24, 50, 12, 0, 1, 0, 0, 26, 24, 50, 12, 0, 1, 0, 0, 27, 24, 50, 12, 0, 1, 0, 0, 28, 24, 50, 12, 0, 1, 0, 0, 29, 24, 50, 12, 0, 1, 0, 0, 30, 24, 50, 12, 0, 1, 0
+</span><span class='line'>1, 512, System_exclusive_packet, 10, 0, 31, 24, 50, 12, 0, 1, 0, 49, 247</span></code></pre></td></tr></table></div></figure></p>
+
+<p>And transform them into this:</p>
+
+<p><figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+</pre></td><td class='code'><pre><code class=''><span class='line'>1, 509, System_exclusive, 265, 65, 16, 22, 66, 5, 0, 0, 0, 0, 24, 50, 12, 0, 1, 0, 0, 1, 24, 50, 12, 0, 1, 0, 0, 2, 24, 50, 12, 0, 1, 0, 0, 3, 24, 50, 12, 0, 1, 0, 0, 4, 24, 50, 12, 0, 1, 0, 0, 5, 24, 50, 12, 0, 1, 0, 0, 6, 24, 50, 12, 0, 1, 0, 0, 7, 24, 50, 12, 0, 1, 0, 0, 8, 24, 50, 12, 0, 1, 0, 0, 9, 24, 50, 12, 0, 1, 0, 0, 10, 24, 50, 12, 0, 1, 0, 0, 11, 24, 50, 12, 0, 1, 0, 0, 12, 24, 50, 12, 0, 1, 0, 0, 13, 24, 50, 12, 0, 1, 0, 2, 6, 24, 50, 12, 0, 1, 0, 0, 15, 24, 50, 12, 0, 1, 0, 0, 16, 24, 50, 12, 0, 1, 0, 0, 17, 24, 50, 12, 0, 1, 0, 0, 18, 24, 50, 12, 0, 1, 0, 0, 19, 24, 50, 12, 0, 1, 0, 0, 20, 24, 50, 12, 0, 1, 0, 0, 21, 24, 50, 12, 0, 1, 0, 0, 22, 24, 50, 12, 0, 1, 0, 0, 23, 24, 50, 12, 0, 1, 0, 0, 24, 24, 50, 12, 0, 1, 0, 0, 25, 24, 50, 12, 0, 1, 0, 0, 26, 24, 50, 12, 0, 1, 0, 0, 27, 24, 50, 12, 0, 1, 0, 0, 28, 24, 50, 12, 0, 1, 0, 0, 29, 24, 50, 12, 0, 1, 0, 0, 30, 24, 50, 12, 0, 1, 0, 0, 31, 24, 50, 12, 0, 1, 0, 49, 247</span></code></pre></td></tr></table></div></figure></p>
+
+<p>That retains all of the data from the two events except that it strips the length indicator byte from the <code>System_exclusive_packet</code> before joining the rest of its bytes to the previous message. So I tried playing <em>that</em>, and, lo and behold: no more &ldquo;Exc. Checksum Error&rdquo; on the MT-32&rsquo;s display! The file now plays 100% correctly, with no issues. It seems like we&rsquo;ve finally gotten to the bottom of it.</p>
+
+<hr />
+
+<p>Meanwhile, as I was finishing up, I started reaching out to people who owned the newer models to get them to test the original, unaltered MIDIs for me. I&rsquo;d known all along that these files were composed for a CM-32L, but I&rsquo;d never actually <em>confirmed</em> whether they played back correctly on the newer models. For all I knew, maybe these files had actually been bad on all models all along and the entire first half of this blog post had been resting on a bad assumption. (Which it was, as it turns out, just not the one I was worried about that this point.) Reports from owners of a CM-64 and a CM-32L came back just as I&rsquo;d have imagined: the original files played back correctly, and the fixed files weren&rsquo;t necessary to get them working.</p>
+
+<p>Then came an unexpected message. NMIError from the ScummVM Discord also had an original model MT-32, same as me, and tried the unaltered files on that. <em>They worked correctly.</em></p>
+
+<p>I started to dig in to figure out what was different. Other than the fact we were using the same model MT-32, our software and hardware setup was pretty different; they were running Windows 11 with a USB ESI M4U eX MIDI interface and Falcosoft Midi Player, while I&rsquo;m running macOS with a Yamaha MD-BT01 Bluetooth MIDI interface and Sweet MIDI Player Pro. But it didn&rsquo;t take us long to work out what was at fault here: I had a hunch that my MIDI player was the bad link in the chain here, and that was it. When they tried Sweet MIDI Player for Windows, they saw the same error as me; when I tried alternate players for Mac, I was able to get it to work<sup id="fnref:5"><a href="#fn:5" rel="footnote">5</a></sup>.</p>
+
+<p>At this point it&rsquo;s become clear my original premise <em>and</em> my second premise were both wrong, but it seems we&rsquo;re finally closing in on a <em>real</em> explanation. Checking that <a href="http://midi.teragonaudio.com/tech/midifile/evts.htm">MIDI documentation I linked earlier</a>, we see something that helps explain the error that my MIDI player was exhibiting:</p>
+
+<blockquote><p>The first packet begins with an F0, but it doesn&rsquo;t end with an F7. The subsequent packets don&rsquo;t start with an F0 nor end with F7. The last packet doesn&rsquo;t start with an F0, but does end with the F7. So, between the first packet&rsquo;s opening F0 and the last packet&rsquo;s closing F7, there&rsquo;s 1 SYSEX message there. [&hellip;] Of course, since a delay is needed inbetween each packet, you need to store each packet as a separate event with its own time in the MTrk. Also, you need some way of knowing which events shouldn&rsquo;t begin with an F0 (ie, all of them except the first packet). So, the MIDI file redefines a midi status of F7 (normally used as an end mark for SYSEX packets) as a way to indicate an event that doesn&rsquo;t begin with F0. If such an event follows an F0 event, then it&rsquo;s assumed that the F7 event is the second &ldquo;packet&rdquo; of a series. In this context, it&rsquo;s referred to as a SYSEX CONTINUATION event.</p></blockquote>
+
+<p>Like I mentioned earlier, an <code>F7</code> byte typically indicates the end of a system exclusive message, but it can <em>also represent the start of a continuation event</em>. Looking at the raw MIDI data in a hex editor, that is indeed what&rsquo;s happening: the start of the event that midicsv labelled <code>System_exclusive_packet</code> is an <code>F7</code> byte. I believe that what&rsquo;s happening is that the MIDI player I&rsquo;m using saw that <code>F7</code> byte and mistook it for the <em>end</em> of a system exclusive message, when in fact it&rsquo;s the <em>start</em> of the next event in the MIDI file. (We can tell it&rsquo;s not actually the end of the message because we have a count telling us the length of the packet, and that <code>F7</code> comes <em>after</em> the end of the first packet, not inside it.) Having made that mistake, the MIDI player sends the first part of the message, ends it with an <code>F7</code>, and then skips the continuation event completely. That then tells the MT-32 that the system exclusive message is complete, at which point it tries to calculate the checksum and fails because the second last byte it received isn&rsquo;t a checksum at all! This also explains why merging the messages had fixed it for me. It&rsquo;s <em>not</em> because it helped with the timing of sending that data, as I thought, but because it avoided the system exclusive message format that the player I was using would misinterpret.</p>
+
+<p>We&rsquo;ve been through quite a few plot twists just to get here. I started out assuming this was the classic MT-32 delay problem, which I&rsquo;ve encountered many times before; then I assumed it was the hardware having issues with the chunked message format; before finally figuring out this was a software problem all along. It&rsquo;s been a journey.</p>
+
+<hr />
+
+<p>Now, at this point, I have to come clean with you. I have something to admit, but you have to promise not to get mad. You see,</p>
+
+<p><em>I didn&rsquo;t actually do any of that stuff I described above.</em></p>
+
+<p>At least, not at the time. I did all of that research <em>now</em>, while writing up this blog post, so that I could go into this with full technical detail. At the time, I did something much simpler. Since I&rsquo;d started with opening one of the files in a MIDI sequencer and peeking at their contents after converting them into CSV, I&rsquo;d noticed two things:</p>
+
+<ol>
+<li>All of the files had the same number of system exclusive messages, which were in the same place in every song; and</li>
+<li>I&rsquo;d already worked out by hand a small tweak to the timing that would get each of the files playable on my MT-32.</li>
+</ol>
+
+
+<p>So, when I actually did this two years ago, I just wrote a simple script that hardcoded everything: I knew exactly the parts of the MIDI files that needed a delay, and I knew what amount of delay was working, so I could just manually shift everything around.</p>
+
+<p>Of course, as we&rsquo;ve already established, that wouldn&rsquo;t have accidentally fixed anything. So why did I think it was fixed? Well, it seems that I fixed it by accident: I did experiment briefly with opening the files in various MIDI-editing tools, and it seems that at least one of them must have automatically merged the system exclusive messages together without telling me. So, for <em>two years</em> I&rsquo;ve been convinced I fixed these files via csvmidi surgery when it was completely unrelated! I tricked myself this whole time!</p>
+
+<hr />
+
+<p>This was a long journey just to find out that nothing was wrong with the MIDIs in the first place. Now that we&rsquo;re finally at our destination, let&rsquo;s listen to some MIDIs, shall we?</p>
+
+<p><iframe width="560" height="315" src="https://www.youtube.com/embed/wT5SONC3gUU?si=Ecvgjv-LSs334eue" title="YouTube video player" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" referrerpolicy="strict-origin-when-cross-origin" allowfullscreen></iframe></p>
+
+<p><hr>
+<ol>
+<li id="fn:1">
+<p>It specifically uses <a href="https://en.wikipedia.org/wiki/Subtractive_synthesis">subtractive synthesis</a>.<a href="#fnref:1" rev="footnote">&#8617;</a></p></li></p>
+
+<p><li id="fn:2">
+<p>These are largely sound effects rather than instruments, though I&rsquo;m sure some songs used them anyway.<a href="#fnref:2" rev="footnote">&#8617;</a></p></li></p>
+
+<p><li id="fn:3">
+<p>Yet. You never know&hellip;<a href="#fnref:3" rev="footnote">&#8617;</a></p></li></p>
+
+<p><li id="fn:4">
+<p>As far as I can tell, 120 beats per minute is also considered the default MIDI tempo unless a file specifies otherwise.<a href="#fnref:4" rev="footnote">&#8617;</a></p></li></p>
+
+<p><li id="fn:5">
+<p>Little compatibility report: Sweet MIDI Player Pro for Mac and Windows and PXR MIDI Player for Mac both exhibit the same error with these files, while TMIDI Player for Windows and Drumstick MIDI File Player for Mac play them back correctly. And don&rsquo;t worry, I&rsquo;ve submitted bug reports to both players that had the issue.<a href="#fnref:5" rev="footnote">&#8617;</a></p></li>
+</ol></p>
+]]></content>
+  </entry>
   
   <entry>
     <title type="html"><![CDATA[What's Up With That Song From the Duck Game on Amiga CD-32 Anyway?]]></title>
@@ -1674,168 +1841,6 @@
 <p>Tempting as it is to refactor the lexer, I had other things to do, and I really wasn&rsquo;t familiar enough with its innards to take that on.<a href="#fnref:5" rev="footnote">&#8617;</a></p></li>
 <li id="fn:6">
 <p>As it turns out, this wasn&rsquo;t the only game with the same issue. Fixing this also fixed several other Japanese games, including <em>The Seven Colors: Legend of Psy・S City</em> and <em>Eriko Tamura&rsquo;s Oz</em>.<a href="#fnref:6" rev="footnote">&#8617;</a></p></li>
-</ol>
-</div>
-
-]]></content>
-  </entry>
-  
-  <entry>
-    <title type="html"><![CDATA[Exploring JVS]]></title>
-    <link href="http://mistys-internet.website/blog/blog/2021/08/14/exploring-jvs/"/>
-    <updated>2021-08-14T13:54:08-07:00</updated>
-    <id>http://mistys-internet.website/blog/blog/2021/08/14/exploring-jvs</id>
-    <content type="html"><![CDATA[<p>Everyone had their weird pandemic hobby, right? Well, mine is that I bought an arcade video game. Not the whole cabinet - just a board, to hook up to a TV and a game controller. If I can&rsquo;t go to the arcade, at least I can bring a favourite game home, right?</p>
-
-<p>As you might imagine, an arcade board isn&rsquo;t just plug and play; you can&rsquo;t just plug in a USB gamepad and call it a day. Finding out how to actually use it took some research. I looked up the different methods, and found I had more or less two options: a more expensive one involving repurposed arcade hardware, and an open-source one using off-the-shelf parts. While I was figuring out if the more expensive options were worth it, I decided I&rsquo;d try out the open source one, <a href="https://github.com/openjvs/openjvs">OpenJVS</a>. I started out as just a user, but ended up getting involved in development. Over the past few months, I&rsquo;ve contributed a bunch of new features and bugfixes. In the process I learned a lot about the specification&hellip; and quashed my fair share of weird bugs.</p>
-
-<h2>So what is JVS anyway?</h2>
-
-<p>Imagine this: you&rsquo;re an arcade machine manufacturer, and you need to make it easy for a machine operator to swap a new board into one of their cabinets. How do you make sure they don&rsquo;t have to run dozens of wires to get the controls hooked up? Video is easy; you can just use VGA, DVI, or HDMI. Power is easy too. What else is left? Well, there&rsquo;s many different kinds of input so players can actually play the game; coin inputs and money bookkeeping; smart cards to communicate information to a game; in other words, all kinds of input from the player.</p>
-
-<p>The solution? JAMMA Video Standard, or JVS, the standard used by most arcade games since the late 90s.<sup id="fnref:1"><a href="#fn:1" rel="footnote">1</a></sup> It&rsquo;s a serial protocol that makes arcade hardware close to plug and play: connect a single cable from your cabinet&rsquo;s I/O board to your new arcade board, and you get all of your controls and coin slots connected at once.</p>
-
-<p>If you want to use a JVS game at home, you could always put something together using an official I/O board, but - as it happens, the JVS spec is available<sup id="fnref:2"><a href="#fn:2" rel="footnote">2</a></sup>. There&rsquo;s nothing stopping you from making your own I/O board, and it turns out a few different people have. There are a few different open source options intended to work in a few different ways. I use OpenJVS, written by Bobby Dilley, which transforms a Raspberry Pi running Linux into a JVS I/O board.</p>
-
-<h2>How does JVS work?</h2>
-
-<p>So that&rsquo;s JVS, but how does it work? I won&rsquo;t go into deep detail, but here&rsquo;s the 10,000 meter view.</p>
-
-<p>JVS defines communication between an I/O board and a video game board. It uses the <a href="https://en.wikipedia.org/wiki/RS-485">RS-485</a> serial standard to communicate data, meaning that it&rsquo;s possible to use a standard USB RS-485 device to send and receive commands.<sup id="fnref:3"><a href="#fn:3" rel="footnote">3</a></sup> The I/O board handles tracking the state of all of the cabinet&rsquo;s inputs, and it&rsquo;s also responsible for all the coin management: it has its own count of how much money players have spent, and the game just reads that number instead of keeping track of it itself.</p>
-
-<p>The game board communicates with the I/O board by sending commands, then receiving packets of information in return. The game board tells the I/O board how many bytes of data to expect, then sends one or more messages as a set of raw bytes. The I/O board reads those bytes, interprets them, then sends a set of responses for each command.</p>
-
-<p>Open source JVS implementations don&rsquo;t just emulate the things a player would normally touch in the arcade, either. They also simulate features like the service and test buttons, which are tucked away inside a cabinet where only arcade employees can normally use them. The service button allows access to the operator menu, where employees can change hardware and software settings, while the test button does exactly what it sounds like. Arcade players will never get to use these, but for home players it&rsquo;s useful to be able to do things like change how many coins a play costs, turn on free play, or change the game language. OpenJVS supports both of these, and they seemed to work when I tested them. The test button did cause OpenJVS to log a message about an &ldquo;unsupported command&rdquo;, which seemed suspicious, but Bobby and I suspected this was just the board playing fast and loose with the spec so we ignored it. (This will come up again later.)</p>
-
-<p>OpenJVS was already basically complete and implemented all of the common parts of the protocol, so I started out as just a user. As I ran into a few bugs, I started contributing bugfixes and then implementations of more parts of the protocol.</p>
-
-<h2>Let&rsquo;s talk money</h2>
-
-<p>I mentioned coin management earlier. Obviously, in arcades, games are pay-to-play. Most game boards have a free play option so you can play as much as you want without paying, and a lot of home players will just switch their boards into the free play mode. There&rsquo;s nothing stopping you from emulating a coin slot though. OpenJVS lets you map a button on your controller to inserting a coin for something closer to the authentic arcade feeling. It seems like this might not be a common usecase, but the option is always there.</p>
-
-<p><img src="http://mistys-internet.website/blog/images/jvs/coins-253.png" title="Screenshot of the arcade board's coin counter with 253 coins" ></p>
-
-<p>Before long, I noticed a really strange bug. I&rsquo;d be playing games, and then notice that somehow I had over 200 credits in the machine. I definitely wasn&rsquo;t mashing the coin button that much, so I knew something had to be wrong. After some experimentation, I eventually figured out it only happened if you did a few specific things in exactly the right order:</p>
-
-<ul>
-<li>Insert one or more coins</li>
-<li>Enter the service menu and then the input test menu</li>
-<li>Exit the service menu</li>
-</ul>
-
-
-<p>At this point, I realized something suspicious was happening. I was always getting 200+ coins&hellip; but it was more specific than that. I was ending up with exactly 256 minus the number of coins I had when entering the service menu. For example, if I started with 3 coins, I&rsquo;d always have 253 coins after leaving the service menu. That was a pretty good sign I was seeing something in particular: integer underflow.</p>
-
-<p><img src="http://mistys-internet.website/blog/images/jvs/io_test.png" title="Screenshot of the IO test from the service menu" ></p>
-
-<p>Experienced programmers, feel free to skip this paragraph. But for those who aren&rsquo;t familiar: languages like C, which OpenJVS is written in, feature something called integer overflow and underflow. Number types have a maximum size which affects how many numbers it can represent. A 16-bit (or 2-byte) integer that can store only positive numbers, for example, can only represent numbers between 0 and 65535. Picture, for a moment, what happens if you ask a program to subtract 1 from a 16-bit integer that&rsquo;s already at 0, or add 1 to a number that&rsquo;s already at 65535. In C, and many other languages, it will underflow or underflow: subtract 1 from 0, and you get 65535; add 1 to 65535, and you get 0.</p>
-
-<p>Having figured out that I was probably seeing underflow, I took a look at the protocol. Since the JVS I/O board keeps track of the money balance, the protocol provides commands for dealing with that and it seemed like the most likely place I&rsquo;d find the bug. When I dug into OpenJVS&rsquo;s implementation of the &ldquo;decrease number of coins&rdquo; command, it wasn&rsquo;t too hard to find the culprit. It was right here:</p>
-
-<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-<span class='line-number'>2</span>
-<span class='line-number'>3</span>
-<span class='line-number'>4</span>
-<span class='line-number'>5</span>
-<span class='line-number'>6</span>
-</pre></td><td class='code'><pre><code class='c'><span class='line'><span class="cm">/* Prevent underflow of coins */</span>
-</span><span class='line'><span class="k">if</span> <span class="p">(</span><span class="n">coin_decrement</span> <span class="o">&gt;</span> <span class="n">jvsIO</span><span class="o">-&gt;</span><span class="n">state</span><span class="p">.</span><span class="n">coinCount</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span>
-</span><span class='line'>    <span class="n">coin_decrement</span> <span class="o">=</span> <span class="n">jvsIO</span><span class="o">-&gt;</span><span class="n">state</span><span class="p">.</span><span class="n">coinCount</span><span class="p">[</span><span class="mi">0</span><span class="p">];</span>
-</span><span class='line'>
-</span><span class='line'><span class="k">for</span> <span class="p">(</span><span class="kt">int</span> <span class="n">i</span> <span class="o">=</span> <span class="mi">0</span><span class="p">;</span> <span class="n">i</span> <span class="o">&lt;</span> <span class="n">jvsIO</span><span class="o">-&gt;</span><span class="n">capabilities</span><span class="p">.</span><span class="n">coins</span><span class="p">;</span> <span class="n">i</span><span class="o">++</span><span class="p">)</span>
-</span><span class='line'>    <span class="n">jvsIO</span><span class="o">-&gt;</span><span class="n">state</span><span class="p">.</span><span class="n">coinCount</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="o">-=</span> <span class="n">coin_decrement</span><span class="p">;</span>
-</span></code></pre></td></tr></table></div></figure>
-
-
-<p>When OpenJVS received the command to decrement the number of coins by a certain amount, it tried to prevent underflows. Unfortunately, the underflow protection itself was buggy: it checked the number of coins in the first coin slot, but then decremented the number of coins in <em>every</em> slot. If slot 2 has fewer coins than slot 1, then slot 2 will end up underflowing by whatever the difference is. I still wasn&rsquo;t sure why it was trying to remove <em>256</em> coins, which seemed weird. I figured it must just be trying to clear the slot of all coins and trusting the I/O board to prevent underflows, and moved on.</p>
-
-<p>With that bug fixed, I decided to keep working at improving coin support. While I was working on that command, I noticed that OpenJVS was ignoring a similar command. While the board usually only needs to send commands to reduce the number of coins in the balance, like when the player starts a game, it can also send a command to increase the number of coins. I&rsquo;d noticed that my game board was trying to send that command, but OpenJVS had only implemented a placeholder that logged the request and then moved on without doing anything. The quickest way to figure out what was going on was just to implement the command myself. The actual command in the spec is pretty simple:</p>
-
-<table>
-<thead>
-<tr>
-<th> Purpose </th>
-<th> Sample </th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<td> Command code (always 35) </td>
-<td> <code>0x35</code> </td>
-</tr>
-<tr>
-<td> Coin slot index </td>
-<td> <code>0x01</code> </td>
-</tr>
-<tr>
-<td> Amount (first half) </td>
-<td> <code>0x00</code> </td>
-</tr>
-<tr>
-<td> Amount (second half) </td>
-<td> <code>0x01</code> </td>
-</tr>
-</tbody>
-</table>
-
-
-<p>Easy enough: you can identify that it&rsquo;s the command to increase coins by the first byte, <code>35</code>, and then it tells you which coin slot to act on and how many coins to add to it. But when I was replacing the old placeholder command, I noticed something funny:</p>
-
-<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-<span class='line-number'>2</span>
-<span class='line-number'>3</span>
-<span class='line-number'>4</span>
-<span class='line-number'>5</span>
-<span class='line-number'>6</span>
-<span class='line-number'>7</span>
-</pre></td><td class='code'><pre><code class='c'><span class='line'><span class="k">case</span> <span class="nl">CMD_WRITE_COINS</span><span class="p">:</span>
-</span><span class='line'><span class="p">{</span>
-</span><span class='line'>    <span class="n">debug</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="s">&quot;CMD_WRITE_COINS</span><span class="se">\n</span><span class="s">&quot;</span><span class="p">);</span>
-</span><span class='line'>    <span class="n">size</span> <span class="o">=</span> <span class="mi">3</span><span class="p">;</span>
-</span><span class='line'>    <span class="n">outputPacket</span><span class="p">.</span><span class="n">data</span><span class="p">[</span><span class="n">outputPacket</span><span class="p">.</span><span class="n">length</span><span class="o">++</span><span class="p">]</span> <span class="o">=</span> <span class="n">REPORT_SUCCESS</span><span class="p">;</span>
-</span><span class='line'><span class="p">}</span>
-</span><span class='line'><span class="k">break</span><span class="p">;</span>
-</span></code></pre></td></tr></table></div></figure>
-
-
-<p>The placeholder command just reported success without doing anything, then jumped ahead in the stream by the command&rsquo;s length. But it jumped ahead <em>3</em> bytes, and according to the spec this command should be <em>4</em> bytes long. I tested OpenJVS with the command fully implemented, and noticed two things: pressing the test button now inserted 256 coins into the second coin slot, instead of doing nothing; and the &ldquo;unsupported command&rdquo; error I used to see went away. Why? When the buggy placeholder skipped ahead by three bytes, that left one byte in the buffer for OpenJVS to find and mistake for being a command. That byte, <code>0x01</code>, was actually the last byte of the &ldquo;insert coin&rdquo; command that was being sent when the test button was activated. I hadn&rsquo;t even set out to fix the &ldquo;unsupported command&rdquo; bug, but I fixed it anyway.</p>
-
-<p>At this point I&rsquo;d fixed all the bugs I set out to, but I was still seeing something that just didn&rsquo;t feel right. When exiting the service menu, the game board now withdrew coins from the balance; when pressing the test button, the board now added coins. But the number of coins looked wrong: it was happening in increments of 256, instead of 1, and even for test commands that seemed unlikely. So I took another look at the spec, and realized the answer had been staring me in the face the entire time. Let&rsquo;s take another look at the last part of that table from earlier:</p>
-
-<table>
-<thead>
-<tr>
-<th> Purpose </th>
-<th> Sample </th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<td> Amount (first half) </td>
-<td> <code>0x00</code> </td>
-</tr>
-<tr>
-<td> Amount (second half) </td>
-<td> <code>0x01</code> </td>
-</tr>
-</tbody>
-</table>
-
-
-<p>The number of coins to add or remove is a two-byte, or 16-bit, value. Since JVS is communicating through single bytes, any multi-byte values have to be split up into single bytes for transmission. The spec helpfully tells us how to decode that: the numbers are stored in the big-endian, or most-significant byte first, format. But taking a look at OpenJVS&rsquo;s code shows that anywhere it was decoding these values, it was decoding them in little-endian format - in other words, it was reading the bytes backwards. What&rsquo;s 256 in little-endian format? It&rsquo;s the bytes &ldquo;0&rdquo; and &ldquo;1&rdquo;, in that order. What&rsquo;s 1 in big-endian format? It&rsquo;s those same two bytes in that same order. In other words, the game board hadn&rsquo;t been trying to add or subtract 256 coins all this time: it was just trying to add and remove single coins.</p>
-
-<p>Putting it all together, what exactly was happening when I saw coins being added and removed? It actually turns out to be pretty simple. Pressing the test button inserts a coin in the second coin slot. When the operator menu is activated, it can be used to test the coin counter. When the operator leaves the menu, the unit sends commands to remove all of the coins that were added by the test button; this should leave it with the same number of coins as it had when they started. The strange behaviour was a combination of all the bugs working together: the test button didn&rsquo;t do anything because the command wasn&rsquo;t implemented, and the buggy bounds checking and incomplete &ldquo;remove coins&rdquo; command meant it could underflow and leave the player with hundreds of coins.</p>
-
-<p>I originally set out to fix some pretty simple bugs, but every new bug I uncovered revealed a new one. The experience was quite a fun one. I can&rsquo;t say I ever thought I&rsquo;d be writing software for arcade machines, but not only did I fix my own problems, but I had the chance to learn more about how things work in a domain I might never otherwise have gotten the chance to touch.</p>
-<div class="footnotes">
-<hr/>
-<ol>
-<li id="fn:1">
-<p>This was actually the second JAMMA standard, following a simpler standard that was used internationally between 1985 and the late 90s.<a href="#fnref:1" rev="footnote">&#8617;</a></p></li>
-<li id="fn:2">
-<p>Including an excellent <a href="http://daifukkat.su/files/jvs_wip.pdf">English translation</a> by Alex Marshall!<a href="#fnref:2" rev="footnote">&#8617;</a></p></li>
-<li id="fn:3">
-<p>Mostly. JVS actually introduces an extra wire, known as the sync line, but I&rsquo;m going to ignore that here to keep the explanation simple.<a href="#fnref:3" rev="footnote">&#8617;</a></p></li>
 </ol>
 </div>
 
