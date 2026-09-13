@@ -100,7 +100,8 @@
 <iframe style="border: 0; width: 100%; height: 120px;" src="https://bandcamp.com/EmbeddedPlayer/album=4094980965/size=large/bgcol=ffffff/linkcol=0687f5/tracklist=false/artwork=small/track=3976760464/transparent=true/" seamless><a href="https://bubblegumoctopus.bandcamp.com/album/big-battles-ii">Big Battles II by Bubblegum Octopus</a></iframe>
 
 
-<p><p></p>
+<p></p>
+
 
 <p>A few years back, I was linked to a set of about 20 MT-32 MIDIs I really wanted to listen to&hellip; which, unfortunately, didn&rsquo;t play back correctly on my hardware. The problem is, MT-32 isn&rsquo;t really one device but a family of compatible devices. <em>Mostly</em> compatible devices, that is. I have an original-model &ldquo;old&rdquo; MT-32, but Roland followed it up with a couple of newer models: a revised model with slightly improved sound quality; and a newer device called the CM-32L, which adds a few extra builtin instruments<sup id="fnref:2"><a href="#fn:2" rel="footnote">2</a></sup>. The &ldquo;new&rdquo; MT-32 wasn&rsquo;t marked as a different device from the old one, but unluckily for me it and the CM-32L have one big compatibility difference from the &ldquo;old&rdquo; MT-32 that breaks some music for me.</p>
 
@@ -114,7 +115,7 @@
 
 <p>While I was looking around for options, <a href="https://nya.social/notes/818cfc2c52d9639c62b4dcde">someone suggested</a> I try out a pair of interesting-looking tools: <a href="https://www.fourmilab.ch/webtools/midicsv/"><code>midicsv</code> and <code>csvmidi</code></a>. The former takes a binary MIDI file and transforms it into a plaintext CSV file, and the latter does the opposite. If it worked, this looked like it would be perfect. It would take no time to write up a short script to manipulate the CSV and transform it back into a MIDI, and it should be pretty easy to apply whatever I figured out here to other files in the future. First, though, a test: if I was going to be round-tripping this through CSV and back again, could I convert it from MIDI to CSV to back again and have it be the same?</p>
 
-<p><figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
 <span class='line-number'>2</span>
 <span class='line-number'>3</span>
 <span class='line-number'>4</span>
@@ -123,13 +124,14 @@
 </span><span class='line'>SHA-256 (01.mid) = 617a8e8144c1d7da0c2be712635a61cdccbfa49dd3c2c5e50942247dc26a7a6a
 </span><span class='line'>$ midicsv 01.mid 01.csv
 </span><span class='line'>$ csvmidi 01.csv 01-roundtripped.mid
-</span><span class='line'>SHA-256 (01-roundtripped.mid) = 617a8e8144c1d7da0c2be712635a61cdccbfa49dd3c2c5e50942247dc26a7a6a</span></code></pre></td></tr></table></div></figure></p>
+</span><span class='line'>SHA-256 (01-roundtripped.mid) = 617a8e8144c1d7da0c2be712635a61cdccbfa49dd3c2c5e50942247dc26a7a6a</span></code></pre></td></tr></table></div></figure>
+
 
 <p>Yes! The files are byte-identical. I should be able to trust that any changes in the output file are the ones I want.</p>
 
 <p>Now that I know this workflow looks viable, let&rsquo;s take a look at that CSV output:</p>
 
-<p><figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
 <span class='line-number'>2</span>
 <span class='line-number'>3</span>
 <span class='line-number'>4</span>
@@ -140,13 +142,14 @@
 </span><span class='line'>1, 0, Tempo, 500000
 </span><span class='line'>1, 0, Time_signature, 4, 2, 24, 8
 </span><span class='line'>1, 209, Control_c, 1, 10, 64
-</span><span class='line'>1, 326, System_exclusive, 12, 65, 0, 22, 64, 6, 0, 0, 0, 64, 0, 58, 247</span></code></pre></td></tr></table></div></figure></p>
+</span><span class='line'>1, 326, System_exclusive, 12, 65, 0, 22, 64, 6, 0, 0, 0, 64, 0, 58, 247</span></code></pre></td></tr></table></div></figure>
+
 
 <p>Pretty simple format. As expected, this is raw MIDI data represented in text rather than binary data. MIDI is, essentially, a series of events which occur on a timeline; each of them is a command like, say, &ldquo;play a certain note on a certain channel&rdquo;. Each row in this CSV is an individual command, which makes it very easy for us to find exactly what we want to work with. There&rsquo;s only really two fields that are relevant to us here for what we want to do: the third field is the name of the event, which lets us identify the <code>System_exclusive</code> messages, while the second field is the absolute time at which this event occurs. Since we don&rsquo;t need to actually read the <em>content</em> of the system exclusive messages and don&rsquo;t need to care about any other messages except what timestamp they&rsquo;re at, this is nearly all the information we need for automated MIDI surgery.</p>
 
 <p>That time field requires a little explanation. Since MIDI is a protocol for <em>sequenced</em> music, not <em>recorded</em> music, it&rsquo;s not using an absolute time measurement; it&rsquo;s using a value relative to the song&rsquo;s time signature. This is measured in <a href="https://en.wikipedia.org/wiki/MIDI_beat_clock">&ldquo;MIDI clocks&rdquo;</a>, which are defined as 1/24 of a quarter note. We can turn that into absolute time values using the value defined in the tempo command, which is defined as taking the number of microseconds per quarter note. In this case our <code>Tempo 500000</code> lets us know that each quarter note is 500,000μs (0.5 seconds) and the song plays at a tempo of 120 beats per minute<sup id="fnref:4"><a href="#fn:4" rel="footnote">4</a></sup>, so we can derive what our 40ms interval is in MIDI clock units from that. Given these numbers we can determine that at 120bpm, one MIDI clock is about 20.83ms, so we need at least two MIDI clocks between each system exclusive message to be safe. Now that we&rsquo;ve worked that out, let&rsquo;s take a look at the actual system exclusive messages in this song. This is from the original, unmodified song and represents MIDI messages 29 through 38 in the file.</p>
 
-<p><figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
 <span class='line-number'>2</span>
 <span class='line-number'>3</span>
 <span class='line-number'>4</span>
@@ -165,7 +168,8 @@
 </span><span class='line'>1, 579, System_exclusive_packet, 10, 1, 31, 24, 50, 12, 0, 1, 0, 7, 247
 </span><span class='line'>1, 643, System_exclusive, 255, 65, 16, 22, 66, 5, 6, 0, 1, 32, 24, 50, 12, 0, 1, 0, 1, 33, 24, 50, 12, 0, 1, 0, 1, 34, 24, 50, 12, 0, 1, 0, 1, 35, 24, 50, 12, 0, 1, 0, 2, 19, 24, 50, 12, 0, 1, 0, 1, 37, 24, 50, 12, 0, 1, 0, 1, 38, 24, 50, 12, 0, 1, 0, 1, 39, 24, 50, 12, 0, 1, 0, 1, 40, 24, 50, 12, 0, 1, 0, 2, 17, 24, 50, 12, 0, 1, 0, 1, 42, 24, 50, 12, 0, 1, 0, 2, 11, 24, 50, 12, 0, 1, 0, 1, 44, 24, 50, 12, 0, 1, 0, 1, 45, 24, 50, 12, 0, 1, 0, 1, 46, 24, 50, 12, 0, 1, 0, 1, 47, 24, 50, 12, 0, 1, 0, 2, 9, 24, 50, 12, 0, 1, 0, 1, 49, 24, 50, 12, 0, 1, 0, 1, 50, 24, 50, 12, 0, 1, 0, 1, 51, 24, 50, 12, 0, 1, 0, 1, 52, 24, 50, 12, 0, 1, 0, 1, 53, 24, 50, 12, 0, 1, 0, 1, 54, 24, 50, 12, 0, 1, 0, 2, 13, 24, 50, 12, 0, 1, 0, 2, 10, 24, 50, 12, 0, 0, 0, 2, 12, 24, 50, 12, 0, 1, 0, 2, 16, 24, 50, 12, 0, 1, 0, 2, 4, 24, 50, 12, 0, 1, 0, 2, 8, 24, 50, 12, 0, 1, 0, 2, 2, 24, 50, 12, 0, 1, 0, 2, 7, 24, 50, 12, 0, 1, 0
 </span><span class='line'>1, 645, System_exclusive_packet, 10, 2, 1, 12, 50, 12, 0, 0, 0, 64, 247
-</span><span class='line'>1, 647, System_exclusive, 5, 65, 16, 22, 69, 247</span></code></pre></td></tr></table></div></figure></p>
+</span><span class='line'>1, 647, System_exclusive, 5, 65, 16, 22, 69, 247</span></code></pre></td></tr></table></div></figure>
+
 
 <p>Taking a look at those gaps, this seemed&hellip; less problematic than I expected. This shows gaps between system exclusive messages of at most 118 ticks and at least 2. The two-clock gaps are pretty close to the line, but it looks like everything should be at least above our 40ms target. I tried adjusting the timing to push them out by a minimum of three clocks, but in this case I wasn&rsquo;t seeing the improvements I was hoping for. The MT-32 was still displaying an &ldquo;Exc. Checksum Error&rdquo; as it parsed these messages. So if it&rsquo;s not <em>just</em> the timing, what else could it be?</p>
 
@@ -177,15 +181,17 @@
 
 <p>In other words, it looks like what we&rsquo;re seeing here is a set of system exclusive messages that have been chunked into smaller sizes: each of them has been capped at 256 bytes maximum (255 bytes plus one byte to indicate the length), and if the <em>total size</em> of a single system exclusive message is longer than 255 bytes, then the remaining bytes are sent in a followup message. Looking up documentation online, such as <a href="http://midi.teragonaudio.com/tech/midifile/evts.htm">in this Standard MIDI File Format guide</a>, let me confirm that this is unusual but perfectly valid behaviour and that we should be reading the full thing together as a single message. If we still assume we&rsquo;re seeing some kind of weird timing error with the MT-32, what if we try joining these messages together into a single system exclusive message? In other words, we take these two messages:</p>
 
-<p><figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
 <span class='line-number'>2</span>
 </pre></td><td class='code'><pre><code class=''><span class='line'>1, 509, System_exclusive, 255, 65, 16, 22, 66, 5, 0, 0, 0, 0, 24, 50, 12, 0, 1, 0, 0, 1, 24, 50, 12, 0, 1, 0, 0, 2, 24, 50, 12, 0, 1, 0, 0, 3, 24, 50, 12, 0, 1, 0, 0, 4, 24, 50, 12, 0, 1, 0, 0, 5, 24, 50, 12, 0, 1, 0, 0, 6, 24, 50, 12, 0, 1, 0, 0, 7, 24, 50, 12, 0, 1, 0, 0, 8, 24, 50, 12, 0, 1, 0, 0, 9, 24, 50, 12, 0, 1, 0, 0, 10, 24, 50, 12, 0, 1, 0, 0, 11, 24, 50, 12, 0, 1, 0, 0, 12, 24, 50, 12, 0, 1, 0, 0, 13, 24, 50, 12, 0, 1, 0, 2, 6, 24, 50, 12, 0, 1, 0, 0, 15, 24, 50, 12, 0, 1, 0, 0, 16, 24, 50, 12, 0, 1, 0, 0, 17, 24, 50, 12, 0, 1, 0, 0, 18, 24, 50, 12, 0, 1, 0, 0, 19, 24, 50, 12, 0, 1, 0, 0, 20, 24, 50, 12, 0, 1, 0, 0, 21, 24, 50, 12, 0, 1, 0, 0, 22, 24, 50, 12, 0, 1, 0, 0, 23, 24, 50, 12, 0, 1, 0, 0, 24, 24, 50, 12, 0, 1, 0, 0, 25, 24, 50, 12, 0, 1, 0, 0, 26, 24, 50, 12, 0, 1, 0, 0, 27, 24, 50, 12, 0, 1, 0, 0, 28, 24, 50, 12, 0, 1, 0, 0, 29, 24, 50, 12, 0, 1, 0, 0, 30, 24, 50, 12, 0, 1, 0
-</span><span class='line'>1, 512, System_exclusive_packet, 10, 0, 31, 24, 50, 12, 0, 1, 0, 49, 247</span></code></pre></td></tr></table></div></figure></p>
+</span><span class='line'>1, 512, System_exclusive_packet, 10, 0, 31, 24, 50, 12, 0, 1, 0, 49, 247</span></code></pre></td></tr></table></div></figure>
+
 
 <p>And transform them into this:</p>
 
-<p><figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-</pre></td><td class='code'><pre><code class=''><span class='line'>1, 509, System_exclusive, 265, 65, 16, 22, 66, 5, 0, 0, 0, 0, 24, 50, 12, 0, 1, 0, 0, 1, 24, 50, 12, 0, 1, 0, 0, 2, 24, 50, 12, 0, 1, 0, 0, 3, 24, 50, 12, 0, 1, 0, 0, 4, 24, 50, 12, 0, 1, 0, 0, 5, 24, 50, 12, 0, 1, 0, 0, 6, 24, 50, 12, 0, 1, 0, 0, 7, 24, 50, 12, 0, 1, 0, 0, 8, 24, 50, 12, 0, 1, 0, 0, 9, 24, 50, 12, 0, 1, 0, 0, 10, 24, 50, 12, 0, 1, 0, 0, 11, 24, 50, 12, 0, 1, 0, 0, 12, 24, 50, 12, 0, 1, 0, 0, 13, 24, 50, 12, 0, 1, 0, 2, 6, 24, 50, 12, 0, 1, 0, 0, 15, 24, 50, 12, 0, 1, 0, 0, 16, 24, 50, 12, 0, 1, 0, 0, 17, 24, 50, 12, 0, 1, 0, 0, 18, 24, 50, 12, 0, 1, 0, 0, 19, 24, 50, 12, 0, 1, 0, 0, 20, 24, 50, 12, 0, 1, 0, 0, 21, 24, 50, 12, 0, 1, 0, 0, 22, 24, 50, 12, 0, 1, 0, 0, 23, 24, 50, 12, 0, 1, 0, 0, 24, 24, 50, 12, 0, 1, 0, 0, 25, 24, 50, 12, 0, 1, 0, 0, 26, 24, 50, 12, 0, 1, 0, 0, 27, 24, 50, 12, 0, 1, 0, 0, 28, 24, 50, 12, 0, 1, 0, 0, 29, 24, 50, 12, 0, 1, 0, 0, 30, 24, 50, 12, 0, 1, 0, 0, 31, 24, 50, 12, 0, 1, 0, 49, 247</span></code></pre></td></tr></table></div></figure></p>
+<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+</pre></td><td class='code'><pre><code class=''><span class='line'>1, 509, System_exclusive, 265, 65, 16, 22, 66, 5, 0, 0, 0, 0, 24, 50, 12, 0, 1, 0, 0, 1, 24, 50, 12, 0, 1, 0, 0, 2, 24, 50, 12, 0, 1, 0, 0, 3, 24, 50, 12, 0, 1, 0, 0, 4, 24, 50, 12, 0, 1, 0, 0, 5, 24, 50, 12, 0, 1, 0, 0, 6, 24, 50, 12, 0, 1, 0, 0, 7, 24, 50, 12, 0, 1, 0, 0, 8, 24, 50, 12, 0, 1, 0, 0, 9, 24, 50, 12, 0, 1, 0, 0, 10, 24, 50, 12, 0, 1, 0, 0, 11, 24, 50, 12, 0, 1, 0, 0, 12, 24, 50, 12, 0, 1, 0, 0, 13, 24, 50, 12, 0, 1, 0, 2, 6, 24, 50, 12, 0, 1, 0, 0, 15, 24, 50, 12, 0, 1, 0, 0, 16, 24, 50, 12, 0, 1, 0, 0, 17, 24, 50, 12, 0, 1, 0, 0, 18, 24, 50, 12, 0, 1, 0, 0, 19, 24, 50, 12, 0, 1, 0, 0, 20, 24, 50, 12, 0, 1, 0, 0, 21, 24, 50, 12, 0, 1, 0, 0, 22, 24, 50, 12, 0, 1, 0, 0, 23, 24, 50, 12, 0, 1, 0, 0, 24, 24, 50, 12, 0, 1, 0, 0, 25, 24, 50, 12, 0, 1, 0, 0, 26, 24, 50, 12, 0, 1, 0, 0, 27, 24, 50, 12, 0, 1, 0, 0, 28, 24, 50, 12, 0, 1, 0, 0, 29, 24, 50, 12, 0, 1, 0, 0, 30, 24, 50, 12, 0, 1, 0, 0, 31, 24, 50, 12, 0, 1, 0, 49, 247</span></code></pre></td></tr></table></div></figure>
+
 
 <p>That retains all of the data from the two events except that it strips the length indicator byte from the <code>System_exclusive_packet</code> before joining the rest of its bytes to the previous message. So I tried playing <em>that</em>, and, lo and behold: no more &ldquo;Exc. Checksum Error&rdquo; on the MT-32&rsquo;s display! The file now plays 100% correctly, with no issues. It seems like we&rsquo;ve finally gotten to the bottom of it.</p>
 
@@ -227,25 +233,26 @@
 
 <p>This was a long journey just to find out that nothing was wrong with the MIDIs in the first place. Now that we&rsquo;re finally at our destination, let&rsquo;s listen to some MIDIs, shall we?</p>
 
-<p><iframe width="560" height="315" src="https://www.youtube.com/embed/wT5SONC3gUU?si=Ecvgjv-LSs334eue" title="YouTube video player" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" referrerpolicy="strict-origin-when-cross-origin" allowfullscreen></iframe></p>
+<iframe width="560" height="315" src="https://www.youtube.com/embed/wT5SONC3gUU?si=Ecvgjv-LSs334eue" title="YouTube video player" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" referrerpolicy="strict-origin-when-cross-origin" allowfullscreen></iframe>
 
-<p><hr>
+
+
+<div class="footnotes">
+<hr/>
 <ol>
 <li id="fn:1">
-<p>It specifically uses <a href="https://en.wikipedia.org/wiki/Subtractive_synthesis">subtractive synthesis</a>.<a href="#fnref:1" rev="footnote">&#8617;</a></p></li></p>
+<p>It specifically uses <a href="https://en.wikipedia.org/wiki/Subtractive_synthesis">subtractive synthesis</a>.<a href="#fnref:1" rev="footnote">&#8617;</a></p></li>
+<li id="fn:2">
+<p>These are largely sound effects rather than instruments, though I&rsquo;m sure some songs used them anyway.<a href="#fnref:2" rev="footnote">&#8617;</a></p></li>
+<li id="fn:3">
+<p>Yet. You never know&hellip;<a href="#fnref:3" rev="footnote">&#8617;</a></p></li>
+<li id="fn:4">
+<p>As far as I can tell, 120 beats per minute is also considered the default MIDI tempo unless a file specifies otherwise.<a href="#fnref:4" rev="footnote">&#8617;</a></p></li>
+<li id="fn:5">
+<p>Little compatibility report: TMIDI Player and Falcosoft Midi Player for Windows and Drumstick MIDI File Player for Mac all played these files back correctly. Sweet MIDI Player Pro for Mac and Windows and PXR MIDI Player for Mac both exhibited the same error I&rsquo;d been experiencing. I reported the issue to the developers, both of whom have now fixed it. A fixed version of PXR MIDI Player is out now, and I&rsquo;ve had the chance to test a prerelease of Sweet MIDI Player 1.1.7 which will also fix the issue.<a href="#fnref:5" rev="footnote">&#8617;</a></p></li>
+</ol>
+</div>
 
-<p><li id="fn:2">
-<p>These are largely sound effects rather than instruments, though I&rsquo;m sure some songs used them anyway.<a href="#fnref:2" rev="footnote">&#8617;</a></p></li></p>
-
-<p><li id="fn:3">
-<p>Yet. You never know&hellip;<a href="#fnref:3" rev="footnote">&#8617;</a></p></li></p>
-
-<p><li id="fn:4">
-<p>As far as I can tell, 120 beats per minute is also considered the default MIDI tempo unless a file specifies otherwise.<a href="#fnref:4" rev="footnote">&#8617;</a></p></li></p>
-
-<p><li id="fn:5">
-<p>Little compatibility report: Sweet MIDI Player Pro for Mac and Windows and PXR MIDI Player for Mac both exhibit the same error with these files, while TMIDI Player for Windows and Drumstick MIDI File Player for Mac play them back correctly. And don&rsquo;t worry, I&rsquo;ve submitted bug reports to both players that had the issue.<a href="#fnref:5" rev="footnote">&#8617;</a></p></li>
-</ol></p>
 </div>
   
   
